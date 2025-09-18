@@ -1,0 +1,10 @@
+{
+	"files.exclude": {
+		".godot/": true,
+		"**/*.import": true,
+		"**/*.uid": true
+	},
+	"editor.formatOnSave": true,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false
+}
