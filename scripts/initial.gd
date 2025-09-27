@@ -11,3 +11,9 @@ func _ready():
 	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+	var input_handler = InputHandler.new()
+	add_child(input_handler)
+	input_handler.pressed.connect(func(position):
+		print(position)
+	)
