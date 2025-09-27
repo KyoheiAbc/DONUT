@@ -4,7 +4,7 @@ extends Node
 signal pressed(position: Vector2)
 signal direction(direction: Vector2)
 
-static var THRESHOLD: int = 100
+static var THRESHOLD: int = 50
 
 var valid_area: Rect2 = Rect2(-4000, -4000, 8000, 8000)
 

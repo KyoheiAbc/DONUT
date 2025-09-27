@@ -1,6 +1,7 @@
 class_name Main
 extends Node
 
+static var WINDOW: Vector2 = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
 static var ROOT: Node
 
 func _ready():
