@@ -2,4 +2,6 @@
 *.import
 *.uid
 
+assets/*_edited.png
+
 *.DS_Store
