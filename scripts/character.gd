@@ -58,7 +58,7 @@ func _ready():
 	button.pressed.connect(func() -> void:
 		Main.show_black(0.1)
 		self.queue_free()
-		Main.ROOT.add_child(Initial.new())
+		Main.ROOT.add_child(Option.new())
 	)
 
 	var input_handler = InputHandler.new()
