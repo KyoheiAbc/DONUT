@@ -21,3 +21,6 @@ static func show_black(duration: float) -> void:
 	rect.color = Color.from_hsv(0, 0, 0, 0.5)
 	await Main.ROOT.get_tree().create_timer(duration).timeout
 	canvas.queue_free()
+
+static func set_position(control: Control, position: Vector2) -> void:
+	control.position = position - control.size / 2

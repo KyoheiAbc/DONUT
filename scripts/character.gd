@@ -45,7 +45,7 @@ func _ready():
 		add_child(cursor)
 		cursor.color = Color.from_hsv(i * 0.5, 1, 1, 1)
 		cursor.size = Vector2(220, 220)
-		cursor.position = sprites[i].position - cursor.size / 2
+		Main.set_position(cursor, sprites[i].position)
 		cursor.z_index = -1
 		cursors.append(cursor)
 
@@ -54,7 +54,7 @@ func _ready():
 	button.add_theme_font_size_override("font_size", 32)
 	button.text = "OK"
 	button.size = Vector2(200, 100)
-	button.position = Vector2(Main.WINDOW.x / 2 - button.size.x / 2, Main.WINDOW.y - button.size.y * 1.5)
+	Main.set_position(button, Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.9))
 	button.pressed.connect(func() -> void:
 		Main.show_black(0.1)
 		self.queue_free()
