@@ -12,6 +12,9 @@ var next_donut_count: int = 0
 
 var move_down_enable: bool = true
 
+var game_over: bool = false
+var enable_exit: bool = false
+
 func _ready():
 	var rect = ColorRect.new()
 	add_child(rect)
@@ -49,6 +52,12 @@ func _ready():
 			Donut.move(target_donut, direction * 100, donuts)
 	)
 	input_manager_left.pressed.connect(func(position: Vector2) -> void:
+		if game_over:
+			if enable_exit:
+				Main.show_black(0.1)
+				self.queue_free()
+				Main.ROOT.add_child(Character.new())
+			return
 		move_down_enable = true
 	)
 
@@ -59,6 +68,12 @@ func _ready():
 	add_child(input_manager_right)
 	input_manager_right.valid_area = Rect2(Main.WINDOW.x * 0.75, -4000, 8000, 8000)
 	input_manager_right.pressed.connect(func(position: Vector2) -> void:
+		if game_over:
+			if enable_exit:
+				Main.show_black(0.1)
+				self.queue_free()
+				Main.ROOT.add_child(Initial.new())
+			return
 		target_donut.value = randi() % 5
 		target_donut.sprite.modulate = Color.from_hsv(target_donut.value / 5.0, 0.5, 1)
 	)
@@ -78,7 +93,7 @@ func _ready():
 	add_child(label)
 	set_process(false)
 	label.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
-	label.add_theme_font_size_override("font_size", 128)
+	label.add_theme_font_size_override("font_size", 256)
 	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -91,6 +106,9 @@ func _ready():
 	set_process(true)
 
 func _process(_delta: float) -> void:
+	if game_over:
+		return
+
 	for donut in donuts:
 		if donut == target_donut:
 			continue
@@ -106,6 +124,27 @@ func _process(_delta: float) -> void:
 		target_donut = Donut.new(randi() % 4)
 		add_child(target_donut)
 		target_donut.pos = Vector2(250, 50)
+		target_donut.render()
 		donuts.append(target_donut)
+		if Donut.get_colliding_donut(target_donut, donuts) != null:
+			target_donut.queue_free()
+			var tween = sprites[0].create_tween().set_loops()
+			tween.tween_property(sprites[0], "rotation", 2 * PI, 1.5).as_relative()
+
+			var label = Label.new()
+			add_child(label)
+			label.size = Main.WINDOW
+			label.add_theme_font_size_override("font_size", 256)
+			label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			label.text = "GAME OVER"
+			game_over = true
+
+			var timer = get_tree().create_timer(2.0)
+			timer.timeout.connect(func() -> void:
+				enable_exit = true
+			)
+			return
 
 	clearer.process(donuts)
