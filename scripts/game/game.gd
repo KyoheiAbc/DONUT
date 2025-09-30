@@ -76,7 +76,7 @@ func _ready():
 	clearer.cleared.connect(func(count: int) -> void:
 		if count > 0:
 			jump(sprites[0], Vector2(0, -150), 0.35)
-			bot.hp.value = max(bot.hp.value - 30, 0)
+			bot.hp.value = max(bot.hp.value - 10, 0)
 			if bot.hp.value <= 0:
 				var tween = sprites[1].create_tween().set_loops()
 				tween.tween_property(sprites[1], "rotation", 2 * PI, 1.5).as_relative()
@@ -108,7 +108,7 @@ func _ready():
 				self.queue_free()
 				Main.ROOT.add_child(Initial.new())
 			return
-		target_donut.value = randi() % 5
+		target_donut.value = randi() % 4
 		target_donut.sprite.modulate = Color.from_hsv(target_donut.value / 5.0, 0.5, 1)
 	)
 

@@ -5,6 +5,29 @@ signal cleared(count: int)
 signal clear_donuts_detected
 
 var wait_count: int = 0
+var combo: int = 0
+var clear_text_count: int = 0
+var label: Label
+
+func _init() -> void:
+	label = Label.new()
+	add_child(label)
+	label.position = Vector2(1400, 50)
+	label.add_theme_font_size_override("font_size", 96)
+	label.add_theme_color_override("font_color", Color(1, 1, 0))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+func _process(_delta: float) -> void:
+	if combo >= 1:
+		label.add_theme_color_override("font_color", Color(1, 1, 0, 1))
+		label.text = "%dx COMBO!" % combo
+		clear_text_count = 0
+	else:
+		clear_text_count += 1
+		label.add_theme_color_override("font_color", Color(1, 1, 0, max(0, 1 - clear_text_count / 60.0)))
+		if clear_text_count > 60:
+			label.text = ""
 
 func process(donuts: Array[Donut]) -> void:
 	if should_clear(donuts):
@@ -12,9 +35,13 @@ func process(donuts: Array[Donut]) -> void:
 		if wait_count > 60:
 			clear_marked_donuts(donuts)
 			wait_count = 0
+			combo += 1
 		return
 
 	wait_count = 0
+
+	if not all_donuts_stopped(donuts.back(), donuts):
+		return
 
 	var size = Vector2(6, 12)
 	var grid = []
@@ -41,6 +68,16 @@ func process(donuts: Array[Donut]) -> void:
 					var grid_pos = Vector2(int(donut.pos.x / 100), int(donut.pos.y / 100))
 					if grid_pos.x == x and grid_pos.y == y:
 						donut.to_clear = true
+
+func all_donuts_stopped(target_donut: Donut, donuts: Array[Donut]) -> bool:
+	for donut in donuts:
+		if donut == target_donut:
+			continue
+		if donut.value == -1:
+			continue
+		if donut.freeze_count < 30:
+			return false
+	return true
 
 func should_clear(donuts: Array[Donut]) -> bool:
 	for donut in donuts:
@@ -100,5 +137,7 @@ func find_large_groups(input: Array, find_threshold: int) -> Array:
 						result[pos.y][pos.x] = 1
 	if detected:
 		emit_signal("clear_donuts_detected")
+	else:
+		combo = 0
 
 	return result
