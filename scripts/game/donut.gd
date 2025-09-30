@@ -7,6 +7,8 @@ static var POSITION_OFFSET = Vector2(1000, 500 - SPRITE_SIZE.y * 6)
 var value: int
 var pos: Vector2
 
+var to_clear: bool = false
+
 var freeze_count: int
 
 var node: Node2D
@@ -28,6 +30,12 @@ func _init(_value: int):
 
 func process(donuts: Array[Donut]) -> void:
 	if value == -1:
+		return
+
+	if to_clear:
+		sprite.scale.y = 1.3
+		sprite.scale.x = 0.7
+		render()
 		return
 
 	if move(self, Vector2(0, 10), donuts) == Vector2.ZERO:

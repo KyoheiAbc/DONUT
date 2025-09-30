@@ -1,8 +1,18 @@
 class_name Clearer
 extends Node
 
+var wait_count: int = 0
+	
+func process(donuts: Array[Donut]) -> void:
+	if should_clear(donuts):
+		wait_count += 1
+		if wait_count > 60:
+			clear_marked_donuts(donuts)
+			wait_count = 0
+		return
 
-static func clean(donuts: Array[Donut]) -> int:
+	wait_count = 0
+
 	var size = Vector2(6, 12)
 	var grid = []
 	for y in range(size.y):
@@ -12,7 +22,7 @@ static func clean(donuts: Array[Donut]) -> int:
 	for donut in donuts:
 		if donut.value == -1:
 			continue
-		if donut.freeze_count < 60:
+		if donut.freeze_count < 30:
 			continue
 		var grid_pos = Vector2(int(donut.pos.x / 100), int(donut.pos.y / 100))
 		if grid_pos.x < 0 or grid_pos.x >= size.x or grid_pos.y < 0 or grid_pos.y >= size.y:
@@ -21,18 +31,28 @@ static func clean(donuts: Array[Donut]) -> int:
 
 	var to_clear = find_large_groups(grid, 3)
 
-	var cleared_count = 0
 	for y in range(size.y):
 		for x in range(size.x):
 			if to_clear[y][x] == 1:
 				for donut in donuts:
 					var grid_pos = Vector2(int(donut.pos.x / 100), int(donut.pos.y / 100))
 					if grid_pos.x == x and grid_pos.y == y:
-						cleared_count += 1
-						donuts.erase(donut)
-						donut.queue_free()
+						donut.to_clear = true
 
-	return cleared_count
+func should_clear(donuts: Array[Donut]) -> bool:
+	for donut in donuts:
+		if donut.to_clear:
+			return true
+	return false
+
+func clear_marked_donuts(donuts: Array[Donut]) -> void:
+	var to_remove = []
+	for donut in donuts:
+		if donut.to_clear:
+			to_remove.append(donut)
+	for donut in to_remove:
+		donuts.erase(donut)
+		donut.queue_free()
 
 static func find_large_groups(input: Array, find_threshold: int) -> Array:
 	var size = Vector2(input[0].size(), input.size())

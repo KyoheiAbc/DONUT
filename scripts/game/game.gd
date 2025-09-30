@@ -5,6 +5,8 @@ var sprites: Array[Sprite2D] = []
 
 var donuts: Array[Donut] = []
 
+var clearer: Clearer
+
 var target_donut: Donut
 var next_donut_count: int = 0
 
@@ -49,6 +51,9 @@ func _ready():
 	input_manager_left.pressed.connect(func(position: Vector2) -> void:
 		move_down_enable = true
 	)
+
+	clearer = Clearer.new()
+	add_child(clearer)
 
 	var input_manager_right = InputHandler.new()
 	add_child(input_manager_right)
@@ -102,3 +107,5 @@ func _process(_delta: float) -> void:
 		add_child(target_donut)
 		target_donut.pos = Vector2(250, 50)
 		donuts.append(target_donut)
+
+	clearer.process(donuts)
