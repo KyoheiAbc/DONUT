@@ -60,10 +60,44 @@ func _ready():
 			return
 		move_down_enable = true
 	)
+	var node = Node2D.new()
+	add_child(node)
+	node.position = Vector2(650, 750)
+	sprites.append(Sprite2D.new())
+	node.add_child(sprites.back())
+	sprites.back().texture = load(Character.SPRITE_PATHS[Character.CHARACTER_INDEXES[0]])
+
+	var bot = Bot.new()
+	add_child(bot)
+	sprites.append(bot.sprite)
 
 	clearer = Clearer.new()
 	add_child(clearer)
+	clearer.cleared.connect(func(count: int) -> void:
+		if count > 0:
+			jump(sprites[0], Vector2(0, -150), 0.35)
+			bot.hp.value = max(bot.hp.value - 30, 0)
+			if bot.hp.value <= 0:
+				var tween = sprites[1].create_tween().set_loops()
+				tween.tween_property(sprites[1], "rotation", 2 * PI, 1.5).as_relative()
 
+				var label = Label.new()
+				add_child(label)
+				label.size = Main.WINDOW
+				label.add_theme_font_size_override("font_size", 256)
+				label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+				label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+				label.text = "GAME OVER"
+				game_over = true
+
+				var timer = get_tree().create_timer(2.0)
+				timer.timeout.connect(func() -> void:
+					enable_exit = true
+				)
+				return
+	)
+	
 	var input_manager_right = InputHandler.new()
 	add_child(input_manager_right)
 	input_manager_right.valid_area = Rect2(Main.WINDOW.x * 0.75, -4000, 8000, 8000)
@@ -77,17 +111,6 @@ func _ready():
 		target_donut.value = randi() % 5
 		target_donut.sprite.modulate = Color.from_hsv(target_donut.value / 5.0, 0.5, 1)
 	)
-
-	var node = Node2D.new()
-	add_child(node)
-	node.position = Vector2(650, 750)
-	sprites.append(Sprite2D.new())
-	node.add_child(sprites.back())
-	sprites.back().texture = load(Character.SPRITE_PATHS[Character.CHARACTER_INDEXES[0]])
-
-	var bot = Bot.new()
-	add_child(bot)
-	sprites.append(bot.sprite)
 
 	var label = Label.new()
 	add_child(label)
@@ -148,3 +171,9 @@ func _process(_delta: float) -> void:
 			return
 
 	clearer.process(donuts)
+
+
+static func jump(sprite: Sprite2D, delta: Vector2, time: float):
+	var tween = sprite.get_tree().create_tween()
+	tween.tween_property(sprite, "position", delta, time * 0.5).as_relative()
+	tween.tween_property(sprite, "position", Vector2.ZERO, time * 0.5)

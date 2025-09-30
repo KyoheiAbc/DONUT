@@ -1,8 +1,11 @@
 class_name Clearer
 extends Node
 
+signal cleared(count: int)
+signal clear_donuts_detected
+
 var wait_count: int = 0
-	
+
 func process(donuts: Array[Donut]) -> void:
 	if should_clear(donuts):
 		wait_count += 1
@@ -46,15 +49,18 @@ func should_clear(donuts: Array[Donut]) -> bool:
 	return false
 
 func clear_marked_donuts(donuts: Array[Donut]) -> void:
+	var count = 0
 	var to_remove = []
 	for donut in donuts:
 		if donut.to_clear:
 			to_remove.append(donut)
 	for donut in to_remove:
+		count += 1
 		donuts.erase(donut)
 		donut.queue_free()
+	emit_signal("cleared", count)
 
-static func find_large_groups(input: Array, find_threshold: int) -> Array:
+func find_large_groups(input: Array, find_threshold: int) -> Array:
 	var size = Vector2(input[0].size(), input.size())
 	var visited = []
 	var result = []
@@ -67,6 +73,7 @@ static func find_large_groups(input: Array, find_threshold: int) -> Array:
 
 	var directions = [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
 
+	var detected: bool = false
 	for y in range(size.y):
 		for x in range(size.x):
 			if not visited[y][x]:
@@ -88,7 +95,10 @@ static func find_large_groups(input: Array, find_threshold: int) -> Array:
 							if input[new_pos.y][new_pos.x] == value and not visited[new_pos.y][new_pos.x]:
 								stack.append(new_pos)
 				if group.size() >= find_threshold:
+					detected = true
 					for pos in group:
 						result[pos.y][pos.x] = 1
+	if detected:
+		emit_signal("clear_donuts_detected")
 
 	return result
