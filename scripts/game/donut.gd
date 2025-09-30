@@ -32,10 +32,20 @@ func process(donuts: Array[Donut]) -> void:
 
 	if move(self, Vector2(0, 10), donuts) == Vector2.ZERO:
 		freeze_count += 1
+
+		var animation_progress = min(freeze_count, 30) / 30.0 * PI
+		sprite.scale.y = 1 - 0.3 * sin(animation_progress)
+		sprite.scale.x = 1 + 0.3 * sin(animation_progress)
+		sprite.position.y = 15 * sin(animation_progress)
 	else:
 		freeze_count = 0
 
 	render()
+
+func drop(donuts: Array[Donut]) -> void:
+	while true:
+		if move(self, Vector2(0, 100), donuts) == Vector2.ZERO:
+			break
 
 func render() -> void:
 	node.position = pos / 100 * SPRITE_SIZE + POSITION_OFFSET

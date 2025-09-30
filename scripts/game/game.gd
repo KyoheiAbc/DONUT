@@ -6,6 +6,9 @@ var sprites: Array[Sprite2D] = []
 var donuts: Array[Donut] = []
 
 var target_donut: Donut
+var next_donut_count: int = 0
+
+var move_down_enable: bool = true
 
 func _ready():
 	var rect = ColorRect.new()
@@ -26,7 +29,7 @@ func _ready():
 		add_child(donut)
 		donut.sprite.visible = false
 
-	target_donut = Donut.new(randi() % 5)
+	target_donut = Donut.new(randi() % 4)
 	add_child(target_donut)
 	target_donut.pos = Vector2(250, 50)
 	donuts.append(target_donut)
@@ -36,7 +39,15 @@ func _ready():
 	add_child(input_manager_left)
 	input_manager_left.valid_area = Rect2(-4000, -4000, 4000 + Main.WINDOW.x * 0.75, 8000)
 	input_manager_left.direction.connect(func(direction: Vector2) -> void:
-		Donut.move(target_donut, direction * 100, donuts)
+		if direction == Vector2.UP and move_down_enable:
+			move_down_enable = false
+			target_donut.drop(donuts)
+			next_donut_count = 60
+		elif direction != Vector2.UP:
+			Donut.move(target_donut, direction * 100, donuts)
+	)
+	input_manager_left.pressed.connect(func(position: Vector2) -> void:
+		move_down_enable = true
 	)
 
 	var input_manager_right = InputHandler.new()
@@ -80,12 +91,14 @@ func _process(_delta: float) -> void:
 			continue
 		donut.process(donuts)
 
-	target_donut.process(donuts)
-	
-	if target_donut.freeze_count >= 60:
-		target_donut = Donut.new(randi() % 5)
+	if Donut.move(target_donut, Vector2(0, 10), donuts) == Vector2.ZERO:
+		next_donut_count += 1
+	else:
+		next_donut_count = 0
+	target_donut.render()
+
+	if next_donut_count >= 60:
+		target_donut = Donut.new(randi() % 4)
 		add_child(target_donut)
 		target_donut.pos = Vector2(250, 50)
 		donuts.append(target_donut)
-
-	Clearer.clean(donuts)
