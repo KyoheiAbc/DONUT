@@ -7,7 +7,6 @@ var donuts: Array[Donut] = []
 
 var target_donut: Donut
 
-
 func _ready():
 	var rect = ColorRect.new()
 	add_child(rect)
@@ -17,19 +16,15 @@ func _ready():
 	
 	for y in range(16):
 		donuts.append(Donut.new(-1))
-		add_child(donuts.back())
 		donuts.back().pos = Vector2(-50, 100 * y + 50 - 300)
-		donuts.back().sprite.visible = false
-	for y in range(16):
 		donuts.append(Donut.new(-1))
-		add_child(donuts.back())
 		donuts.back().pos = Vector2(650, 100 * y + 50 - 300)
-		donuts.back().sprite.visible = false
 	for x in range(6):
 		donuts.append(Donut.new(-1))
-		add_child(donuts.back())
 		donuts.back().pos = Vector2(100 * x + 50, 1250)
-		donuts.back().sprite.visible = false
+	for donut in donuts:
+		add_child(donut)
+		donut.sprite.visible = false
 
 	target_donut = Donut.new(randi() % 5)
 	add_child(target_donut)
@@ -51,6 +46,7 @@ func _ready():
 		target_donut.value = randi() % 5
 		target_donut.sprite.modulate = Color.from_hsv(target_donut.value / 5.0, 0.5, 1)
 	)
+
 	var node = Node2D.new()
 	add_child(node)
 	node.position = Vector2(650, 750)
@@ -85,6 +81,7 @@ func _process(_delta: float) -> void:
 		donut.process(donuts)
 
 	target_donut.process(donuts)
+	
 	if target_donut.freeze_count >= 60:
 		target_donut = Donut.new(randi() % 5)
 		add_child(target_donut)
