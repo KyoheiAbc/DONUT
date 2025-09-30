@@ -36,10 +36,20 @@ func _ready():
 	hp = GameVSlider.new(Vector2(40, 400), Color(0, 1, 0))
 	node.add_child(hp)
 	Main.set_position(hp, Vector2(280, 0))
+	hp.value = 100
+	hp.min_value = 0
+	hp.max_value = 100
+	hp.step = 1
+	hp.editable = false
 
 	attack = GameVSlider.new(Vector2(40, 400), Color(1, 0.5, 0))
 	node.add_child(attack)
 	Main.set_position(attack, Vector2(230, 0))
+	attack.value = 100
+	attack.min_value = 0
+	attack.max_value = 100
+	attack.step = 1
+	attack.editable = false
 
 func _process(_delta: float) -> void:
 	return
