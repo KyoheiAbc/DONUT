@@ -11,6 +11,7 @@ signal game_over()
 static var COLOR_NUMBER = 4
 static var TARGET_DONUT_FREEZE_COUNT = 60
 static var TARGET_DONUT_GRAVITY = 10
+static var CLEAR_WAIT_TIME = 0.5
 
 static var ACTIVE: bool = false
 
@@ -95,6 +96,8 @@ static func all_donuts_are_stopped(target_donut: Donut, donuts: Array[Donut]) ->
 			return false
 		if donut.freeze_count < Donut.FREEZE_COUNT:
 			return false
+		if donut.to_clear:
+			return false
 	return true
 
 static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
@@ -102,6 +105,12 @@ static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
 		if donut.pos == pos:
 			return donut
 	return null
+
+static func copy_donuts_excluding_target(target_donut: Donut, donuts: Array[Donut]) -> Array[Donut]:
+	var result: Array[Donut] = donuts.duplicate()
+	if target_donut != null:
+		result.erase(target_donut)
+	return result
 
 func _process(_delta: float) -> void:
 	if target_donut == null:
@@ -119,9 +128,16 @@ func _process(_delta: float) -> void:
 	donuts_process()
 
 	if all_donuts_are_stopped(target_donut, donuts):
-		var donuts_without_target: Array[Donut] = donuts.duplicate()
-		donuts_without_target.erase(target_donut)
-		var clearable_donuts = Cleaner.find_clearable_donuts(donuts_without_target)
+		var clearable_donuts = Cleaner.find_clearable_donuts(copy_donuts_excluding_target(target_donut, donuts))
 		for donut in clearable_donuts:
-			donuts.erase(donut)
-			donut.queue_free()
+			donut.to_clear = true
+		if clearable_donuts.size() > 0:
+			var timer = Timer.new()
+			add_child(timer)
+			timer.start(CLEAR_WAIT_TIME)
+			timer.timeout.connect(func() -> void:
+				for clearable_donut in clearable_donuts:
+					donuts.erase(clearable_donut)
+					clearable_donut.queue_free()
+				timer.queue_free()
+			)
