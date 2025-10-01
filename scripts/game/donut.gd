@@ -6,6 +6,8 @@ static var POSITION_OFFSET = Vector2(1000, 500 - SPRITE_SIZE.y * 6)
 
 static var GRAVITY = 30
 
+static var FREEZE_COUNT = 30
+
 var value: int
 var pos: Vector2
 
@@ -43,7 +45,7 @@ func process(donuts: Array[Donut]) -> void:
 	if move(self, Vector2(0, GRAVITY), donuts) == Vector2.ZERO:
 		freeze_count += 1
 
-		var animation_progress = min(freeze_count, 30) / 30.0 * PI
+		var animation_progress = min(freeze_count, FREEZE_COUNT) / float(FREEZE_COUNT) * PI
 		sprite.scale.y = 1 - 0.3 * sin(animation_progress)
 		sprite.scale.x = 1 + 0.3 * sin(animation_progress)
 		sprite.position.y = 15 * sin(animation_progress)
@@ -55,6 +57,9 @@ func process(donuts: Array[Donut]) -> void:
 
 func render() -> void:
 	node.position = pos / 100 * SPRITE_SIZE + POSITION_OFFSET
+
+func grid_pos() -> Vector2i:
+	return Vector2i(pos.x / 100, pos.y / 100)
 
 static func move(donut: Donut, delta: Vector2, donuts: Array[Donut]) -> Vector2:
 	var original_position = donut.pos

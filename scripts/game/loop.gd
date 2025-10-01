@@ -12,6 +12,8 @@ static var COLOR_NUMBER = 4
 static var TARGET_DONUT_FREEZE_COUNT = 60
 static var TARGET_DONUT_GRAVITY = 10
 
+static var ACTIVE: bool = true
+
 func _ready():
 	for y in range(16):
 		donuts.append(Donut.new(-1))
@@ -26,6 +28,9 @@ func _ready():
 		donut.sprite.visible = false
 
 	target_donut = spawn_donut()
+
+	await get_tree().create_timer(2.0).timeout
+	setup_input()
 
 func setup_input() -> void:
 	var input_handler = InputHandler.new()
@@ -72,16 +77,49 @@ func donuts_process() -> void:
 			continue
 		donut.process(donuts)
 
+static func all_donuts_are_stopped(target_donut: Donut, donuts: Array[Donut]) -> bool:
+	for donut in donuts:
+		if donut.value == -1:
+			continue
+		if donut == target_donut:
+			continue
+		if get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts) == null:
+			return false
+		if donut.freeze_count < Donut.FREEZE_COUNT:
+			return false
+	return true
+
+static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
+	for donut in donuts:
+		if donut.pos == pos:
+			return donut
+	return null
 
 func _process(_delta: float) -> void:
 	if target_donut == null:
-		target_donut = spawn_donut()
-		if target_donut == null:
-			emit_signal("game_over")
-			set_process(false)
-			return
+		if ACTIVE:
+			target_donut = spawn_donut()
+			if target_donut == null:
+				emit_signal("game_over")
+				set_process(false)
+				return
+		else:
+			if all_donuts_are_stopped(target_donut, donuts):
+				target_donut = spawn_donut()
+				if target_donut == null:
+					emit_signal("game_over")
+					set_process(false)
+					return
 
 
 	target_donut_process()
 
 	donuts_process()
+
+	if all_donuts_are_stopped(target_donut, donuts):
+		var donuts_without_target: Array[Donut] = donuts.duplicate()
+		donuts_without_target.erase(target_donut)
+		var clearable_donuts = Cleaner.find_clearable_donuts(donuts_without_target)
+		for donut in clearable_donuts:
+			donuts.erase(donut)
+			donut.queue_free()

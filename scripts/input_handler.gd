@@ -12,6 +12,8 @@ var sum: Vector2 = Vector2.ZERO
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
+		if not event.pressed:
+			return
 		if event.keycode == KEY_W or event.keycode == KEY_UP:
 			emit_signal("direction", Vector2(0, -1))
 		if event.keycode == KEY_S or event.keycode == KEY_DOWN:

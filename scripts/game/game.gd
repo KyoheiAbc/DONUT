@@ -26,7 +26,6 @@ func _ready():
 
 	set_process(true)
 	loop.set_process(true)
-	loop.setup_input()
 
 	loop.game_over.connect(game_over)
 
