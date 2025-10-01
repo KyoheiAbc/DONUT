@@ -12,7 +12,7 @@ static var COLOR_NUMBER = 4
 static var TARGET_DONUT_FREEZE_COUNT = 60
 static var TARGET_DONUT_GRAVITY = 10
 
-static var ACTIVE: bool = true
+static var ACTIVE: bool = false
 
 func _ready():
 	for y in range(16):
@@ -56,6 +56,14 @@ func spawn_donut() -> Donut:
 	donuts.append(donut)
 	return donut
 
+func next_or_game_over() -> bool:
+	target_donut = spawn_donut()
+	if target_donut == null:
+		emit_signal("game_over")
+		set_process(false)
+		return false
+	return true
+
 func target_donut_process() -> void:
 	if target_donut == null:
 		return
@@ -98,17 +106,11 @@ static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
 func _process(_delta: float) -> void:
 	if target_donut == null:
 		if ACTIVE:
-			target_donut = spawn_donut()
-			if target_donut == null:
-				emit_signal("game_over")
-				set_process(false)
+			if not next_or_game_over():
 				return
 		else:
 			if all_donuts_are_stopped(target_donut, donuts):
-				target_donut = spawn_donut()
-				if target_donut == null:
-					emit_signal("game_over")
-					set_process(false)
+				if not next_or_game_over():
 					return
 
 
