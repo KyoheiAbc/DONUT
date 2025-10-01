@@ -4,23 +4,14 @@ extends Node
 var sprites: Array[Sprite2D] = []
 
 var donuts: Array[Donut] = []
-
-var clearer: Clearer
-
 var target_donut: Donut
-var next_donut_count: int = 0
-
-var move_down_enable: bool = true
-
-var game_over: bool = false
-var enable_exit: bool = false
 
 func _ready():
 	var rect = ColorRect.new()
 	add_child(rect)
 	rect.color = Color(0.3, 0.3, 0.3)
 	rect.size = Vector2(Donut.SPRITE_SIZE.x * 6, Donut.SPRITE_SIZE.y * 12)
-	Main.set_position(rect, Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500))
+	Main.set_control_position(rect, Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500))
 	
 	for y in range(16):
 		donuts.append(Donut.new(-1))
@@ -34,92 +25,11 @@ func _ready():
 		add_child(donut)
 		donut.sprite.visible = false
 
-	target_donut = Donut.new(randi() % 4)
-	add_child(target_donut)
-	target_donut.pos = Vector2(250, 50)
-	donuts.append(target_donut)
-	target_donut.render()
-
-	var input_manager_left = InputHandler.new()
-	add_child(input_manager_left)
-	input_manager_left.valid_area = Rect2(-4000, -4000, 4000 + Main.WINDOW.x * 0.75, 8000)
-	input_manager_left.direction.connect(func(direction: Vector2) -> void:
-		if direction == Vector2.UP and move_down_enable:
-			move_down_enable = false
-			target_donut.drop(donuts)
-			next_donut_count = 60
-		elif direction != Vector2.UP:
-			Donut.move(target_donut, direction * 100, donuts)
-	)
-	input_manager_left.pressed.connect(func(position: Vector2) -> void:
-		if game_over:
-			if enable_exit:
-				Main.show_black(0.1)
-				self.queue_free()
-				Main.ROOT.add_child(Character.new())
-			return
-		move_down_enable = true
-	)
-	var node = Node2D.new()
-	add_child(node)
-	node.position = Vector2(650, 750)
-	sprites.append(Sprite2D.new())
-	node.add_child(sprites.back())
-	sprites.back().texture = load(Character.SPRITE_PATHS[Character.CHARACTER_INDEXES[0]])
-
-	var bot = Bot.new()
-	add_child(bot)
-	sprites.append(bot.sprite)
-
-	clearer = Clearer.new()
-	add_child(clearer)
-	clearer.cleared.connect(func(count: int) -> void:
-		if count > 0:
-			jump(sprites[0], Vector2(0, -150), 0.35)
-			bot.hp.value = max(bot.hp.value - 10, 0)
-			if bot.hp.value <= 0:
-				var tween = sprites[1].create_tween().set_loops()
-				tween.tween_property(sprites[1], "rotation", 2 * PI, 1.5).as_relative()
-
-				var label = Label.new()
-				add_child(label)
-				label.size = Main.WINDOW
-				label.add_theme_font_size_override("font_size", 256)
-				label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-				label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-				label.text = "GAME OVER"
-				game_over = true
-
-				var timer = get_tree().create_timer(2.0)
-				timer.timeout.connect(func() -> void:
-					enable_exit = true
-				)
-				return
-	)
-	
-	var input_manager_right = InputHandler.new()
-	add_child(input_manager_right)
-	input_manager_right.valid_area = Rect2(Main.WINDOW.x * 0.75, -4000, 8000, 8000)
-	input_manager_right.pressed.connect(func(position: Vector2) -> void:
-		if game_over:
-			if enable_exit:
-				Main.show_black(0.1)
-				self.queue_free()
-				Main.ROOT.add_child(Initial.new())
-			return
-		target_donut.value = randi() % 4
-		target_donut.sprite.modulate = Color.from_hsv(target_donut.value / 5.0, 0.5, 1)
-	)
 
 	var label = Label.new()
 	add_child(label)
+	Main.setup_label(label)
 	set_process(false)
-	label.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
-	label.add_theme_font_size_override("font_size", 256)
-	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
@@ -127,53 +37,3 @@ func _ready():
 	await get_tree().create_timer(0.5).timeout
 	label.queue_free()
 	set_process(true)
-
-func _process(_delta: float) -> void:
-	if game_over:
-		return
-
-	for donut in donuts:
-		if donut == target_donut:
-			continue
-		donut.process(donuts)
-
-	if Donut.move(target_donut, Vector2(0, 10), donuts) == Vector2.ZERO:
-		next_donut_count += 1
-	else:
-		next_donut_count = 0
-	target_donut.render()
-
-	if next_donut_count >= 60:
-		target_donut = Donut.new(randi() % 4)
-		add_child(target_donut)
-		target_donut.pos = Vector2(250, 50)
-		target_donut.render()
-		donuts.append(target_donut)
-		if Donut.get_colliding_donut(target_donut, donuts) != null:
-			target_donut.queue_free()
-			var tween = sprites[0].create_tween().set_loops()
-			tween.tween_property(sprites[0], "rotation", 2 * PI, 1.5).as_relative()
-
-			var label = Label.new()
-			add_child(label)
-			label.size = Main.WINDOW
-			label.add_theme_font_size_override("font_size", 256)
-			label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			label.text = "GAME OVER"
-			game_over = true
-
-			var timer = get_tree().create_timer(2.0)
-			timer.timeout.connect(func() -> void:
-				enable_exit = true
-			)
-			return
-
-	clearer.process(donuts)
-
-
-static func jump(sprite: Sprite2D, delta: Vector2, time: float):
-	var tween = sprite.get_tree().create_tween()
-	tween.tween_property(sprite, "position", delta, time * 0.5).as_relative()
-	tween.tween_property(sprite, "position", Vector2.ZERO, time * 0.5)

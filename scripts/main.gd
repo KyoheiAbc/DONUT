@@ -12,6 +12,18 @@ func _ready():
 func ready():
 	ROOT.add_child(Initial.new())
 
+static func setup_label(label: Label) -> void:
+	label.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
+	label.add_theme_font_size_override("font_size", 256)
+	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+static func setup_button(button: Button) -> void:
+	button.add_theme_font_size_override("font_size", 32)
+	button.size = Vector2(200, 100)
+	button.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.9) - button.size / 2
+
 static func show_black(duration: float) -> void:
 	var canvas = CanvasLayer.new()
 	ROOT.add_child(canvas)
@@ -22,5 +34,5 @@ static func show_black(duration: float) -> void:
 	await Main.ROOT.get_tree().create_timer(duration).timeout
 	canvas.queue_free()
 
-static func set_position(control: Control, position: Vector2) -> void:
+static func set_control_position(control: Control, position: Vector2) -> void:
 	control.position = position - control.size / 2
