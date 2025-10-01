@@ -4,6 +4,8 @@ extends Node
 static var SPRITE_SIZE = Vector2(64, 64)
 static var POSITION_OFFSET = Vector2(1000, 500 - SPRITE_SIZE.y * 6)
 
+static var GRAVITY = 30
+
 var value: int
 var pos: Vector2
 
@@ -38,7 +40,7 @@ func process(donuts: Array[Donut]) -> void:
 		render()
 		return
 
-	if move(self, Vector2(0, 10), donuts) == Vector2.ZERO:
+	if move(self, Vector2(0, GRAVITY), donuts) == Vector2.ZERO:
 		freeze_count += 1
 
 		var animation_progress = min(freeze_count, 30) / 30.0 * PI
@@ -50,10 +52,6 @@ func process(donuts: Array[Donut]) -> void:
 
 	render()
 
-func drop(donuts: Array[Donut]) -> void:
-	while true:
-		if move(self, Vector2(0, 100), donuts) == Vector2.ZERO:
-			break
 
 func render() -> void:
 	node.position = pos / 100 * SPRITE_SIZE + POSITION_OFFSET
