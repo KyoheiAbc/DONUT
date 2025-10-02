@@ -5,7 +5,7 @@ var combo: int = 0
 var combo_label: Label
 
 var combo_stop_timer: Timer
-static var COMBO_STOP_TIME = 2.0
+static var COMBO_STOP_TIME = 3.0
 static var COMBO_STOP_IMMEDIATE: bool = true
 
 func _init():

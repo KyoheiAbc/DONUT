@@ -3,8 +3,7 @@ extends SceneTree
 class_name Test
 
 func _init():
-	Loop.test_all_donuts_are_stopped()
-
+	Donut.test_all_donuts_are_stopped()
 	Donut.test_get_colliding_donut()
 	Donut.test_move()
 	

@@ -4,6 +4,10 @@ extends Node
 var elements: Array[Donut]
 var child_relative_pos: Array[Vector2] = [Vector2.UP * 100, Vector2.RIGHT * 100, Vector2.DOWN * 100, Vector2.LEFT * 100]
 
+var freeze_count: int = 0
+static var FREEZE_COUNT = 60
+static var GRAVITY = 10
+
 static func test_donuts_pair():
 	var donuts_pair = DonutsPair.new(Vector2(300, 300))
 	assert(donuts_pair.elements.size() == 2)
@@ -14,11 +18,18 @@ static func test_donuts_pair():
 
 
 func _init(pos: Vector2) -> void:
-	elements = [Donut.new(randi() % Loop.COLOR_NUMBER), Donut.new(randi() % Loop.COLOR_NUMBER)]
+	elements = [Donut.new(randi() % Game.COLOR_NUMBER), Donut.new(randi() % Game.COLOR_NUMBER)]
 	add_child(elements[0])
 	add_child(elements[1])
 	elements[0].pos = pos
 	elements[1].pos = pos + child_relative_pos[0]
+
+func process(all_donuts: Array[Donut]) -> void:
+	if DonutsPair.move(self, Vector2.DOWN * GRAVITY, all_donuts) == Vector2.ZERO:
+		freeze_count += 1
+	else:
+		freeze_count = 0
+	
 
 static func test_move():
 	var donuts: Array[Donut] = []
@@ -125,7 +136,7 @@ static func test_rotation():
 	donuts.append(Donut.new(0))
 	donuts.back().pos = Vector2(200, 300)
 	rotation(donuts_pair, donuts)
-	assert(donuts_pair.elements[0].pos == Vector2(300, 400))
+	assert(donuts_pair.elements[0].pos == Vector2(300, 200))
 	assert(donuts_pair.elements[1].pos == Vector2(300, 300))
 	donuts_pair.queue_free()
 	for donut in donuts:
@@ -148,6 +159,7 @@ static func test_rotation():
 
 static func rotation(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 	var initial_pos = donuts_pair.elements[0].pos
+	var initial_child_pos = donuts_pair.elements[1].pos
 
 	donuts_pair.child_relative_pos.push_back(donuts_pair.child_relative_pos.pop_front())
 	donuts_pair.elements[1].pos = donuts_pair.elements[0].pos
@@ -156,9 +168,9 @@ static func rotation(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 	if Donut.get_colliding_donut(donuts_pair.elements[0], donuts) == null:
 		return
 	
-	donuts_pair.child_relative_pos.push_front(donuts_pair.child_relative_pos.pop_back())
+	donuts_pair.child_relative_pos.push_back(donuts_pair.child_relative_pos.pop_front())
 	donuts_pair.elements[1].pos = initial_pos
-	sync_position(donuts_pair, false, donuts)
+	donuts_pair.elements[0].pos = initial_child_pos
 	return
 
 
@@ -227,3 +239,19 @@ static func sync_position(pair: DonutsPair, to_parent: bool, donuts: Array[Donut
 		return true
 	child_donut.pos = initial_pos
 	return false
+
+
+static func spawn_donuts_pair(all_donuts: Array[Donut], node: Node) -> DonutsPair:
+	var donuts_pair = DonutsPair.new(Vector2(350, 350))
+	node.add_child(donuts_pair)
+	for donut in donuts_pair.elements:
+		all_donuts.append(donut)
+		Donut.render(donut)
+	return donuts_pair
+
+static func copy_all_donuts_except_pair(all_donuts: Array[Donut], donuts_pair: DonutsPair) -> Array[Donut]:
+	var result: Array[Donut] = all_donuts.duplicate()
+	if donuts_pair != null:
+		result.erase(donuts_pair.elements[0])
+		result.erase(donuts_pair.elements[1])
+	return result

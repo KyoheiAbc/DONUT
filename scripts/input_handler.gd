@@ -6,8 +6,6 @@ signal direction(direction: Vector2)
 
 static var THRESHOLD: int = 50
 
-var valid_area: Rect2 = Rect2(-4000, -4000, 8000, 8000)
-
 var sum: Vector2 = Vector2.ZERO
 
 func _input(event: InputEvent) -> void:
@@ -22,10 +20,9 @@ func _input(event: InputEvent) -> void:
 			emit_signal("direction", Vector2(-1, 0))
 		if event.keycode == KEY_D or event.keycode == KEY_RIGHT:
 			emit_signal("direction", Vector2(1, 0))
+		if event.keycode == KEY_SPACE or event.keycode == KEY_ENTER:
+			emit_signal("pressed", Main.WINDOW)
 	
-	if not valid_area.has_point(get_viewport().get_mouse_position()):
-		return
-
 	if event is InputEventScreenTouch:
 		sum = Vector2.ZERO
 		if event.pressed:

@@ -1,68 +1,46 @@
 class_name Donut
-extends Node
+extends Node2D
 
 static var SPRITE_SIZE = Vector2(64, 64)
 static var POSITION_OFFSET = Vector2(1000 - SPRITE_SIZE.x, 500 - SPRITE_SIZE.y * 9)
-
-static var GRAVITY = 30
-
-static var FREEZE_COUNT = 30
 
 const DONUT_TEXTURE: Texture2D = preload("res://assets/donut.png")
 
 var value: int
 var pos: Vector2
-
-var to_clear: bool = false
-
-var freeze_count: int
-
-var node: Node2D
 var sprite: Sprite2D
+
+var freeze_count: int = 0
+static var FREEZE_COUNT = 30
+static var GRAVITY = 20
+var to_clear: bool = false
 
 func _init(_value: int):
 	value = _value
 
-	freeze_count = 0
-
-	node = Node2D.new()
-	add_child(node)
-
 	sprite = Sprite2D.new()
-	node.add_child(sprite)
+	add_child(sprite)
 	sprite.texture = DONUT_TEXTURE
-	if value == 10:
-		sprite.modulate = Color(0.7, 0.7, 0.7)
-	else:
-		sprite.modulate = Color.from_hsv(value / 5.0, 0.5, 1)
+	sprite.modulate = Color.from_hsv(value / 5.0, 0.5, 1)
 
 
-func process(donuts: Array[Donut]) -> void:
+func process(all_donuts: Array[Donut]) -> void:
 	if value == -1:
 		return
 
 	if to_clear:
 		sprite.scale.y = 1.3
 		sprite.scale.x = 0.7
-		render(self)
 		return
 
-	if move(self, Vector2(0, GRAVITY), donuts) == Vector2.ZERO:
+	if move(self, Vector2(0, GRAVITY), all_donuts) == Vector2.ZERO:
 		freeze_count += 1
-
 		var animation_progress = min(freeze_count, FREEZE_COUNT) / float(FREEZE_COUNT) * PI
 		sprite.scale.y = 1 - 0.3 * sin(animation_progress)
 		sprite.scale.x = 1 + 0.3 * sin(animation_progress)
 		sprite.position.y = 15 * sin(animation_progress)
 	else:
 		freeze_count = 0
-
-	render(self)
-
-
-static func render(donut: Donut) -> void:
-	donut.node.position = donut.pos / 100 * SPRITE_SIZE + POSITION_OFFSET
-
 
 static func test_move() -> void:
 	var donuts: Array[Donut] = []
@@ -92,6 +70,9 @@ static func test_move() -> void:
 	for d in donuts:
 		d.queue_free()
 	donuts.clear()
+
+static func render(donut: Donut) -> void:
+	donut.position = donut.pos / 100 * SPRITE_SIZE + POSITION_OFFSET
 
 
 static func move(donut: Donut, delta: Vector2, donuts: Array[Donut]) -> Vector2:
@@ -147,3 +128,49 @@ static func get_colliding_donut(donut: Donut, donuts: Array[Donut]) -> Donut:
 		if rect_a.intersects(rect_b):
 			return other_donut
 	return null
+
+static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
+	for donut in donuts_except_pair:
+		if donut.value == -1:
+			continue
+		if get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts_except_pair) == null:
+			return false
+		if donut.freeze_count < Donut.FREEZE_COUNT:
+			return false
+		if donut.to_clear:
+			return false
+	return true
+
+static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
+	for donut in donuts:
+		if donut.pos == pos:
+			return donut
+	return null
+
+
+static func test_all_donuts_are_stopped() -> void:
+	pass
+
+
+static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> void:
+	var spawn_count = 0
+	var y = 50
+	while true:
+		y -= 100
+		var x_positions = [150, 250, 350, 450, 550, 650]
+		x_positions.shuffle()
+		for x in range(x_positions.size()):
+			print("spawn garbage at ", Vector2(x_positions[x], y))
+			var donut = Donut.new(10)
+			donut.pos = Vector2(x_positions[x], y)
+			if Donut.get_colliding_donut(donut, all_donuts) != null:
+				donut.queue_free()
+				print("  but collision detected, skip")
+				continue
+			all_donuts.append(donut)
+			node.add_child(donut)
+			spawn_count += 1
+			print("  spawned")
+
+			if spawn_count >= count:
+				return
