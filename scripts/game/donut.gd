@@ -150,10 +150,6 @@ static func all_garbage_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 			continue
 		if get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts_except_pair) == null:
 			return false
-		if donut.freeze_count < Donut.FREEZE_COUNT:
-			return false
-		if donut.to_clear:
-			return false
 	return true
 
 static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:

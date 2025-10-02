@@ -34,11 +34,23 @@ func _ready():
 	player_node.add_child(sprite)
 	sprite.texture = Character.SPRITES[Character.CHARACTER_INDEXES[0]]
 
+	var back_button = Button.new()
+	back_button.text = "BACK"
+	Main.setup_button(back_button)
+	Main.set_control_position(back_button, Vector2(128, 64))
+	add_child(back_button)
+	back_button.pressed.connect(func() -> void:
+		Main.show_black(0.1)
+		self.queue_free()
+		Main.ROOT.add_child(Character.new())
+	)
+
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
 	label.text = "GO!"
 	await get_tree().create_timer(0.5).timeout
 	label.queue_free()
+
 
 	set_process(true)
 

@@ -11,17 +11,18 @@ signal attack()
 
 func _process(delta: float) -> void:
 	if donuts_pair == null:
-		if Game.game_over(all_donuts):
-			emit_signal("game_over")
-			set_process(false)
-			return
-
 		if Game.ACTIVE:
 			if Donut.all_garbage_are_stopped(all_donuts):
 				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
 		else:
 			if Donut.all_donuts_are_stopped(all_donuts):
 				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
+
+		if donuts_pair != null:
+			if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
+				emit_signal("game_over")
+				set_process(false)
+				return
 
 	if donuts_pair != null:
 		donuts_pair.process(all_donuts)
