@@ -8,6 +8,8 @@ static var GRAVITY = 30
 
 static var FREEZE_COUNT = 30
 
+const DONUT_TEXTURE: Texture2D = preload("res://assets/donut.png")
+
 var value: int
 var pos: Vector2
 
@@ -28,7 +30,7 @@ func _init(_value: int):
 
 	sprite = Sprite2D.new()
 	node.add_child(sprite)
-	sprite.texture = load("res://assets/donut.png")
+	sprite.texture = DONUT_TEXTURE
 	if value == 10:
 		sprite.modulate = Color(0.7, 0.7, 0.7)
 	else:
