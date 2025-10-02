@@ -21,7 +21,10 @@ func _init(_value: int):
 	sprite = Sprite2D.new()
 	add_child(sprite)
 	sprite.texture = DONUT_TEXTURE
-	sprite.modulate = Color.from_hsv(value / 5.0, 0.5, 1)
+	if value >= 10:
+		sprite.modulate = Color(0.8, 0.8, 0.8)
+	else:
+		sprite.modulate = Color.from_hsv(value / 5.0, 0.5, 1)
 
 
 func process(all_donuts: Array[Donut]) -> void:
@@ -141,6 +144,18 @@ static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 			return false
 	return true
 
+static func all_garbage_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
+	for donut in donuts_except_pair:
+		if donut.value < 10:
+			continue
+		if get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts_except_pair) == null:
+			return false
+		if donut.freeze_count < Donut.FREEZE_COUNT:
+			return false
+		if donut.to_clear:
+			return false
+	return true
+
 static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
 	for donut in donuts:
 		if donut.pos == pos:
@@ -160,17 +175,23 @@ static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> v
 		var x_positions = [150, 250, 350, 450, 550, 650]
 		x_positions.shuffle()
 		for x in range(x_positions.size()):
-			print("spawn garbage at ", Vector2(x_positions[x], y))
 			var donut = Donut.new(10)
 			donut.pos = Vector2(x_positions[x], y)
 			if Donut.get_colliding_donut(donut, all_donuts) != null:
 				donut.queue_free()
-				print("  but collision detected, skip")
 				continue
 			all_donuts.append(donut)
 			node.add_child(donut)
 			spawn_count += 1
-			print("  spawned")
-
 			if spawn_count >= count:
 				return
+
+static func get_around(target: Donut, all_donuts: Array[Donut]) -> Array[Donut]:
+	var result: Array[Donut] = []
+	var directions = [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
+	for dir in directions:
+		var pos = target.pos + dir * 100
+		var donut = get_donut_at_position(pos, all_donuts)
+		if donut != null and donut.value != -1:
+			result.append(donut)
+	return result

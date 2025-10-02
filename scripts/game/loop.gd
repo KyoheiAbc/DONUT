@@ -7,6 +7,7 @@ var all_donuts: Array[Donut] = []
 var score_board: ScoreBoard = null
 
 signal game_over()
+signal attack()
 
 func _process(delta: float) -> void:
 	if donuts_pair == null:
@@ -16,7 +17,8 @@ func _process(delta: float) -> void:
 			return
 
 		if Game.ACTIVE:
-			donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
+			if Donut.all_garbage_are_stopped(all_donuts):
+				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
 		else:
 			if Donut.all_donuts_are_stopped(all_donuts):
 				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
@@ -45,8 +47,17 @@ func _process(delta: float) -> void:
 				for clearable_donut in clearable_donuts[0]:
 					all_donuts.erase(clearable_donut)
 					clearable_donut.queue_free()
+					var around = Donut.get_around(clearable_donut, all_donuts)
+					for around_donut in around:
+						if around_donut.value < 10:
+							continue
+						if around_donut.freeze_count < Donut.FREEZE_COUNT:
+							continue
+						all_donuts.erase(around_donut)
+						around_donut.queue_free()
 				timer.queue_free()
 				score_board.render()
+				emit_signal("attack")
 			)
 		score_board.on_found_clearable_group(clearable_donuts[1])
 

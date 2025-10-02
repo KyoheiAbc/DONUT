@@ -153,6 +153,8 @@ static func find_large_groups(input: Array, find_threshold: int):
 
 				if input[pos.y][pos.x] == -1:
 					continue
+				if input[pos.y][pos.x] >= 10:
+					continue
 
 				for dir in directions:
 					var new_pos = pos + dir

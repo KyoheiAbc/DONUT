@@ -2,7 +2,9 @@ class_name Game
 extends Node
 
 static var COLOR_NUMBER = 3
-static var ACTIVE: bool = false
+static var ACTIVE: bool = true
+
+var is_game_over: bool = false
 
 func _ready():
 	var rect = ColorRect.new()
@@ -21,6 +23,16 @@ func _ready():
 	add_child(loop)
 	loop.set_process(false)
 	loop.donuts_pair = DonutsPair.spawn_donuts_pair(loop.all_donuts, loop)
+
+	var bot = Bot.new()
+	loop.add_child(bot)
+
+	var player_node = Node2D.new()
+	loop.add_child(player_node)
+	player_node.position = Vector2(650, 750)
+	var sprite = Sprite2D.new()
+	player_node.add_child(sprite)
+	sprite.texture = Character.SPRITES[Character.CHARACTER_INDEXES[0]]
 
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
@@ -46,7 +58,10 @@ func _ready():
 	input_handler.direction.connect(func(direction: Vector2) -> void:
 		if loop.donuts_pair == null:
 			return
-		DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts)
+		if direction == Vector2.UP:
+			DonutsPair.hard_drop(loop.donuts_pair, loop.all_donuts)
+		else:
+			DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts)
 	)
 	input_handler.pressed.connect(func(position: Vector2) -> void:
 		if loop.donuts_pair == null:
@@ -55,25 +70,50 @@ func _ready():
 			DonutsPair.rotation(loop.donuts_pair, loop.all_donuts)
 	)
 
-	loop.game_over.connect(show_game_over)
+	loop.game_over.connect(func() -> void:
+		Main.start_rotation_loop(sprite)
+		show_game_over()
+	)
 
 	loop.score_board = ScoreBoard.new()
 	add_child(loop.score_board)
 
 	var garbage_timer = Timer.new()
 	add_child(garbage_timer)
-	garbage_timer.start(5.0)
+	garbage_timer.start(Bot.SPEED)
 	garbage_timer.timeout.connect(func() -> void:
-		Donut.spawn_garbage(randi() % 8 + 1, loop.all_donuts, loop)
+		if is_game_over:
+			return
+		Donut.spawn_garbage(randi() % Bot.ATTACK + 1, loop.all_donuts, loop)
+		# Donut.spawn_garbage(12, loop.all_donuts, loop)
+		Main.jump(bot.sprite, Vector2(0, 180), 0.3)
 	)
 
+	loop.attack.connect(func() -> void:
+		Main.jump(sprite, Vector2(0, -180), 0.3)
+		bot.hp.value = max(bot.hp.value - loop.score_board.combo * loop.score_board.combo, 0)
+	)
+
+	bot.game_over.connect(func() -> void:
+		if is_game_over:
+			return
+		loop.set_process(false)
+		Main.start_rotation_loop(bot.sprite)
+		show_game_over()
+	)
+
+
 static func game_over(all_donuts: Array[Donut]) -> bool:
+	if not Donut.all_donuts_are_stopped(all_donuts):
+		return false
 	for donut in all_donuts:
 		if donut.pos == Vector2(350, 350):
 			return true
 	return false
 
 func show_game_over() -> void:
+	is_game_over = true
+
 	var label = Label.new()
 	label.text = "GAME OVER"
 	Main.setup_label(label)

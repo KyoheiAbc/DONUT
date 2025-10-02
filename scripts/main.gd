@@ -18,6 +18,7 @@ static func setup_label(label: Label) -> void:
 	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.z_index = 256
 
 static func setup_button(button: Button) -> void:
 	button.add_theme_font_size_override("font_size", 32)
@@ -36,3 +37,15 @@ static func show_black(duration: float) -> void:
 
 static func set_control_position(control: Control, position: Vector2) -> void:
 	control.position = position - control.size / 2
+
+static func jump(sprite: Sprite2D, delta: Vector2, duration: float) -> void:
+	var tween = sprite.create_tween()
+	tween.tween_property(sprite, "position", delta, duration * 0.5).as_relative()
+	tween.tween_property(sprite, "position", Vector2.ZERO, duration * 0.5)
+	await tween.finished
+	sprite.position = Vector2.ZERO
+	tween.kill()
+
+static func start_rotation_loop(sprite: Sprite2D) -> void:
+	var tween = sprite.create_tween().set_loops()
+	tween.tween_property(sprite, "rotation", 2 * PI, 1).as_relative()

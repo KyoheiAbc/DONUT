@@ -30,25 +30,40 @@ func _ready():
 	slider.value_changed.connect(func(value): InputHandler.THRESHOLD = value)
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.1, 150))
 
-	# slider = CustomHSlider.new("botHp", Game.BOT_HP, 0, 1000, 10)
-	# add_child(slider)
-	# slider.value_changed.connect(func(value): Game.BOT_HP = value)
-	# Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 150))
+	slider = CustomHSlider.new("colorNum", Game.COLOR_NUMBER, 1, 5, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Game.COLOR_NUMBER = int(value))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.1, 300))
 
-	# slider = CustomHSlider.new("botSpd", Game.BOT_SPD, 0, 1000, 10)
-	# add_child(slider)
-	# slider.value_changed.connect(func(value): Game.BOT_SPD = value)
-	# Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 300))
+	slider = CustomHSlider.new("comboWait", ScoreBoard.COMBO_STOP_TIME, 1, 100, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): ScoreBoard.COMBO_STOP_TIME = value / 10.0)
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.1, 450))
 
-	# for i in [1, 3, 5, 7, 9, 11, 13]:
-	# 	slider = CustomHSlider.new("botCombo" + str(i), Game["BOT_COMBO_" + str(i)], 0, 9, 1)
-	# 	add_child(slider)
-	# 	slider.value_changed.connect(func(value): Game["BOT_COMBO_" + str(i)] = value)
-	# 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.7, 150 + 150 * ((i - 1) / 2)))
-	# 	if i == 11:
-	# 		Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.9, 150))
-	# 	if i == 13:
-	# 		Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.9, 300))
+	slider = CustomHSlider.new("groupSize", Cleaner.GROUP_SIZE_TO_CLEAR, 2, 10, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Cleaner.GROUP_SIZE_TO_CLEAR = int(value))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.3, 150))
+
+	slider = CustomHSlider.new("active", 1 if Game.ACTIVE else 0, 0, 1, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Game.ACTIVE = value == 1)
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.3, 300))
+
+	slider = CustomHSlider.new("botHp", Bot.HP, 1, 300, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Bot.HP = int(value))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 150))
+
+	slider = CustomHSlider.new("botAttack", Bot.ATTACK, 1, 36, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Bot.ATTACK = int(value))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 300))
+
+	slider = CustomHSlider.new("botSpeed", Bot.SPEED, 1, 20, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Bot.SPEED = int(value))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 450))
 
 
 	var button = Button.new()

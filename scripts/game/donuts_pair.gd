@@ -196,6 +196,14 @@ static func move(donuts_pair: DonutsPair, direction: Vector2, donuts: Array[Donu
 	sync_position(donuts_pair, true, donuts_except_pair)
 	return Vector2.ZERO
 
+static func hard_drop(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
+	while true:
+		var moved = move(donuts_pair, Vector2.DOWN * 100, donuts)
+		if moved == Vector2.ZERO:
+			break
+	donuts_pair.freeze_count = FREEZE_COUNT
+
+
 static func test_sync_position():
 	var donuts: Array[Donut] = []
 	var donuts_pair = DonutsPair.new(Vector2(0, 0))
