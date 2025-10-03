@@ -34,7 +34,7 @@ func _ready():
 	node.position = Vector2(650, 250)
 	sprite = Sprite2D.new()
 	node.add_child(sprite)
-	sprite.texture = Character.SPRITES[Character.get_character_index(Character.MAP, 1)]
+	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)]
 
 	hp = GameVSlider.new(Vector2(40, 400), Color(0, 1, 0))
 	node.add_child(hp)

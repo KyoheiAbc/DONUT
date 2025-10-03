@@ -73,12 +73,10 @@ func _ready():
 			Array2D.move_value(MAP, target_index, Vector2(-1, 0))
 	)
 
-static func get_character_index(map: Array, target: int) -> int:
-	return Array2D.vector2_to_value(map, Array2D.get_position(map, target))
 
 func _process(_delta: float) -> void:
 	for i in cursors.size():
-		cursors[i].position = sprites[get_character_index(MAP, i)].position - cursors[i].size / 2
+		cursors[i].position = sprites[Array2D.get_position_value(MAP, i)].position - cursors[i].size / 2
 	for i in SPRITES.size():
-		sprites_a[i].visible = (i == get_character_index(MAP, 0))
-		sprites_b[i].visible = (i == get_character_index(MAP, 1))
+		sprites_a[i].visible = (i == Array2D.get_position_value(MAP, 0))
+		sprites_b[i].visible = (i == Array2D.get_position_value(MAP, 1))

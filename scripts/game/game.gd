@@ -30,7 +30,7 @@ func _ready():
 	player_node.position = Vector2(650, 750)
 	var sprite = Sprite2D.new()
 	player_node.add_child(sprite)
-	sprite.texture = Character.SPRITES[Character.get_character_index(Character.MAP, 0)]
+	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
 	label.text = "GO!"

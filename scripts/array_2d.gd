@@ -24,6 +24,10 @@ static func out_of_bounds(pos: Vector2, array_2d: Array) -> bool:
 static func get_size(array_2d: Array) -> Vector2:
 	return Vector2(array_2d[0].size(), array_2d.size())
 
+static func get_position_value(array_2d: Array, value: int) -> int:
+	var position = get_position(array_2d, value)
+	return vector2_to_value(array_2d, position)
+
 static func get_value(array_2d: Array, position: Vector2):
 	return array_2d[position.y][position.x]
 static func set_value(array_2d: Array, position: Vector2, value) -> void:

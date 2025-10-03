@@ -107,6 +107,11 @@ func test_array_2d():
 	assert(Array2D.value_to_vector2(array_2d, 10) == Vector2(1, 3))
 	assert(Array2D.value_to_vector2(array_2d, 11) == Vector2(2, 3))
 
+	assert(Array2D.get_position_value(array_2d, 5) == 1)
+	assert(Array2D.get_position_value(array_2d, 10) == 4)
+	assert(Array2D.get_position_value(array_2d, 30) == 6)
+	assert(Array2D.get_position_value(array_2d, 20) == 10)
+
 signal test_score_board_completed
 
 func test_score_board() -> void:
