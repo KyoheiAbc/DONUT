@@ -6,7 +6,6 @@ var combo_label: Label
 
 var combo_stop_timer: Timer
 static var COMBO_STOP_TIME = 3.0
-static var COMBO_STOP_IMMEDIATE: bool = true
 
 func _init():
 	combo_label = Label.new()
@@ -36,7 +35,5 @@ func on_found_clearable_group(count: int) -> void:
 	if count == 0:
 		if combo_stop_timer.is_stopped():
 			combo_stop_timer.start()
-			if COMBO_STOP_IMMEDIATE:
-				combo = 0
 	if count > 0:
 		combo_stop_timer.stop()

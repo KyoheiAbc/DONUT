@@ -130,8 +130,27 @@ static func test_find_large_groups():
 		[1, 1, 1, 0],
 		[0, 0, 0, 0],
 	])
-	assert(ret[1] == 3)
-
+	input = [
+		[1, 1, 1],
+		[1, 1, 1],
+		[1, 1, 1],
+	]
+	ret = find_large_groups(input, 1)
+	assert(ret[0] == [
+		[1, 1, 1],
+		[1, 1, 1],
+		[1, 1, 1],
+	])
+	input = [
+		[-1, 1],
+		[1, -1],
+	]
+	ret = find_large_groups(input, 1)
+	assert(ret[0] == [
+		[0, 1],
+		[1, 0],
+	])
+	assert(ret[1] == 2)
 
 static func find_large_groups(input: Array, find_threshold: int):
 	var size = Vector2(input[0].size(), input.size())
@@ -152,8 +171,10 @@ static func find_large_groups(input: Array, find_threshold: int):
 				group.append(pos)
 
 				if input[pos.y][pos.x] == -1:
+					group.pop_back()
 					continue
 				if input[pos.y][pos.x] >= 10:
+					group.pop_back()
 					continue
 
 				for dir in directions:
