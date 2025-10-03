@@ -1,7 +1,7 @@
 class_name Cleaner
 extends Node
 
-static var GROUP_SIZE_TO_CLEAR = 3
+static var GROUP_SIZE_TO_CLEAR = 4
 static var CLEAR_WAIT_TIME = 0.5
 
 static func test_find_clearable_donuts():

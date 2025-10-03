@@ -4,9 +4,14 @@ extends Node
 var sprite: Sprite2D
 var hp: GameVSlider
 
-static var HP = 100
+static var HP = 300
+static var COMBO_TIME = 10
+
+var combo_timer: Timer
 
 signal game_over()
+signal combo_ended(count: int)
+signal combo_doing(count: int)
 
 class GameVSlider extends VSlider:
 	func _init(_size: Vector2, color: Color) -> void:
@@ -28,6 +33,18 @@ class GameVSlider extends VSlider:
 
 		size = _size
 
+func reduce_hp(amount: int) -> void:
+	var tween = hp.create_tween()
+	if hp.value - amount < 0:
+		amount = hp.value
+	tween.tween_property(hp, "value", -amount, 3).as_relative()
+	await tween.finished
+	if hp.value <= 0:
+		emit_signal("game_over")
+
+func _process(delta: float) -> void:
+	pass
+
 func _ready():
 	var node = Node2D.new()
 	add_child(node)
@@ -44,3 +61,15 @@ func _ready():
 	hp.step = 1
 	hp.editable = false
 	hp.value = HP
+
+	combo_timer = Timer.new()
+	add_child(combo_timer)
+	combo_timer.start(COMBO_TIME)
+	combo_timer.timeout.connect(func() -> void:
+		combo_timer.stop()
+		for i in range(3):
+			emit_signal("combo_doing", i + 1)
+			await get_tree().create_timer(1.5).timeout
+		emit_signal("combo_ended", 3)
+		combo_timer.start(COMBO_TIME)
+	)

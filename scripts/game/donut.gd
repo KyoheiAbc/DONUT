@@ -214,6 +214,12 @@ static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 			return false
 	return true
 
+static func garbage_drop_done(donuts: Array[Donut]) -> bool:
+	for donut in donuts:
+		if donut.value == 10 and Donut.get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts) == null:
+			return false
+	return true
+
 static func test_all_donuts_are_stopped() -> void:
 	var all_donuts: Array[Donut] = []
 	assert(all_donuts_are_stopped(all_donuts) == true)

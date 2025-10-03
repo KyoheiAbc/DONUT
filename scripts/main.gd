@@ -46,6 +46,20 @@ static func jump(sprite: Sprite2D, delta: Vector2, duration: float) -> void:
 	sprite.position = Vector2.ZERO
 	tween.kill()
 
+static func sum_of_squares(value: int) -> int:
+	var return_value = 0
+	for v in range(value + 1):
+		return_value += v * v
+	return return_value
+
+static func test_sum_of_squares() -> void:
+	assert(sum_of_squares(0) == 0)
+	assert(sum_of_squares(1) == 1)
+	assert(sum_of_squares(2) == 5)
+	assert(sum_of_squares(3) == 14)
+	assert(sum_of_squares(4) == 30)
+	assert(sum_of_squares(5) == 55)
+
 static func start_rotation_loop(sprite: Sprite2D) -> void:
 	var tween = sprite.create_tween().set_loops()
 	tween.tween_property(sprite, "rotation", 2 * PI, 1).as_relative()

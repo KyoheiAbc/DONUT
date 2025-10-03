@@ -4,7 +4,7 @@ extends Node
 signal pressed(position: Vector2)
 signal direction(direction: Vector2)
 
-static var THRESHOLD: int = 50
+static var THRESHOLD: int = 100
 
 var sum: Vector2 = Vector2.ZERO
 var drag_area_end_x: int = 8000

@@ -17,6 +17,8 @@ func _ready():
 	Cleaner.test_donut_grid_position()
 	Cleaner.test_find_large_groups()
 
+	Main.test_sum_of_squares()
+
 	test_array_2d()
 
 	# test_score_board()

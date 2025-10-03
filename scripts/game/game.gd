@@ -1,7 +1,7 @@
 class_name Game
 extends Node
 
-static var COLOR_NUMBER = 3
+static var COLOR_NUMBER = 4
 static var ACTIVE: bool = false
 
 func _ready():
@@ -28,9 +28,12 @@ func _ready():
 	var player_node = Node2D.new()
 	loop.add_child(player_node)
 	player_node.position = Vector2(650, 750)
-	var sprite = Sprite2D.new()
-	player_node.add_child(sprite)
-	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+	var player_sprite = Sprite2D.new()
+	player_node.add_child(player_sprite)
+	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+
+	loop.offset = Offset.new()
+	add_child(loop.offset)
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
 	label.text = "GO!"
@@ -70,12 +73,50 @@ func _ready():
 	)
 
 	loop.game_over.connect(func() -> void:
-		Main.start_rotation_loop(sprite)
+		Main.start_rotation_loop(player_sprite)
 		show_game_over()
 	)
 
+
 	loop.score_board = ScoreBoard.new()
 	add_child(loop.score_board)
+
+	loop.score_board.combo_doing.connect(func(count: int) -> void:
+		Main.jump(player_sprite, Vector2(0, -100), 0.25)
+		loop.offset.return_garbage_tmp += count * count
+	)
+	loop.score_board.combo_ended.connect(func(combo: int) -> void:
+		if combo > 0:
+			Main.jump(player_sprite, Vector2(0, -200), 0.3)
+			loop.offset.garbage -= loop.offset.return_garbage_tmp
+			loop.offset.return_garbage_tmp = 0
+			if not bot.combo_timer.is_stopped():
+				if loop.offset.garbage < 0:
+					bot.reduce_hp(-loop.offset.garbage)
+					loop.offset.garbage = 0
+
+	)
+	bot.game_over.connect(func() -> void:
+		Main.start_rotation_loop(bot.sprite)
+		show_game_over()
+	)
+	
+
+	loop.spawn_garbage.connect(func() -> void:
+		Main.jump(bot.sprite, Vector2(0, 200), 0.3)
+	)
+
+	bot.combo_ended.connect(func(count: int) -> void:
+		loop.offset.garbage += loop.offset.garbage_tmp
+		loop.offset.garbage_tmp = 0
+		if loop.offset.garbage < 0:
+			loop.offset.garbage = 0
+			bot.reduce_hp(loop.offset.garbage)
+	)
+	bot.combo_doing.connect(func(count: int) -> void:
+		Main.jump(bot.sprite, Vector2(0, 100), 0.25)
+		loop.offset.garbage_tmp += count * count
+	)
 
 
 func show_game_over() -> void:

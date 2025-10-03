@@ -5,7 +5,10 @@ var combo: int = 0
 var combo_label: Label
 
 var combo_stop_timer: Timer
-static var COMBO_STOP_TIME = 3.0
+static var COMBO_STOP_TIME = 0.001
+
+signal combo_ended(count: int)
+signal combo_doing(count: int)
 
 func _init():
 	combo_label = Label.new()
@@ -18,13 +21,16 @@ func _init():
 	add_child(combo_stop_timer)
 	combo_stop_timer.timeout.connect(func() -> void:
 		combo_stop_timer.stop()
+		var count = combo
 		combo = 0
+		emit_signal("combo_ended", count)
 		render()
 	)
 
 func render() -> void:
 	if combo > 0:
 		combo_label.text = str(combo) + " COMBO!"
+		emit_signal("combo_doing", combo)
 	else:
 		combo_label.text = ""
 
@@ -33,6 +39,7 @@ func on_found_clearable_group(count: int) -> void:
 
 	if count == 0:
 		if combo_stop_timer.is_stopped():
-			combo_stop_timer.start(COMBO_STOP_TIME)
+			if combo > 0:
+				combo_stop_timer.start(COMBO_STOP_TIME)
 	if count > 0:
 		combo_stop_timer.stop()
