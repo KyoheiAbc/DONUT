@@ -10,7 +10,7 @@ func _ready():
 	call_deferred("ready")
 
 func ready():
-	ROOT.add_child(Game.new())
+	ROOT.add_child(Initial.new())
 
 static func setup_label(label: Label) -> void:
 	label.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
