@@ -24,7 +24,7 @@ static func test_find_clearable_donuts():
 	donuts.append(Donut.new(3))
 	donuts.back().pos = Vector2(650, 1550)
 
-	var clearable = find_clearable_donuts(donuts)
+	var clearable = find_clearable_donuts(donuts, GROUP_SIZE_TO_CLEAR)
 	assert(clearable[0].size() == 3)
 	assert(clearable[0].has(donuts[0]))
 	assert(clearable[0].has(donuts[1]))
@@ -35,10 +35,10 @@ static func test_find_clearable_donuts():
 	for d in donuts:
 		d.queue_free()
 
-static func find_clearable_donuts(donuts: Array[Donut]):
+static func find_clearable_donuts(donuts: Array[Donut], group_size_to_clear: int):
 	var ret = mapping_donuts_to_2d_array(donuts)
 	var donuts_map = ret[1]
-	var founded = find_large_groups(ret[0], GROUP_SIZE_TO_CLEAR)
+	var founded = find_large_groups(ret[0], group_size_to_clear)
 
 	var clearable_donuts: Array[Donut] = []
 	for y in range(founded[0].size()):
@@ -59,7 +59,7 @@ static func test_mapping_donuts_to_2d_array():
 	donuts.append(Donut.new(3))
 	donuts.back().pos = Vector2(650, 1550)
 
-	var expected = create_2d_array(Vector2(8, 16), -1)
+	var expected = Array2D.new_array_2d(Vector2(8, 16), -1)
 	expected[2][1] = 1
 	expected[15][6] = 3
 
@@ -75,8 +75,8 @@ static func test_mapping_donuts_to_2d_array():
 
 
 static func mapping_donuts_to_2d_array(donuts: Array[Donut]):
-	var result = create_2d_array(Vector2(8, 16), -1)
-	var donuts_map = create_2d_array(Vector2(8, 16), null)
+	var result = Array2D.new_array_2d(Vector2(8, 16), -1)
+	var donuts_map = Array2D.new_array_2d(Vector2(8, 16), null)
 	for donut in donuts:
 		if donut_out_of_area(donut):
 			continue
@@ -154,8 +154,8 @@ static func test_find_large_groups():
 
 static func find_large_groups(input: Array, find_threshold: int):
 	var size = Vector2(input[0].size(), input.size())
-	var result = create_2d_array(size, 0)
-	var visited = create_2d_array(size, false)
+	var result = Array2D.new_array_2d(size, 0)
+	var visited = Array2D.new_array_2d(size, false)
 
 	var directions = [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
 
@@ -180,7 +180,7 @@ static func find_large_groups(input: Array, find_threshold: int):
 				for dir in directions:
 					var new_pos = pos + dir
 
-					if out_of_bounds(new_pos, input):
+					if Array2D.out_of_bounds(new_pos, input):
 						continue
 
 					if visited[new_pos.y][new_pos.x]:
@@ -195,29 +195,3 @@ static func find_large_groups(input: Array, find_threshold: int):
 					result[pos.y][pos.x] = 1
 
 	return [result, group_count]
-
-static func test_out_of_bounds():
-	var array = create_2d_array(Vector2(6, 12), 0)
-	assert(out_of_bounds(Vector2(0, 0), array) == false)
-	assert(out_of_bounds(Vector2(5, 11), array) == false)
-	assert(out_of_bounds(Vector2(6, 0), array) == true)
-		
-
-static func out_of_bounds(pos: Vector2, array: Array) -> bool:
-	var size = Vector2(array[0].size(), array.size())
-	return pos.x < 0 or pos.x >= size.x or pos.y < 0 or pos.y >= size.y
-
-static func test_create_2d_array():
-	var array = create_2d_array(Vector2(3, 4), 5)
-	assert(array.size() == 4)
-	assert(array[0].size() == 3)
-	assert(array[0][0] == 5)
-	assert(array[3][2] == 5)
-
-static func create_2d_array(size: Vector2, initial_value) -> Array:
-	var result: Array = []
-	for y in range(size.y):
-		result.append([])
-		for x in range(size.x):
-			result[y].append(initial_value)
-	return result

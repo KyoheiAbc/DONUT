@@ -2,9 +2,7 @@ class_name Game
 extends Node
 
 static var COLOR_NUMBER = 3
-static var ACTIVE: bool = true
-
-var is_game_over: bool = false
+static var ACTIVE: bool = false
 
 func _ready():
 	var rect = ColorRect.new()
@@ -32,19 +30,7 @@ func _ready():
 	player_node.position = Vector2(650, 750)
 	var sprite = Sprite2D.new()
 	player_node.add_child(sprite)
-	sprite.texture = Character.SPRITES[Character.CHARACTER_INDEXES[0]]
-
-	var back_button = Button.new()
-	back_button.text = "BACK"
-	Main.setup_button(back_button)
-	Main.set_control_position(back_button, Vector2(128, 64))
-	add_child(back_button)
-	back_button.pressed.connect(func() -> void:
-		Main.show_black(0.1)
-		self.queue_free()
-		Main.ROOT.add_child(Character.new())
-	)
-
+	sprite.texture = Character.SPRITES[Character.get_character_index(Character.MAP, 0)]
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
 	label.text = "GO!"
@@ -90,42 +76,8 @@ func _ready():
 	loop.score_board = ScoreBoard.new()
 	add_child(loop.score_board)
 
-	var garbage_timer = Timer.new()
-	add_child(garbage_timer)
-	garbage_timer.start(Bot.SPEED)
-	garbage_timer.timeout.connect(func() -> void:
-		if is_game_over:
-			return
-		Donut.spawn_garbage(randi() % Bot.ATTACK + 1, loop.all_donuts, loop)
-		# Donut.spawn_garbage(12, loop.all_donuts, loop)
-		Main.jump(bot.sprite, Vector2(0, 180), 0.3)
-	)
-
-	loop.attack.connect(func() -> void:
-		Main.jump(sprite, Vector2(0, -180), 0.3)
-		bot.hp.value = max(bot.hp.value - loop.score_board.combo * loop.score_board.combo, 0)
-	)
-
-	bot.game_over.connect(func() -> void:
-		if is_game_over:
-			return
-		loop.set_process(false)
-		Main.start_rotation_loop(bot.sprite)
-		show_game_over()
-	)
-
-
-static func game_over(all_donuts: Array[Donut]) -> bool:
-	if not Donut.all_donuts_are_stopped(all_donuts):
-		return false
-	for donut in all_donuts:
-		if donut.pos == Vector2(350, 350):
-			return true
-	return false
 
 func show_game_over() -> void:
-	is_game_over = true
-
 	var label = Label.new()
 	label.text = "GAME OVER"
 	Main.setup_label(label)

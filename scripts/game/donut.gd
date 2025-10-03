@@ -132,13 +132,6 @@ static func get_colliding_donut(donut: Donut, donuts: Array[Donut]) -> Donut:
 			return other_donut
 	return null
 
-static func all_garbage_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
-	for donut in donuts_except_pair:
-		if donut.value < 10:
-			continue
-		if get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts_except_pair) == null:
-			return false
-	return true
 
 static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
 	for donut in donuts:

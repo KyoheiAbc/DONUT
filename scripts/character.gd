@@ -1,8 +1,7 @@
 class_name Character
 extends Node
 
-static var CHARACTER_INDEXES: Array[int] = [0, 1]
-
+static var MAP = [[0, 1, -1, -1, -1, -1, -1, -1]]
 const SPRITES: Array[Texture2D] = [
 	preload("res://assets/a_edited.png"),
 	preload("res://assets/b_edited.png"),
@@ -69,23 +68,17 @@ func _ready():
 	)
 	input_handler.direction.connect(func(direction: Vector2) -> void:
 		if direction.x > 0:
-			CHARACTER_INDEXES[target_index] += 1
-			if CHARACTER_INDEXES[target_index] == CHARACTER_INDEXES[target_index - 1]:
-				CHARACTER_INDEXES[target_index] += 1
-			if CHARACTER_INDEXES[target_index] >= SPRITES.size():
-				CHARACTER_INDEXES[target_index] = 0
+			Array2D.move_value(MAP, target_index, Vector2(1, 0))
 		elif direction.x < 0:
-			CHARACTER_INDEXES[target_index] -= 1
-			if CHARACTER_INDEXES[target_index] == CHARACTER_INDEXES[target_index - 1]:
-				CHARACTER_INDEXES[target_index] -= 1
-			if CHARACTER_INDEXES[target_index] < 0:
-				CHARACTER_INDEXES[target_index] = SPRITES.size() - 1
+			Array2D.move_value(MAP, target_index, Vector2(-1, 0))
 	)
+
+static func get_character_index(map: Array, target: int) -> int:
+	return Array2D.vector2_to_value(map, Array2D.get_position(map, target))
 
 func _process(_delta: float) -> void:
 	for i in cursors.size():
-		cursors[i].position = sprites[CHARACTER_INDEXES[i]].position - cursors[i].size / 2
-	
+		cursors[i].position = sprites[get_character_index(MAP, i)].position - cursors[i].size / 2
 	for i in SPRITES.size():
-		sprites_a[i].visible = (i == CHARACTER_INDEXES[0])
-		sprites_b[i].visible = (i == CHARACTER_INDEXES[1])
+		sprites_a[i].visible = (i == get_character_index(MAP, 0))
+		sprites_b[i].visible = (i == get_character_index(MAP, 1))

@@ -55,17 +55,6 @@ func _ready():
 	slider.value_changed.connect(func(value): Bot.HP = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 150))
 
-	slider = CustomHSlider.new("botAttack", Bot.ATTACK, 1, 36, 1)
-	add_child(slider)
-	slider.value_changed.connect(func(value): Bot.ATTACK = int(value))
-	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 300))
-
-	slider = CustomHSlider.new("botSpeed", Bot.SPEED, 1, 20, 1)
-	add_child(slider)
-	slider.value_changed.connect(func(value): Bot.SPEED = int(value))
-	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 450))
-
-
 	var button = Button.new()
 	add_child(button)
 	Main.setup_button(button)

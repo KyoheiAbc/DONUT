@@ -16,9 +16,8 @@ func _init():
 
 	combo_stop_timer = Timer.new()
 	add_child(combo_stop_timer)
-	combo_stop_timer.wait_time = COMBO_STOP_TIME
-	combo_stop_timer.one_shot = true
 	combo_stop_timer.timeout.connect(func() -> void:
+		combo_stop_timer.stop()
 		combo = 0
 		render()
 	)
@@ -34,6 +33,6 @@ func on_found_clearable_group(count: int) -> void:
 
 	if count == 0:
 		if combo_stop_timer.is_stopped():
-			combo_stop_timer.start()
+			combo_stop_timer.start(COMBO_STOP_TIME)
 	if count > 0:
 		combo_stop_timer.stop()

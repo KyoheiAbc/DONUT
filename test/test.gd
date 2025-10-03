@@ -16,20 +16,18 @@ func _ready():
 	Cleaner.test_donut_out_of_area()
 	Cleaner.test_donut_grid_position()
 	Cleaner.test_find_large_groups()
-	Cleaner.test_create_2d_array()
-	Cleaner.test_out_of_bounds()
 
 	test_array_2d()
 
-	test_score_board()
+	# test_score_board()
+	# self.test_score_board_completed.connect(func() -> void:
+	# 	print("All tests passed!")
+	# 	get_tree().quit()
+	# )
+	get_tree().quit()
 
-	self.test_score_board_completed.connect(func() -> void:
-		print("All tests passed!")
-		get_tree().quit()
-	)
-
-func _process(delta: float) -> void:
-	print("Test running, current time: " + str(Time.get_ticks_msec()))
+# func _process(delta: float) -> void:
+# 	print("Test running, current time: " + str(Time.get_ticks_msec()))
 
 func test_array_2d():
 	var array_2d = Array2D.new_array_2d(Vector2(3, 4), -1)

@@ -3,11 +3,8 @@ extends Node
 
 var sprite: Sprite2D
 var hp: GameVSlider
-var attack: GameVSlider
 
 static var HP = 100
-static var ATTACK = 6
-static var SPEED = 10
 
 signal game_over()
 
@@ -37,7 +34,7 @@ func _ready():
 	node.position = Vector2(650, 250)
 	sprite = Sprite2D.new()
 	node.add_child(sprite)
-	sprite.texture = Character.SPRITES[Character.CHARACTER_INDEXES[1]]
+	sprite.texture = Character.SPRITES[Character.get_character_index(Character.MAP, 1)]
 
 	hp = GameVSlider.new(Vector2(40, 400), Color(0, 1, 0))
 	node.add_child(hp)
@@ -47,16 +44,3 @@ func _ready():
 	hp.step = 1
 	hp.editable = false
 	hp.value = HP
-
-	attack = GameVSlider.new(Vector2(40, 400), Color(1, 0.5, 0))
-	node.add_child(attack)
-	Main.set_control_position(attack, Vector2(230, 0))
-	attack.value = 100
-	attack.min_value = 0
-	attack.max_value = 100
-	attack.step = 1
-	attack.editable = false
-
-func _process(_delta: float) -> void:
-	if hp.value <= 0:
-		emit_signal("game_over")
