@@ -52,6 +52,7 @@ func _ready():
 				loop.add_child(donut)
 
 	var input_handler = InputHandler.new()
+	input_handler.drag_area_end_x = Main.WINDOW.x * 0.75
 	add_child(input_handler)
 	input_handler.direction.connect(func(direction: Vector2) -> void:
 		if loop.donuts_pair == null:
