@@ -3,8 +3,18 @@ extends Node
 
 var sprite: Sprite2D
 var hp: GameVSlider
+var attack: GameVSlider
 
-static var HP = 300
+var offset: Offset
+
+var combo_doing: bool = false
+var combo: int = 0
+
+var player_sprite: Sprite2D = null
+
+static var HP = 10
+static var ATTACK_WAIT_TIME = 30
+static var ATTACK = 1
 
 class GameVSlider extends VSlider:
 	func _init(_size: Vector2, color: Color) -> void:
@@ -28,7 +38,41 @@ class GameVSlider extends VSlider:
 
 
 func _process(delta: float) -> void:
-	pass
+	if hp.value <= 0:
+		Game.game_over()
+
+	if combo_doing:
+		return
+
+	if offset.garbage < 0:
+		Main.jump(player_sprite, Vector2(0, -200), 0.3)
+		var tween = create_tween()
+		tween.tween_property(hp, "value", offset.garbage, 3.0).as_relative()
+		offset.garbage = 0
+		return
+		
+	var attack_increase = delta * 1000 / ATTACK_WAIT_TIME
+	attack.value = min(attack.value + attack_increase, attack.max_value)
+	combo = 0
+	if attack.value >= attack.max_value:
+		combo_doing = true
+		var timer = Timer.new()
+		add_child(timer)
+		timer.start(1.5)
+		timer.timeout.connect(func() -> void:
+			combo += 1
+			offset.bot_score_tmp += combo * combo
+			Main.jump(sprite, Vector2(0, 100), 0.3)
+			if combo == ATTACK:
+				timer.stop()
+				timer.queue_free()
+				await get_tree().create_timer(1).timeout
+				attack.value = 0
+				combo_doing = false
+				offset.garbage += offset.bot_score_tmp
+				offset.bot_score_tmp = 0
+		)
+		
 
 func _ready():
 	var node = Node2D.new()
@@ -46,3 +90,12 @@ func _ready():
 	hp.step = 1
 	hp.editable = false
 	hp.value = HP
+
+	attack = GameVSlider.new(Vector2(40, 400), Color(1, 0.6, 0))
+	node.add_child(attack)
+	Main.set_control_position(attack, Vector2(230, 0))
+	attack.min_value = 0
+	attack.max_value = 1000
+	attack.step = 1
+	attack.editable = false
+	attack.value = 0

@@ -32,12 +32,14 @@ func _ready():
 	var player_sprite = Sprite2D.new()
 	player_node.add_child(player_sprite)
 	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+	loop.player_sprite = player_sprite
 
 	var bot = Bot.new()
 	loop.add_child(bot)
-
-	var score_board = ScoreBoard.new()
-	add_child(score_board)
+	bot.set_process(false)
+	bot.offset = loop.offset
+	loop.bot_sprite = bot.sprite
+	bot.player_sprite = player_sprite
 
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
@@ -49,6 +51,7 @@ func _ready():
 	set_process(true)
 
 	loop.set_process(true)
+	bot.set_process(true)
 
 	for y in range(16):
 		for x in range(8):

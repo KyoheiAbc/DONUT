@@ -4,12 +4,28 @@ extends Node
 var donuts_pair: DonutsPair = null
 var all_donuts: Array[Donut] = []
 
+var score_board: ScoreBoard = ScoreBoard.new()
+var offset: Offset = Offset.new()
+
+var player_sprite: Sprite2D = null
+var bot_sprite: Sprite2D = null
+
+func _ready() -> void:
+	add_child(score_board)
+	add_child(offset)
+
 
 func _process(delta: float) -> void:
 	Donut.sort_donuts_by_y_descending(all_donuts)
 
 	if donuts_pair == null:
 		if Donut.all_donuts_are_stopped(all_donuts):
+			if offset.garbage > 0:
+				Donut.spawn_garbage(offset.garbage, all_donuts, self)
+				offset.garbage = 0
+				Main.jump(bot_sprite, Vector2(0, 200), 0.3)
+				return
+
 			donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
 
 			if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
@@ -41,6 +57,14 @@ func _process(delta: float) -> void:
 			timer.timeout.connect(func() -> void:
 				Donut.remove_donuts(clearable_donuts[0], all_donuts)
 				timer.queue_free()
+				score_board.render()
+				offset.player_score_tmp += score_board.combo * score_board.combo
+				Main.jump(player_sprite, Vector2(0, -100), 0.3)
 			)
+			score_board.on_found_clearable_group(clearable_donuts[1])
+		else:
+			score_board.on_found_clearable_group(0)
+			offset.garbage -= offset.player_score_tmp
+			offset.player_score_tmp = 0
 	for donut in all_donuts:
 		Donut.render(donut)
