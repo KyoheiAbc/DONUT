@@ -3,6 +3,8 @@ extends Node
 
 func _ready():
 	Donut.test_all_donuts_are_stopped()
+	Donut.test_sort_donuts_by_y_descending()
+	Donut.test_all_garbage_donuts_are_dropped()
 	Donut.test_get_colliding_donut()
 	Donut.test_move()
 	

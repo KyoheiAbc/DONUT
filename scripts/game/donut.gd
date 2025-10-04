@@ -214,11 +214,41 @@ static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 			return false
 	return true
 
-static func garbage_drop_done(donuts: Array[Donut]) -> bool:
+static func all_garbage_donuts_are_dropped(donuts: Array[Donut]) -> bool:
 	for donut in donuts:
 		if donut.value == 10 and Donut.get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts) == null:
 			return false
 	return true
+static func test_all_garbage_donuts_are_dropped() -> void:
+	var all_donuts: Array[Donut] = []
+	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
+
+	all_donuts.append(Donut.new(10))
+	all_donuts.back().pos = Vector2(100, 100)
+	assert(all_garbage_donuts_are_dropped(all_donuts) == false)
+
+	all_donuts.append(Donut.new(0))
+	all_donuts.back().pos = Vector2(100, 200)
+	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
+
+	all_donuts.back().pos = Vector2(100, 201)
+	assert(all_garbage_donuts_are_dropped(all_donuts) == false)
+
+	all_donuts.back().pos = Vector2(100, 200)
+
+
+	all_donuts.append(Donut.new(10))
+	all_donuts.back().pos = Vector2(100, 0)
+	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
+
+	all_donuts.back().pos = Vector2(100, -1)
+	assert(all_garbage_donuts_are_dropped(all_donuts) == false)
+
+	all_donuts.back().value = 0
+	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
+
+	for d in all_donuts:
+		d.queue_free()
 
 static func test_all_donuts_are_stopped() -> void:
 	var all_donuts: Array[Donut] = []

@@ -23,7 +23,7 @@ func _process(delta: float) -> void:
 				offset.garbage = 0
 
 		if Game.ACTIVE:
-			if Donut.garbage_drop_done(all_donuts):
+			if Donut.all_garbage_donuts_are_dropped(all_donuts):
 				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
 		else:
 			if Donut.all_donuts_are_stopped(all_donuts):

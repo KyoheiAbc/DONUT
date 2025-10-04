@@ -24,7 +24,7 @@ static func test_find_clearable_donuts():
 	donuts.append(Donut.new(3))
 	donuts.back().pos = Vector2(650, 1550)
 
-	var clearable = find_clearable_donuts(donuts, GROUP_SIZE_TO_CLEAR)
+	var clearable = find_clearable_donuts(donuts, 3)
 	assert(clearable[0].size() == 3)
 	assert(clearable[0].has(donuts[0]))
 	assert(clearable[0].has(donuts[1]))
