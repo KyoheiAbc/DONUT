@@ -55,10 +55,6 @@ func _ready():
 	slider.value_changed.connect(func(value): Bot.HP = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 150))
 
-	slider = CustomHSlider.new("botComboTime", Bot.COMBO_TIME, 3, 30, 1)
-	add_child(slider)
-	slider.value_changed.connect(func(value): Bot.COMBO_TIME = int(value))
-	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 300))
 
 	var button = Button.new()
 	add_child(button)

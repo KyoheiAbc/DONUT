@@ -6,22 +6,10 @@ var all_donuts: Array[Donut] = []
 
 var score_board: ScoreBoard = null
 
-var offset: Offset
-
-signal spawn_garbage()
-
-signal game_over()
-
 func _process(delta: float) -> void:
 	Donut.sort_donuts_by_y_descending(all_donuts)
 
 	if donuts_pair == null:
-		if offset.garbage > 0:
-			if score_board.combo == 0:
-				Donut.spawn_garbage(offset.garbage, all_donuts, self)
-				emit_signal("spawn_garbage")
-				offset.garbage = 0
-
 		if Game.ACTIVE:
 			if Donut.all_garbage_donuts_are_dropped(all_donuts):
 				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
@@ -31,7 +19,6 @@ func _process(delta: float) -> void:
 
 		if donuts_pair != null:
 			if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
-				emit_signal("game_over")
 				set_process(false)
 				return
 

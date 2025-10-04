@@ -32,8 +32,6 @@ func _ready():
 	player_node.add_child(player_sprite)
 	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
 
-	loop.offset = Offset.new()
-	add_child(loop.offset)
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
 	label.text = "GO!"
@@ -72,65 +70,6 @@ func _ready():
 			DonutsPair.rotation(loop.donuts_pair, loop.all_donuts)
 	)
 
-	loop.game_over.connect(func() -> void:
-		Main.start_rotation_loop(player_sprite)
-		show_game_over()
-	)
-
 
 	loop.score_board = ScoreBoard.new()
 	add_child(loop.score_board)
-
-	loop.score_board.combo_doing.connect(func(count: int) -> void:
-		Main.jump(player_sprite, Vector2(0, -100), 0.25)
-		loop.offset.return_garbage_tmp += count * count
-	)
-	loop.score_board.combo_ended.connect(func(combo: int) -> void:
-		if combo > 0:
-			Main.jump(player_sprite, Vector2(0, -200), 0.3)
-			loop.offset.garbage -= loop.offset.return_garbage_tmp
-			loop.offset.return_garbage_tmp = 0
-			if not bot.combo_timer.is_stopped():
-				if loop.offset.garbage < 0:
-					bot.reduce_hp(-loop.offset.garbage)
-					loop.offset.garbage = 0
-
-	)
-	bot.game_over.connect(func() -> void:
-		Main.start_rotation_loop(bot.sprite)
-		show_game_over()
-	)
-	
-
-	loop.spawn_garbage.connect(func() -> void:
-		Main.jump(bot.sprite, Vector2(0, 200), 0.3)
-	)
-
-	bot.combo_ended.connect(func(count: int) -> void:
-		loop.offset.garbage += loop.offset.garbage_tmp
-		loop.offset.garbage_tmp = 0
-		if loop.offset.garbage < 0:
-			loop.offset.garbage = 0
-			bot.reduce_hp(loop.offset.garbage)
-	)
-	bot.combo_doing.connect(func(count: int) -> void:
-		Main.jump(bot.sprite, Vector2(0, 100), 0.25)
-		loop.offset.garbage_tmp += count * count
-	)
-
-
-func show_game_over() -> void:
-	var label = Label.new()
-	label.text = "GAME OVER"
-	Main.setup_label(label)
-	add_child(label)
-
-	var button = Button.new()
-	button.text = "FINISH"
-	Main.setup_button(button)
-	add_child(button)
-	button.pressed.connect(func() -> void:
-		Main.show_black(0.1)
-		self.queue_free()
-		Main.ROOT.add_child(Initial.new())
-	)
