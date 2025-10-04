@@ -7,6 +7,7 @@ signal direction(direction: Vector2)
 static var THRESHOLD: int = 100
 
 var sum: Vector2 = Vector2.ZERO
+var drag_index: int = -1
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
@@ -27,8 +28,17 @@ func _input(event: InputEvent) -> void:
 		sum = Vector2.ZERO
 		if event.pressed:
 			emit_signal("pressed", event.position)
+			if event.position.x < Main.WINDOW.x * 0.75:
+				drag_index = event.index
+		else:
+			if event.index == drag_index:
+				drag_index = -1
 
 	if event is InputEventScreenDrag:
+		if drag_index == -1:
+			return
+		if event.index != drag_index:
+			return
 		sum += event.relative
 		if sum.y < -THRESHOLD:
 			emit_signal("direction", Vector2(0, -1))
