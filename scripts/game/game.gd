@@ -53,7 +53,6 @@ func _ready():
 				loop.add_child(donut)
 
 	var input_handler = InputHandler.new()
-	input_handler.drag_area_end_x = Main.WINDOW.x * 0.75
 	add_child(input_handler)
 	input_handler.direction.connect(func(direction: Vector2) -> void:
 		if loop.donuts_pair == null:
@@ -66,7 +65,7 @@ func _ready():
 	input_handler.pressed.connect(func(position: Vector2) -> void:
 		if loop.donuts_pair == null:
 			return
-		if position.x > Main.WINDOW.x / 2:
+		if position.x > Main.WINDOW.x * 0.75:
 			DonutsPair.rotation(loop.donuts_pair, loop.all_donuts)
 	)
 
