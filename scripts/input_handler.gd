@@ -12,6 +12,21 @@ var drag_index: int = -1
 var drag_area_end_x: float = Main.WINDOW.x * 0.75
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if not event.pressed:
+			return
+		if event.keycode == KEY_W or event.keycode == KEY_UP:
+			emit_signal("direction", Vector2(0, -1))
+		if event.keycode == KEY_S or event.keycode == KEY_DOWN:
+			emit_signal("direction", Vector2(0, 1))
+		if event.keycode == KEY_A or event.keycode == KEY_LEFT:
+			emit_signal("direction", Vector2(-1, 0))
+		if event.keycode == KEY_D or event.keycode == KEY_RIGHT:
+			emit_signal("direction", Vector2(1, 0))
+		if event.keycode == KEY_SPACE or event.keycode == KEY_ENTER:
+			emit_signal("pressed", Main.WINDOW)
+
+
 	if event is InputEventScreenTouch:
 		if event.pressed:
 			emit_signal("pressed", event.position)
