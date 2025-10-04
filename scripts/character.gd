@@ -59,6 +59,7 @@ func _ready():
 	)
 
 	var input_handler = InputHandler.new()
+	input_handler.drag_area_end_x = 8000
 	add_child(input_handler)
 	input_handler.pressed.connect(func(position: Vector2) -> void:
 		if position.x < Main.WINDOW.x / 2:
