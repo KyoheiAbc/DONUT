@@ -7,6 +7,8 @@ func _ready():
 	Donut.test_all_garbage_donuts_are_dropped()
 	Donut.test_get_colliding_donut()
 	Donut.test_move()
+	Donut.test_get_around()
+	Donut.test_clear_garbage_donuts()
 	
 	DonutsPair.test_donuts_pair()
 	DonutsPair.test_sync_position()

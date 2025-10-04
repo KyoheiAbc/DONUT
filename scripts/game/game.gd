@@ -1,10 +1,16 @@
 class_name Game
 extends Node
 
-static var COLOR_NUMBER = 4
+static var COLOR_NUMBER = 3
 static var ACTIVE: bool = false
 
+static var SELF: Node = null
+
 func _ready():
+	Game.SELF = self
+
+	set_process(false)
+
 	var rect = ColorRect.new()
 	add_child(rect)
 	rect.color = Color(0.3, 0.3, 0.3)
@@ -15,15 +21,10 @@ func _ready():
 	add_child(label)
 	Main.setup_label(label)
 
-	set_process(false)
-
 	var loop = Loop.new()
 	add_child(loop)
 	loop.set_process(false)
 	loop.donuts_pair = DonutsPair.spawn_donuts_pair(loop.all_donuts, loop)
-
-	var bot = Bot.new()
-	loop.add_child(bot)
 
 	var player_node = Node2D.new()
 	loop.add_child(player_node)
@@ -31,6 +32,12 @@ func _ready():
 	var player_sprite = Sprite2D.new()
 	player_node.add_child(player_sprite)
 	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+
+	var bot = Bot.new()
+	loop.add_child(bot)
+
+	var score_board = ScoreBoard.new()
+	add_child(score_board)
 
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
@@ -69,6 +76,18 @@ func _ready():
 			DonutsPair.rotation(loop.donuts_pair, loop.all_donuts)
 	)
 
+static func game_over() -> void:
+	var label = Label.new()
+	Game.SELF.add_child(label)
+	label.text = "GAME OVER"
+	Main.setup_label(label)
 
-	loop.score_board = ScoreBoard.new()
-	add_child(loop.score_board)
+	var button = Button.new()
+	Game.SELF.add_child(button)
+	button.text = "FINISH"
+	Main.setup_button(button)
+	button.pressed.connect(func() -> void:
+		Main.show_black(0.1)
+		Game.SELF.queue_free()
+		Main.ROOT.add_child(Character.new())
+	)

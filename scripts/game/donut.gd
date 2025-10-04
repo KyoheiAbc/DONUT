@@ -11,8 +11,8 @@ var pos: Vector2
 var sprite: Sprite2D
 
 var freeze_count: int = 0
-static var FREEZE_COUNT = 30
-static var GRAVITY = 20
+static var FREEZE_COUNT = 20
+static var GRAVITY = 70
 var to_clear: bool = false
 
 func _init(_value: int):
@@ -201,6 +201,59 @@ static func test_get_around() -> void:
 	for d in donuts:
 		d.queue_free()
 	donuts.clear()
+
+static func remove_donuts(donuts_to_remove: Array[Donut], all_donuts: Array[Donut]) -> void:
+	for donut in donuts_to_remove:
+		all_donuts.erase(donut)
+		donut.queue_free()
+
+static func test_clear_garbage_donuts() -> void:
+	var all_donuts: Array[Donut] = []
+	var target = Donut.new(0)
+	target.pos = Vector2(300, 300)
+	all_donuts.append(target)
+
+	var up = Donut.new(10)
+	up.pos = Vector2(300, 200)
+	all_donuts.append(up)
+	up.freeze_count = Donut.FREEZE_COUNT
+
+	var down = Donut.new(10)
+	down.pos = Vector2(300, 400)
+	all_donuts.append(down)
+	down.freeze_count = Donut.FREEZE_COUNT - 1
+
+	var left = Donut.new(10)
+	left.pos = Vector2(200, 301)
+	all_donuts.append(left)
+	left.freeze_count = Donut.FREEZE_COUNT
+
+	var right = Donut.new(10)
+	right.pos = Vector2(400, 300)
+	all_donuts.append(right)
+	right.freeze_count = Donut.FREEZE_COUNT
+
+	assert(all_donuts.size() == 4 + 1)
+
+
+	clear_garbage_donuts(target, all_donuts)
+	assert(all_donuts.size() == 2 + 1)
+	assert(all_donuts.has(down))
+	assert(all_donuts.has(left))
+
+	for d in all_donuts:
+		d.queue_free()
+	all_donuts.clear()
+
+static func clear_garbage_donuts(donut: Donut, all_donuts: Array[Donut]) -> void:
+	var arounf_donuts = Donut.get_around(donut, all_donuts)
+	for around_donut in arounf_donuts:
+		if around_donut.value != 10:
+			continue
+		if around_donut.freeze_count < Donut.FREEZE_COUNT:
+			continue
+		all_donuts.erase(around_donut)
+		around_donut.queue_free()
 
 static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 	for donut in donuts_except_pair:
