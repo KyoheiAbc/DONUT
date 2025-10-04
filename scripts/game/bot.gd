@@ -12,9 +12,9 @@ var combo: int = 0
 
 var player_sprite: Sprite2D = null
 
-static var HP = 10
-static var ATTACK_WAIT_TIME = 30
-static var ATTACK = 1
+static var HP = 100
+static var ATTACK_WAIT_TIME = 3
+static var ATTACK = 3
 
 class GameVSlider extends VSlider:
 	func _init(_size: Vector2, color: Color) -> void:
@@ -38,6 +38,9 @@ class GameVSlider extends VSlider:
 
 
 func _process(delta: float) -> void:
+	if Game.GAME_OVER:
+		return
+
 	if hp.value <= 0:
 		Game.game_over()
 

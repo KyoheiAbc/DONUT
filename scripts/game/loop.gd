@@ -56,6 +56,8 @@ func _process(delta: float) -> void:
 			timer.start(Cleaner.CLEAR_WAIT_TIME)
 			timer.timeout.connect(func() -> void:
 				Donut.remove_donuts(clearable_donuts[0], all_donuts)
+				for donut in clearable_donuts[0]:
+					Donut.clear_garbage_donuts(donut, all_donuts)
 				timer.queue_free()
 				score_board.render()
 				offset.player_score_tmp += score_board.combo * score_board.combo

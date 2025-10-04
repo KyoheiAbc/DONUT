@@ -1,10 +1,12 @@
 class_name Game
 extends Node
 
-static var COLOR_NUMBER = 3
+static var COLOR_NUMBER = 4
 static var ACTIVE: bool = false
 
 static var SELF: Node = null
+
+static var GAME_OVER: bool = false
 
 func _ready():
 	Game.SELF = self
@@ -80,6 +82,8 @@ func _ready():
 	)
 
 static func game_over() -> void:
+	Game.GAME_OVER = true
+	
 	var label = Label.new()
 	Game.SELF.add_child(label)
 	label.text = "GAME OVER"

@@ -11,8 +11,8 @@ var pos: Vector2
 var sprite: Sprite2D
 
 var freeze_count: int = 0
-static var FREEZE_COUNT = 20
-static var GRAVITY = 70
+static var FREEZE_COUNT = 30
+static var GRAVITY = 30
 var to_clear: bool = false
 
 func _init(_value: int):
