@@ -74,13 +74,15 @@ func _ready():
 			DonutsPair.hard_drop(loop.donuts_pair, loop.all_donuts)
 			Main.hop(loop.player_sprite, Vector2(80, -80), 0.3, 1)
 		else:
-			DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts)
+			if DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts) != Vector2.ZERO:
+				loop.donuts_pair.freeze_count = 0
 	)
 	input_handler.pressed.connect(func(position: Vector2) -> void:
 		if loop.donuts_pair == null:
 			return
 		if position.x > Main.WINDOW.x * 0.75:
 			DonutsPair.rotation(loop.donuts_pair, loop.all_donuts)
+			loop.donuts_pair.freeze_count = 0
 	)
 
 static func game_over() -> void:

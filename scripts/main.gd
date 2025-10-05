@@ -53,16 +53,19 @@ static func rotation(sprite: Sprite2D, iterations: int, duration: float) -> void
 	sprite.rotation = 0
 	tween.kill()
 
-static func hop(sprite: Sprite2D, delta: Vector2, duration: float) -> void:
-	var tween = sprite.create_tween()
-	tween.tween_property(sprite, "position", delta, duration * 0.5).as_relative()
-	tween.parallel().tween_property(sprite, "rotation", PI / 8 if delta.x > 0 else -PI / 8, duration * 0.5).as_relative()
-	tween.chain().tween_property(sprite, "position", Vector2.ZERO, duration * 0.5)
-	tween.parallel().tween_property(sprite, "rotation", 0, duration * 0.5)
-	await tween.finished
-	sprite.position = Vector2.ZERO
-	sprite.rotation = 0
-	tween.kill()
+static func hop(sprite: Sprite2D, delta: Vector2, duration: float, iterations: int) -> void:
+	for i in range(iterations):
+		var tween = sprite.create_tween()
+		var random_delta = delta
+		random_delta.x = - delta.x if randf() < 0.5 else delta.x
+		tween.tween_property(sprite, "position", random_delta, duration * 0.5).as_relative()
+		tween.parallel().tween_property(sprite, "rotation", PI / 8 if random_delta.x > 0 else -PI / 8, duration * 0.5).as_relative()
+		tween.chain().tween_property(sprite, "position", Vector2.ZERO, duration * 0.5)
+		tween.parallel().tween_property(sprite, "rotation", 0, duration * 0.5)
+		await tween.finished
+		sprite.position = Vector2.ZERO
+		sprite.rotation = 0
+		tween.kill()
 
 static func sum_of_squares(value: int) -> int:
 	var return_value = 0
