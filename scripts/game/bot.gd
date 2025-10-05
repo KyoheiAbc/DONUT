@@ -10,6 +10,8 @@ var offset: Offset
 var combo_doing: bool = false
 var combo: int = 0
 
+var is_stunned: bool = false
+
 var player_sprite: Sprite2D = null
 
 static var HP = 100
@@ -40,9 +42,14 @@ class GameVSlider extends VSlider:
 func _process(delta: float) -> void:
 	if Game.GAME_OVER:
 		return
+	if is_stunned:
+		return
 
 	if hp.value <= 0:
 		Game.game_over()
+		set_process(false)
+		Main.start_rotation_loop(sprite)
+		return
 
 	if combo_doing:
 		return
@@ -52,7 +59,20 @@ func _process(delta: float) -> void:
 		var tween = create_tween()
 		tween.tween_property(hp, "value", offset.garbage, 3.0).as_relative()
 		offset.garbage = 0
+		is_stunned = true
+		Main.rotation(sprite, 1, 1.5)
+		var timer = Timer.new()
+		add_child(timer)
+		timer.start(1.5)
+		timer.timeout.connect(func() -> void:
+			is_stunned = false
+			timer.queue_free()
+		)
 		return
+	
+	if attack.value == 0:
+		Main.hop(sprite, Vector2(80, -80), 0.3, ATTACK)
+		
 		
 	var attack_increase = delta * 1000 / ATTACK_WAIT_TIME
 	attack.value = min(attack.value + attack_increase, attack.max_value)
@@ -63,6 +83,10 @@ func _process(delta: float) -> void:
 		add_child(timer)
 		timer.start(1.5)
 		timer.timeout.connect(func() -> void:
+			if Game.GAME_OVER:
+				timer.stop()
+				timer.queue_free()
+				return
 			combo += 1
 			offset.bot_score_tmp += combo * combo
 			Main.jump(sprite, Vector2(0, 100), 0.3)

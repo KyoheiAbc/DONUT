@@ -20,17 +20,12 @@ func _process(delta: float) -> void:
 
 	if donuts_pair == null:
 		if Donut.all_donuts_are_stopped(all_donuts):
-			if offset.garbage > 0:
-				Donut.spawn_garbage(offset.garbage, all_donuts, self)
-				offset.garbage = 0
-				Main.jump(bot_sprite, Vector2(0, 200), 0.3)
-				return
-
 			donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
 
 			if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
 				Game.game_over()
 				set_process(false)
+				Main.start_rotation_loop(player_sprite)
 				return
 
 
@@ -55,6 +50,10 @@ func _process(delta: float) -> void:
 			add_child(timer)
 			timer.start(Cleaner.CLEAR_WAIT_TIME)
 			timer.timeout.connect(func() -> void:
+				if Game.GAME_OVER:
+					timer.stop()
+					timer.queue_free()
+					return
 				Donut.remove_donuts(clearable_donuts[0], all_donuts)
 				for donut in clearable_donuts[0]:
 					Donut.clear_garbage_donuts(donut, all_donuts)
@@ -68,5 +67,13 @@ func _process(delta: float) -> void:
 			score_board.on_found_clearable_group(0)
 			offset.garbage -= offset.player_score_tmp
 			offset.player_score_tmp = 0
+
+			if donuts_pair == null:
+				if offset.garbage > 0:
+					Donut.spawn_garbage(offset.garbage, all_donuts, self)
+					offset.garbage = 0
+					Main.jump(bot_sprite, Vector2(0, 200), 0.3)
+					return
+
 	for donut in all_donuts:
 		Donut.render(donut)

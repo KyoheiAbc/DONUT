@@ -10,6 +10,7 @@ static var GAME_OVER: bool = false
 
 func _ready():
 	Game.SELF = self
+	Game.GAME_OVER = false
 
 	set_process(false)
 
@@ -71,6 +72,7 @@ func _ready():
 			return
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(loop.donuts_pair, loop.all_donuts)
+			Main.hop(loop.player_sprite, Vector2(80, -80), 0.3, 1)
 		else:
 			DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts)
 	)
