@@ -1,7 +1,7 @@
 extends SceneTree
 
-const SIZE = 64
-const INNER_RADIUS_RATIO = 0.5
+const SIZE = 32
+const INNER_RADIUS_RATIO = 0.3
 
 func _init():
 	var circle = Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)

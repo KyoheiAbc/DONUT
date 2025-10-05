@@ -24,26 +24,26 @@ func _ready():
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
 		add_child(sprites.back())
-		sprites.back().scale = Vector2(0.5, 0.5)
+		sprites.back().scale = Vector2(0.4, 0.4)
 		sprites.back().texture = SPRITES[i]
-		sprites.back().position = Vector2(i * 220, 650)
-		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 220) / 2
+		sprites.back().position = Vector2(i * 100, 270)
+		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 100) / 2
 
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
 		sprites_a.back().texture = SPRITES[i]
-		sprites_a.back().position = Vector2(600, 250)
+		sprites_a.back().position = Vector2(200, 110)
 
 		sprites_b.append(Sprite2D.new())
 		add_child(sprites_b[i])
 		sprites_b.back().texture = SPRITES[i]
-		sprites_b.back().position = Vector2(1400, 250)
+		sprites_b.back().position = Vector2(600, 110)
 
 	for i in range(2):
 		var cursor = ColorRect.new()
 		add_child(cursor)
 		cursor.color = Color.from_hsv(i * 0.5, 1, 1, 1)
-		cursor.size = Vector2(220, 220)
+		cursor.size = Vector2(90, 90)
 		Main.set_control_position(cursor, sprites[i].position)
 		cursor.z_index = -1
 		cursors.append(cursor)
@@ -55,7 +55,7 @@ func _ready():
 	button.pressed.connect(func() -> void:
 		Main.show_black(0.1)
 		self.queue_free()
-		Main.ROOT.add_child(Option.new())
+		Main.ROOT.add_child(Game.new())
 	)
 
 	var input_handler = InputHandler.new()

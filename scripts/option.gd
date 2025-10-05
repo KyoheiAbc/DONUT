@@ -8,14 +8,14 @@ class CustomHSlider extends HSlider:
 		step = step
 		value = initial_value
 
-		size = Vector2(300, 150)
+		size = Vector2(200, 80)
 
 		var label = Label.new()
 		add_child(label)
 		label.size = size
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.set_autowrap_mode(TextServer.AutowrapMode.AUTOWRAP_WORD)
-		label.add_theme_font_size_override("font_size", 32)
+		label.add_theme_font_size_override("font_size", 16)
 		value_changed.connect(func(value):
 			label.text = text + ": " + str(value)
 		)
