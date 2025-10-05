@@ -40,7 +40,6 @@ func _ready():
 	var bot = Bot.new()
 	loop.add_child(bot)
 	bot.set_process(false)
-	bot.offset = loop.offset
 	loop.bot_sprite = bot.sprite
 	bot.player_sprite = player_sprite
 
