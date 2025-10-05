@@ -20,13 +20,14 @@ func _process(delta: float) -> void:
 
 	if donuts_pair == null:
 		if Donut.all_donuts_are_stopped(all_donuts):
-			donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
+			if offset.garbage <= 0:
+				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
 
-			if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
-				Game.game_over()
-				set_process(false)
-				Main.start_rotation_loop(player_sprite)
-				return
+				if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
+					Game.game_over()
+					set_process(false)
+					Main.start_rotation_loop(player_sprite)
+					return
 
 
 	if donuts_pair != null:

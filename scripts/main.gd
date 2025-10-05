@@ -63,6 +63,7 @@ static func hop(sprite: Sprite2D, delta: Vector2, duration: float, iterations: i
 		tween.chain().tween_property(sprite, "position", Vector2.ZERO, duration * 0.5)
 		tween.parallel().tween_property(sprite, "rotation", 0, duration * 0.5)
 		await tween.finished
+		await sprite.get_tree().create_timer(duration * 0.5).timeout
 		sprite.position = Vector2.ZERO
 		sprite.rotation = 0
 		tween.kill()
