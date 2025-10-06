@@ -30,7 +30,6 @@ func process():
 	frame_count += 1
 
 	if is_building_combo:
-		print("Rival building combo:", frame_count)
 		emit_signal("signal_progress", max(1000 * frame_count, 0) / BUILDING_COMBO_FRAME_COUNT)
 		if frame_count >= BUILDING_COMBO_FRAME_COUNT:
 			is_building_combo = false

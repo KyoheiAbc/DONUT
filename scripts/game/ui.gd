@@ -53,10 +53,18 @@ func on_damaged(index: int) -> void:
 func on_attack(index: int) -> void:
 	VisualEffect.jump(sprites[index], true if index == 1 else false)
 
+
+var rival_attack_prepared: bool = false
 func on_combo(index: int, count: int) -> void:
 	if count > 0:
-		VisualEffect.hop(sprites[index])
+		VisualEffect.hop(sprites[index], 1)
+	if index == 1:
+		rival_attack_prepared = false
 
 
 func on_rival_progress(progress: int) -> void:
+	if not rival_attack_prepared:
+		if sprites[1].rotation == 0 and sprites[1].position == Vector2.ZERO:
+			rival_attack_prepared = true
+			VisualEffect.hop(sprites[1], 3)
 	rival_attack_slider.value = progress
