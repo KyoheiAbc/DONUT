@@ -8,6 +8,9 @@ var frame: int = 0
 var is_building_combo: bool = true
 var combo: int = 0
 
+var sprite: Sprite2D = null
+var hp_slider: VisualEffect.GameVSlider = null
+
 static var BUILDING_COMBO_FRAME: int = 30 * 3 * 3
 
 static var ONE_COMBO_FRAME: int = 30
@@ -54,3 +57,22 @@ func process() -> void:
 				is_building_combo = true
 				combo = 0
 				emit_signal("signal_combo", -1)
+
+	
+func _init():
+	pass
+	var node = Node2D.new()
+	add_child(node)
+	node.position = Vector2(650, 250)
+	sprite = Sprite2D.new()
+	node.add_child(sprite)
+	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)]
+
+	hp_slider = VisualEffect.GameVSlider.new(Vector2(40, 400), Color(0, 1, 0))
+	node.add_child(hp_slider)
+	VisualEffect.set_control_position(hp_slider, Vector2(280, 0))
+	hp_slider.min_value = 0
+	hp_slider.max_value = hp
+	hp_slider.step = 1
+	hp_slider.editable = false
+	hp_slider.value = hp

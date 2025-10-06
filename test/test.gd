@@ -85,6 +85,10 @@ func _ready():
 	assert(offset.scores_tmp[1] == 0)
 
 
+	player.queue_free()
+	rival.queue_free()
+	offset.queue_free()
+
 	get_tree().quit()
 
 # 	Donut.test_all_donuts_are_stopped()

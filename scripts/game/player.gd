@@ -7,6 +7,8 @@ var garbage: int = 0
 signal signal_combo(combo: int)
 signal signal_damaged(damage: int)
 
+var sprite: Sprite2D = null
+
 func on_combo(combo: int) -> void:
 	if combo >= 0:
 		combo_is_doing = true
@@ -27,3 +29,11 @@ func on_receive_garbage() -> int:
 	var return_garbage = garbage
 	garbage = 0
 	return return_garbage
+
+func _init() -> void:
+	var node = Node2D.new()
+	add_child(node)
+	node.position = Vector2(650, 750)
+	sprite = Sprite2D.new()
+	node.add_child(sprite)
+	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
