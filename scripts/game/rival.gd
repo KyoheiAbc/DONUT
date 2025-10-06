@@ -1,7 +1,7 @@
 class_name Rival
 extends Node
 
-const BUILDING_COMBO_FRAME_COUNT = 3 * 1 * 30
+const BUILDING_COMBO_FRAME_COUNT = 3 * 3 * 30
 const ONE_COMBO_DO_FRAME_COUNT = 30
 const MAX_COMBO = 3
 

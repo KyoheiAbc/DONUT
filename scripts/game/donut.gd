@@ -119,8 +119,7 @@ static func get_around(target: Donut, all_donuts: Array[Donut]) -> Array[Donut]:
 
 static func remove_donuts(donuts_to_remove: Array[Donut], all_donuts: Array[Donut]) -> void:
 	for donut in donuts_to_remove:
-		all_donuts.erase(donut)
-		donut.queue_free()
+		clear_donut(donut, all_donuts)
 
 
 static func clear_garbage_donuts(donut: Donut, all_donuts: Array[Donut]) -> void:
@@ -130,8 +129,7 @@ static func clear_garbage_donuts(donut: Donut, all_donuts: Array[Donut]) -> void
 			continue
 		if around_donut.freeze_count < Donut.FREEZE_COUNT:
 			continue
-		all_donuts.erase(around_donut)
-		around_donut.queue_free()
+		clear_donut(around_donut, all_donuts)
 
 static func clear_donut(donut: Donut, all_donuts: Array[Donut]) -> void:
 	var upper_donut = get_donut_at_position(donut.pos + Vector2(0, -100), all_donuts)
