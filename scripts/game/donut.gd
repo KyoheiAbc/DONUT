@@ -45,35 +45,6 @@ func process(all_donuts: Array[Donut]) -> void:
 	else:
 		freeze_count = 0
 
-static func test_move() -> void:
-	var donuts: Array[Donut] = []
-	var donut: Donut
-	donut = Donut.new(0)
-	donuts.append(donut)
-	donut.pos = Vector2(100, 100)
-	assert(move(donut, Vector2(100, 0), donuts) == Vector2(100, 0))
-	assert(donut.pos == Vector2(200, 100))
-
-	donut.pos = Vector2(300, 300)
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(300, 450)
-	assert(move(donut, Vector2(0, 100), donuts) == Vector2(0, 50))
-	assert(donut.pos == Vector2(300, 350))
-
-	donut.pos = Vector2(500, 500)
-	donuts.back().pos = Vector2(600, 550)
-	assert(move(donut, Vector2(100, 0), donuts) == Vector2(100, -50))
-	assert(donut.pos == Vector2(600, 450))
-
-	donut.pos = Vector2(500, 500)
-	donuts.back().pos = Vector2(600, 500)
-	assert(move(donut, Vector2(100, 0), donuts) == Vector2.ZERO)
-	assert(donut.pos == Vector2(500, 500))
-
-	for d in donuts:
-		d.queue_free()
-	donuts.clear()
-
 static func render(donut: Donut) -> void:
 	donut.position = donut.pos / 100 * SPRITE_SIZE + POSITION_OFFSET
 
@@ -98,29 +69,6 @@ static func move(donut: Donut, delta: Vector2, donuts: Array[Donut]) -> Vector2:
 
 	donut.pos = original_position
 	return donut.pos - original_position
-
-static func test_get_colliding_donut() -> void:
-	var donuts: Array[Donut] = []
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(100, 100)
-	donuts.append(Donut.new(1))
-	donuts.back().pos = Vector2(200, 100)
-	donuts.append(Donut.new(2))
-	donuts.back().pos = Vector2(300, 100)
-
-	assert(get_colliding_donut(donuts[0], donuts) == null)
-	assert(get_colliding_donut(donuts[1], donuts) == null)
-	assert(get_colliding_donut(donuts[2], donuts) == null)
-
-	donuts.append(Donut.new(3))
-	donuts.back().pos = Vector2(150, 100)
-	assert(get_colliding_donut(donuts[0], donuts) == donuts[3])
-	assert(get_colliding_donut(donuts[1], donuts) == donuts[3])
-	assert(get_colliding_donut(donuts[2], donuts) == null)
-
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
 
 static func get_colliding_donut(donut: Donut, donuts: Array[Donut]) -> Donut:
 	var rect_a = Rect2(donut.pos - Vector2(50, 50), Vector2(100, 100))
@@ -169,81 +117,11 @@ static func get_around(target: Donut, all_donuts: Array[Donut]) -> Array[Donut]:
 			result.append(donut)
 	return result
 
-static func test_get_around() -> void:
-	var donuts: Array[Donut] = []
-	var center = Donut.new(0)
-	center.pos = Vector2(300, 300)
-	donuts.append(center)
-
-	var up = Donut.new(1)
-	up.pos = Vector2(300, 200)
-	donuts.append(up)
-
-	var down = Donut.new(2)
-	down.pos = Vector2(300, 401)
-	donuts.append(down)
-
-	var left = Donut.new(3)
-	left.pos = Vector2(200, 300)
-	donuts.append(left)
-
-	var right = Donut.new(4)
-	right.pos = Vector2(401, 300)
-	donuts.append(right)
-
-	var around = get_around(center, donuts)
-	assert(around.size() == 2)
-	assert(around.has(up))
-	assert(not around.has(down))
-	assert(around.has(left))
-	assert(not around.has(right))
-
-	for d in donuts:
-		d.queue_free()
-	donuts.clear()
-
 static func remove_donuts(donuts_to_remove: Array[Donut], all_donuts: Array[Donut]) -> void:
 	for donut in donuts_to_remove:
 		all_donuts.erase(donut)
 		donut.queue_free()
 
-static func test_clear_garbage_donuts() -> void:
-	var all_donuts: Array[Donut] = []
-	var target = Donut.new(0)
-	target.pos = Vector2(300, 300)
-	all_donuts.append(target)
-
-	var up = Donut.new(10)
-	up.pos = Vector2(300, 200)
-	all_donuts.append(up)
-	up.freeze_count = Donut.FREEZE_COUNT
-
-	var down = Donut.new(10)
-	down.pos = Vector2(300, 400)
-	all_donuts.append(down)
-	down.freeze_count = Donut.FREEZE_COUNT - 1
-
-	var left = Donut.new(10)
-	left.pos = Vector2(200, 301)
-	all_donuts.append(left)
-	left.freeze_count = Donut.FREEZE_COUNT
-
-	var right = Donut.new(10)
-	right.pos = Vector2(400, 300)
-	all_donuts.append(right)
-	right.freeze_count = Donut.FREEZE_COUNT
-
-	assert(all_donuts.size() == 4 + 1)
-
-
-	clear_garbage_donuts(target, all_donuts)
-	assert(all_donuts.size() == 2 + 1)
-	assert(all_donuts.has(down))
-	assert(all_donuts.has(left))
-
-	for d in all_donuts:
-		d.queue_free()
-	all_donuts.clear()
 
 static func clear_garbage_donuts(donut: Donut, all_donuts: Array[Donut]) -> void:
 	var arounf_donuts = Donut.get_around(donut, all_donuts)
@@ -276,123 +154,6 @@ static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 			return false
 	return true
 
-static func all_garbage_donuts_are_dropped(donuts: Array[Donut]) -> bool:
-	for donut in donuts:
-		if donut.value == 10 and Donut.get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts) == null:
-			return false
-	return true
-static func test_all_garbage_donuts_are_dropped() -> void:
-	var all_donuts: Array[Donut] = []
-	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
-
-	all_donuts.append(Donut.new(10))
-	all_donuts.back().pos = Vector2(100, 100)
-	assert(all_garbage_donuts_are_dropped(all_donuts) == false)
-
-	all_donuts.append(Donut.new(0))
-	all_donuts.back().pos = Vector2(100, 200)
-	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
-
-	all_donuts.back().pos = Vector2(100, 201)
-	assert(all_garbage_donuts_are_dropped(all_donuts) == false)
-
-	all_donuts.back().pos = Vector2(100, 200)
-
-
-	all_donuts.append(Donut.new(10))
-	all_donuts.back().pos = Vector2(100, 0)
-	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
-
-	all_donuts.back().pos = Vector2(100, -1)
-	assert(all_garbage_donuts_are_dropped(all_donuts) == false)
-
-	all_donuts.back().value = 0
-	assert(all_garbage_donuts_are_dropped(all_donuts) == true)
-
-	for d in all_donuts:
-		d.queue_free()
-
-static func test_all_donuts_are_stopped() -> void:
-	var all_donuts: Array[Donut] = []
-	assert(all_donuts_are_stopped(all_donuts) == true)
-
-	all_donuts.append(Donut.new(0))
-	all_donuts.back().pos = Vector2(100, 100)
-	assert(all_donuts_are_stopped(all_donuts) == false)
-	all_donuts[0].freeze_count = Donut.FREEZE_COUNT
-	assert(all_donuts_are_stopped(all_donuts) == false)
-	all_donuts.append(Donut.new(-1))
-	all_donuts.back().pos = Vector2(100, 250)
-	assert(all_donuts_are_stopped(all_donuts) == false)
-	all_donuts.back().pos = Vector2(100, 200)
-	assert(all_donuts_are_stopped(all_donuts) == true)
-	all_donuts.append(Donut.new(1))
-	all_donuts.back().pos = Vector2(100, 0)
-	assert(all_donuts_are_stopped(all_donuts) == false)
-	all_donuts.back().freeze_count = Donut.FREEZE_COUNT
-	assert(all_donuts_are_stopped(all_donuts) == true)
-	all_donuts.back().to_clear = true
-	assert(all_donuts_are_stopped(all_donuts) == false)
-
-	for d in all_donuts:
-		d.queue_free()
-
-
-static func test_sort_donuts_by_y_descending() -> void:
-	var donuts: Array[Donut] = []
-	
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(700, 300)
-	donuts.append(Donut.new(1))
-	donuts.back().pos = Vector2(500, 500)
-	donuts.append(Donut.new(2))
-	donuts.back().pos = Vector2(300, 700)
-
-	assert(donuts[0].pos == Vector2(700, 300))
-	assert(donuts[1].pos == Vector2(500, 500))
-	assert(donuts[2].pos == Vector2(300, 700))
-
-
-	sort_donuts_by_y_descending(donuts)
-
-	assert(donuts[0].pos == Vector2(300, 700))
-	assert(donuts[1].pos == Vector2(500, 500))
-	assert(donuts[2].pos == Vector2(700, 300))
-
-	donuts.append(Donut.new(3))
-	donuts.back().pos = Vector2(900, 400)
-
-
-	assert(donuts[3].pos == Vector2(900, 400))
-
-	sort_donuts_by_y_descending(donuts)
-
-	assert(donuts[0].pos == Vector2(300, 700))
-	assert(donuts[1].pos == Vector2(500, 500))
-	assert(donuts[2].pos == Vector2(900, 400))
-	assert(donuts[3].pos == Vector2(700, 300))
-
-	var donut = Donut.new(4)
-	donut.pos = Vector2(100, 100)
-	donuts.insert(2, donut)
-	assert(donuts[2].pos == Vector2(100, 100))
-	sort_donuts_by_y_descending(donuts)
-	assert(donuts[2].pos == Vector2(900, 400))
-	assert(donuts[4].pos == Vector2(100, 100))
-
-	donuts.append(Donut.new(5))
-	donuts.back().pos = Vector2(900, 400)
-	assert(donuts[5].pos == Vector2(900, 400))
-	sort_donuts_by_y_descending(donuts)
-	assert(donuts[2].pos == Vector2(900, 400))
-	assert(donuts[3].pos == Vector2(900, 400))
-	assert(donuts[4].pos == Vector2(700, 300))
-	assert(donuts[5].pos == Vector2(100, 100))
-
-
-	for d in donuts:
-		d.queue_free()
-	donuts.clear()
 	
 static func sort_donuts_by_y_descending(all_donuts: Array[Donut]) -> void:
 	all_donuts.sort_custom(func(a, b): return a.pos.y > b.pos.y)

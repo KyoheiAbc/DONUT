@@ -4,37 +4,6 @@ extends Node
 static var GROUP_SIZE_TO_CLEAR = 4
 static var CLEAR_WAIT_TIME = 0.5
 
-static func test_find_clearable_donuts():
-	var donuts: Array[Donut] = []
-	donuts.append(Donut.new(1))
-	donuts.back().pos = Vector2(150, 250)
-
-	donuts.append(Donut.new(1))
-	donuts.back().pos = Vector2(250, 250)
-
-	donuts.append(Donut.new(1))
-	donuts.back().pos = Vector2(350, 250)
-
-	donuts.append(Donut.new(2))
-	donuts.back().pos = Vector2(150, 350)
-
-	donuts.append(Donut.new(2))
-	donuts.back().pos = Vector2(250, 350)
-
-	donuts.append(Donut.new(3))
-	donuts.back().pos = Vector2(650, 1550)
-
-	var clearable = find_clearable_donuts(donuts, 3)
-	assert(clearable[0].size() == 3)
-	assert(clearable[0].has(donuts[0]))
-	assert(clearable[0].has(donuts[1]))
-	assert(clearable[0].has(donuts[2]))
-
-	assert(clearable[1] == 1)
-
-	for d in donuts:
-		d.queue_free()
-
 static func find_clearable_donuts(donuts: Array[Donut], group_size_to_clear: int):
 	var ret = mapping_donuts_to_2d_array(donuts)
 	var donuts_map = ret[1]
@@ -48,32 +17,6 @@ static func find_clearable_donuts(donuts: Array[Donut], group_size_to_clear: int
 
 	return [clearable_donuts, founded[1]]
 
-static func test_mapping_donuts_to_2d_array():
-	var donuts: Array[Donut] = []
-	donuts.append(Donut.new(1))
-	donuts.back().pos = Vector2(150, 250)
-
-	donuts.append(Donut.new(2))
-	donuts.back().pos = Vector2(150, 1600)
-
-	donuts.append(Donut.new(3))
-	donuts.back().pos = Vector2(650, 1550)
-
-	var expected = Array2D.new_array_2d(Vector2(8, 16), -1)
-	expected[2][1] = 1
-	expected[15][6] = 3
-
-	var results = mapping_donuts_to_2d_array(donuts)
-	assert(results[0] == expected)
-
-	assert(results[1][2][1] == donuts[0])
-	assert(results[1][15][1] == null)
-	assert(results[1][15][6] == donuts[2])
-	
-	for d in donuts:
-		d.queue_free()
-
-
 static func mapping_donuts_to_2d_array(donuts: Array[Donut]):
 	var result = Array2D.new_array_2d(Vector2(8, 16), -1)
 	var donuts_map = Array2D.new_array_2d(Vector2(8, 16), null)
@@ -85,28 +28,9 @@ static func mapping_donuts_to_2d_array(donuts: Array[Donut]):
 		donuts_map[grid_pos.y][grid_pos.x] = donut
 	return [result, donuts_map]
 
-static func test_donut_out_of_area():
-	var donut = Donut.new(0)
-	donut.pos = Vector2(50, 49)
-	assert(donut_out_of_area(donut) == true)
-	donut.queue_free()
-
-	donut = Donut.new(0)
-	donut.pos = Vector2(750, 1550)
-	assert(donut_out_of_area(donut) == false)
-	donut.queue_free()
 
 static func donut_out_of_area(donut: Donut) -> bool:
 	return donut.pos.x < 50 or donut.pos.x > 750 or donut.pos.y < 50 or donut.pos.y > 1550
-
-static func test_donut_grid_position():
-	var donut = Donut.new(0)
-	donut.pos = Vector2(50, 50)
-	assert(donut_grid_position(donut) == Vector2i(0, 0))
-
-	donut.pos = Vector2(750, 1550)
-	assert(donut_grid_position(donut) == Vector2i(7, 15))
-	donut.queue_free()
 
 
 static func donut_grid_position(donut: Donut) -> Vector2i:

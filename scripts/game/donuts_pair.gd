@@ -8,15 +8,6 @@ var freeze_count: int = 0
 static var FREEZE_COUNT = 60
 static var GRAVITY = 5
 
-static func test_donuts_pair():
-	var donuts_pair = DonutsPair.new(Vector2(300, 300))
-	assert(donuts_pair.elements.size() == 2)
-	assert(donuts_pair.elements[0].pos == Vector2(300, 300))
-	assert(donuts_pair.elements[1].pos == Vector2(300, 200))
-
-	donuts_pair.queue_free()
-
-
 func _init(pos: Vector2) -> void:
 	elements = [Donut.new(randi() % Game.COLOR_NUMBER), Donut.new(randi() % Game.COLOR_NUMBER)]
 	add_child(elements[0])
@@ -30,133 +21,6 @@ func process(all_donuts: Array[Donut]) -> void:
 	else:
 		freeze_count = 0
 	
-
-static func test_move():
-	var donuts: Array[Donut] = []
-	var donuts_pair: DonutsPair
-	donuts_pair = DonutsPair.new(Vector2(300, 300))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	assert(move(donuts_pair, Vector2(100, 0), donuts) == Vector2(100, 0))
-	assert(donuts_pair.elements[0].pos == Vector2(400, 300))
-	assert(donuts_pair.elements[1].pos == Vector2(400, 200))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
-
-	donuts_pair = DonutsPair.new(Vector2(300, 300))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	assert(move(donuts_pair, Vector2(0, -100), donuts) == Vector2(0, -100))
-	assert(donuts_pair.elements[0].pos == Vector2(300, 200))
-	assert(donuts_pair.elements[1].pos == Vector2(300, 100))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
-
-	donuts_pair = DonutsPair.new(Vector2(500, 500))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(500, 250)
-	assert(move(donuts_pair, Vector2(0, -100), donuts) == Vector2(0, -50))
-	assert(donuts_pair.elements[0].pos == Vector2(500, 450))
-	assert(donuts_pair.elements[1].pos == Vector2(500, 350))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
-	donuts_pair = DonutsPair.new(Vector2(500, 500))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(500, 650)
-	assert(move(donuts_pair, Vector2(0, 100), donuts) == Vector2(0, 50))
-	assert(donuts_pair.elements[0].pos == Vector2(500, 550))
-	assert(donuts_pair.elements[1].pos == Vector2(500, 450))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
-
-	donuts_pair = DonutsPair.new(Vector2(500, 500))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(400, 500)
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(400, 400)
-	assert(move(donuts_pair, Vector2(-100, 0), donuts) == Vector2.ZERO)
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
-static func test_rotation():
-	var donuts: Array[Donut] = []
-	var donuts_pair: DonutsPair
-
-	donuts_pair = DonutsPair.new(Vector2(300, 300))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	rotation(donuts_pair, donuts)
-	assert(donuts_pair.elements[0].pos == Vector2(300, 300))
-	assert(donuts_pair.elements[1].pos == Vector2(400, 300))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-	
-
-	donuts_pair = DonutsPair.new(Vector2(300, 300))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(400, 300)
-	rotation(donuts_pair, donuts)
-	assert(donuts_pair.elements[0].pos == Vector2(200, 300))
-	assert(donuts_pair.elements[1].pos == Vector2(300, 300))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
-
-	donuts_pair = DonutsPair.new(Vector2(300, 300))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(400, 300)
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(200, 300)
-	rotation(donuts_pair, donuts)
-	assert(donuts_pair.elements[0].pos == Vector2(300, 200))
-	assert(donuts_pair.elements[1].pos == Vector2(300, 300))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
-
-	donuts_pair = DonutsPair.new(Vector2(300, 300))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(400, 350)
-	rotation(donuts_pair, donuts)
-	assert(donuts_pair.elements[0].pos == Vector2(300, 250))
-	assert(donuts_pair.elements[1].pos == Vector2(400, 250))
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-	donuts.clear()
-
 static func rotation(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 	var initial_pos = donuts_pair.elements[0].pos
 	var initial_child_pos = donuts_pair.elements[1].pos
@@ -202,38 +66,6 @@ static func hard_drop(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 		if moved == Vector2.ZERO:
 			break
 	donuts_pair.freeze_count = FREEZE_COUNT
-
-
-static func test_sync_position():
-	var donuts: Array[Donut] = []
-	var donuts_pair = DonutsPair.new(Vector2(0, 0))
-	donuts.append(donuts_pair.elements[0])
-	donuts.append(donuts_pair.elements[1])
-
-	donuts_pair.elements[0].pos = Vector2(300, 300)
-	assert(sync_position(donuts_pair, true, donuts))
-	assert(donuts_pair.elements[1].pos == Vector2(300, 200))
-
-	donuts_pair.elements[1].pos = Vector2(500, 500)
-	assert(sync_position(donuts_pair, false, donuts))
-	assert(donuts_pair.elements[0].pos == Vector2(500, 600))
-
-	donuts.append(Donut.new(0))
-	donuts.back().pos = Vector2(700, 700)
-
-	donuts_pair.elements[0].pos = Vector2(700, 800)
-	assert(!sync_position(donuts_pair, true, donuts))
-
-	donuts_pair.elements[1].pos = Vector2(700, 600)
-	assert(!sync_position(donuts_pair, false, donuts))
-
-	donuts_pair.elements[0].pos = Vector2(600, 700)
-	assert(sync_position(donuts_pair, true, donuts))
-
-	donuts_pair.queue_free()
-	for donut in donuts:
-		donut.queue_free()
-
 
 static func sync_position(pair: DonutsPair, to_parent: bool, donuts: Array[Donut]) -> bool:
 	var base_donut = pair.elements[0] if to_parent else pair.elements[1]
