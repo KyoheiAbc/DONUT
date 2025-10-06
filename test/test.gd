@@ -2,17 +2,15 @@ class_name Test
 extends Node
 
 var frame: int = 0
+
+var offset = Offset.new()
 var player = Player.new()
 var rival = Rival.new()
-var offset = Offset.new()
-func process():
-	frame += 1
-	rival.process()
 
 func _ready():
+	add_child(offset)
 	add_child(player)
 	add_child(rival)
-	add_child(offset)
 
 	offset.signal_score.connect(func(score: int) -> void:
 		print("offset score: %d, frame: %d\n" % [score, frame])
@@ -39,17 +37,49 @@ func _ready():
 	)
 
 	for i in range(30 * 20):
-		if i == 200:
+		frame += 1
+		if frame == 1:
+			player.on_combo(0)
+			assert(offset.scores_tmp[0] == 0)
+		if frame == 10:
 			player.on_combo(1)
-		if i == 210:
+			assert(offset.scores_tmp[0] == 1)
+		if frame == 20:
+			player.on_combo(2)
+			assert(offset.scores_tmp[0] == 5)
+			assert(offset.score == 0)
+		if frame == 30:
 			player.on_combo(-1)
-		if i == 320:
+			assert(offset.scores_tmp[0] == 0)
+			assert(offset.score == 0)
+			assert(rival.hp == 995)
+		if frame == 330:
+			player.on_combo(0)
+			assert(offset.scores_tmp[0] == 0)
+		if frame == 340:
+			player.on_combo(2)
+			assert(offset.scores_tmp[0] == 4)
+			assert(offset.score == 0)
+		if frame == 350:
+			player.on_combo(-1)
+			assert(offset.scores_tmp[0] == 0)
+			assert(offset.score == 4)
+			assert(rival.hp == 995)
+		if frame == 360:
+			player.on_combo(0)
+		if frame == 370:
 			player.on_combo(1)
-		if i == 330:
+		if frame == 380:
 			player.on_combo(-1)
-		process()
+		
+		rival.process()
 
-	print("Final score: %d\n" % [offset.score])
+
+	assert(rival.hp == 995)
+	assert(player.garbage == 9)
+	assert(offset.score == 0)
+	assert(offset.scores_tmp[0] == 0)
+	assert(offset.scores_tmp[1] == 0)
 
 
 	get_tree().quit()

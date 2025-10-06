@@ -22,13 +22,12 @@ func on_score(score: int) -> void:
 	if score < 0:
 		return
 
-	if not is_building_combo:
-		return
-
-	hp = max(hp - score, 0)
-	frame = max(frame - DECREASE_FRAME_WHEN_DAMAGED, 0)
-	emit_signal("signal_damaged", score)
-
+	if is_building_combo:
+		hp = max(hp - score, 0)
+		frame = max(frame - DECREASE_FRAME_WHEN_DAMAGED, 0)
+		emit_signal("signal_damaged", score)
+	else:
+		print("Rival continues combo, no damage taken\n")
 
 func process() -> void:
 	if hp == 0:
@@ -40,12 +39,12 @@ func process() -> void:
 		return
 
 	if is_building_combo:
-		if frame > BUILDING_COMBO_FRAME:
+		if frame >= BUILDING_COMBO_FRAME:
 			frame = 0
 			is_building_combo = false
 			emit_signal("signal_combo", combo)
 	else:
-		if frame > ONE_COMBO_FRAME:
+		if frame >= ONE_COMBO_FRAME:
 			frame = 0
 			combo += 1
 			if combo <= COMBO:
