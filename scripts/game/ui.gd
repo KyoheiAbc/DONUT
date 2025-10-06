@@ -54,17 +54,20 @@ func on_attack(index: int) -> void:
 	VisualEffect.jump(sprites[index], true if index == 1 else false)
 
 
-var rival_attack_prepared: bool = false
+var rival_combo_count: int = 3
+var rival_attack_motion_count: int = 0
+
 func on_combo(index: int, count: int) -> void:
 	if count > 0:
 		VisualEffect.hop(sprites[index], 1)
 	if index == 1:
-		rival_attack_prepared = false
-
+		rival_attack_motion_count = 0
 
 func on_rival_progress(progress: int) -> void:
-	if not rival_attack_prepared:
-		if sprites[1].rotation == 0 and sprites[1].position == Vector2.ZERO:
-			rival_attack_prepared = true
-			VisualEffect.hop(sprites[1], 3)
 	rival_attack_slider.value = progress
+
+	for i in range(rival_combo_count):
+		if progress >= rival_attack_slider.max_value * 0.333 * i and rival_attack_motion_count == i:
+			if sprites[1].rotation == 0 and sprites[1].position == Vector2.ZERO:
+				VisualEffect.hop(sprites[1], 3 if i == 0 else 1)
+				rival_attack_motion_count += 1
