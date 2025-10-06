@@ -1,8 +1,8 @@
 class_name Donut
 extends Node2D
 
-static var SPRITE_SIZE = Vector2(64, 64)
-static var POSITION_OFFSET = Vector2(1000 - SPRITE_SIZE.x, 500 - SPRITE_SIZE.y * 9)
+static var SPRITE_SIZE = Vector2(32, 32)
+static var POSITION_OFFSET = Vector2(400 - SPRITE_SIZE.x, 200 - SPRITE_SIZE.y * 9)
 
 const DONUT_TEXTURE: Texture2D = preload("res://assets/donut.png")
 
@@ -254,6 +254,15 @@ static func clear_garbage_donuts(donut: Donut, all_donuts: Array[Donut]) -> void
 			continue
 		all_donuts.erase(around_donut)
 		around_donut.queue_free()
+
+static func clear_donut(donut: Donut, all_donuts: Array[Donut]) -> void:
+	var upper_donut = get_donut_at_position(donut.pos + Vector2(0, -100), all_donuts)
+	all_donuts.erase(donut)
+	donut.queue_free()
+	if upper_donut == null:
+		return
+	if upper_donut.freeze_count == Donut.FREEZE_COUNT:
+		upper_donut.freeze_count = 0
 
 static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 	for donut in donuts_except_pair:

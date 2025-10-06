@@ -1,78 +1,50 @@
 class_name Rival
 extends Node
 
-var hp: int = 1000
+const BUILDING_COMBO_FRAME_COUNT = 3 * 1 * 30
+const ONE_COMBO_DO_FRAME_COUNT = 30
+const MAX_COMBO = 3
 
-var frame: int = 0
+var hp: int = 100
 
+var frame_count: int = 0
 var is_building_combo: bool = true
 var combo: int = 0
 
-var sprite: Sprite2D = null
-var hp_slider: VisualEffect.GameVSlider = null
+signal signal_combo(count)
+signal signal_damaged(damage)
 
-static var BUILDING_COMBO_FRAME: int = 30 * 3 * 3
+signal signal_progress(progress: int)
+signal signal_hp_changed(hp: int)
 
-static var ONE_COMBO_FRAME: int = 30
-static var COMBO: int = 3
-static var DECREASE_FRAME_WHEN_DAMAGED: int = 30
+func on_score_changed(new_score: int) -> void:
+	if is_building_combo:
+		if new_score > 0:
+			hp = max(hp - new_score, 0)
+			frame_count = frame_count - 30
+			emit_signal("signal_damaged", new_score)
+			emit_signal("signal_hp_changed", hp)
 
-signal signal_combo(combo: int)
-signal signal_damaged(damage: int)
 
-
-func on_score(score: int) -> void:
-	if score < 0:
-		return
+func process():
+	frame_count += 1
 
 	if is_building_combo:
-		hp = max(hp - score, 0)
-		frame = max(frame - DECREASE_FRAME_WHEN_DAMAGED, 0)
-		emit_signal("signal_damaged", score)
-	else:
-		print("Rival continues combo, no damage taken\n")
-
-func process() -> void:
-	if hp == 0:
-		return
-
-	frame += 1
-
-	if frame <= 0:
-		return
-
-	if is_building_combo:
-		if frame >= BUILDING_COMBO_FRAME:
-			frame = 0
+		print("Rival building combo:", frame_count)
+		emit_signal("signal_progress", max(1000 * frame_count, 0) / BUILDING_COMBO_FRAME_COUNT)
+		if frame_count >= BUILDING_COMBO_FRAME_COUNT:
 			is_building_combo = false
-			emit_signal("signal_combo", combo)
+			frame_count = 0
+			emit_signal("signal_combo", 0)
+
 	else:
-		if frame >= ONE_COMBO_FRAME:
-			frame = 0
+		if frame_count >= ONE_COMBO_DO_FRAME_COUNT:
+			frame_count = 0
 			combo += 1
-			if combo <= COMBO:
+			if combo <= MAX_COMBO:
 				emit_signal("signal_combo", combo)
-
-			if combo > COMBO:
-				is_building_combo = true
+			else:
+				frame_count = 0
 				combo = 0
+				is_building_combo = true
 				emit_signal("signal_combo", -1)
-
-	
-func _init():
-	pass
-	var node = Node2D.new()
-	add_child(node)
-	node.position = Vector2(650, 250)
-	sprite = Sprite2D.new()
-	node.add_child(sprite)
-	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)]
-
-	hp_slider = VisualEffect.GameVSlider.new(Vector2(40, 400), Color(0, 1, 0))
-	node.add_child(hp_slider)
-	VisualEffect.set_control_position(hp_slider, Vector2(280, 0))
-	hp_slider.min_value = 0
-	hp_slider.max_value = hp
-	hp_slider.step = 1
-	hp_slider.editable = false
-	hp_slider.value = hp

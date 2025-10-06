@@ -41,7 +41,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventScreenDrag:
 		if event.index != drag_index:
 			return
-		if event.relative.length() > THRESHOLD * 2:
+		if event.relative.length() > THRESHOLD:
 			return
 			
 		sum += event.relative
