@@ -8,6 +8,9 @@ var player = Player.new()
 var rival = Rival.new()
 
 func _ready():
+	print(Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)])
+	print(Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)])
+
 	add_child(offset)
 	add_child(player)
 	add_child(rival)
@@ -107,12 +110,6 @@ func _ready():
 
 # 	test_array_2d()
 
-# 	test_score_board()
-# 	self.test_score_board_completed.connect(func() -> void:
-# 		print("All tests passed!")
-# 		get_tree().quit()
-# 	)
-
 
 # func test_array_2d():
 # 	var array_2d = Array2D.new_array_2d(Vector2(3, 4), -1)
@@ -196,77 +193,3 @@ func _ready():
 # 	assert(Array2D.get_position_value(array_2d, 10) == 4)
 # 	assert(Array2D.get_position_value(array_2d, 30) == 6)
 # 	assert(Array2D.get_position_value(array_2d, 20) == 10)
-
-# signal test_score_board_completed
-
-# func test_score_board() -> void:
-# 	var score_board = ScoreBoard.new()
-# 	ScoreBoard.COMBO_STOP_TIME = 0.3
-# 	add_child(score_board)
-		
-# 	assert(score_board.combo == 0)
-# 	assert(score_board.combo_label.text == "")
-# 	assert(score_board.combo_stop_timer.is_stopped())
-
-# 	score_board.on_found_clearable_group(3)
-# 	assert(score_board.combo == 3)
-# 	assert(score_board.combo_label.text == "")
-# 	assert(score_board.combo_stop_timer.is_stopped())
-
-# 	score_board.render()
-# 	assert(score_board.combo == 3)
-# 	assert(score_board.combo_label.text == "3 COMBO!")
-# 	assert(score_board.combo_stop_timer.is_stopped())
-
-# 	score_board.on_found_clearable_group(2)
-# 	assert(score_board.combo == 5)
-# 	assert(score_board.combo_label.text == "3 COMBO!")
-# 	assert(score_board.combo_stop_timer.is_stopped())
-
-# 	score_board.render()
-# 	assert(score_board.combo == 5)
-# 	assert(score_board.combo_label.text == "5 COMBO!")
-# 	assert(score_board.combo_stop_timer.is_stopped())
-
-# 	score_board.on_found_clearable_group(0)
-# 	assert(score_board.combo == 5)
-# 	assert(score_board.combo_label.text == "5 COMBO!")
-# 	assert(not score_board.combo_stop_timer.is_stopped())
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 0.9).timeout
-# 	assert(score_board.combo == 5)
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 0.1).timeout
-# 	assert(score_board.combo == 0)
-
-# 	score_board.on_found_clearable_group(2)
-# 	assert(score_board.combo == 2)
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 0.9).timeout
-# 	assert(score_board.combo == 2)
-# 	score_board.on_found_clearable_group(1)
-# 	assert(score_board.combo == 3)
-# 	assert(score_board.combo_stop_timer.is_stopped())
-
-# 	score_board.on_found_clearable_group(0)
-# 	assert(score_board.combo == 3)
-# 	assert(not score_board.combo_stop_timer.is_stopped())
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 0.9).timeout
-# 	assert(score_board.combo == 3)
-# 	score_board.on_found_clearable_group(0)
-# 	score_board.on_found_clearable_group(0)
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 0.05).timeout
-# 	assert(score_board.combo == 3)
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 0.1).timeout
-# 	assert(score_board.combo == 0)
-
-# 	score_board.on_found_clearable_group(1)
-# 	assert(score_board.combo == 1)
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 0.9).timeout
-# 	score_board.on_found_clearable_group(1)
-# 	assert(score_board.combo == 2)
-# 	assert(score_board.combo_stop_timer.is_stopped())
-# 	score_board.on_found_clearable_group(0)
-# 	await get_tree().create_timer(ScoreBoard.COMBO_STOP_TIME * 1.1).timeout
-# 	assert(score_board.combo == 0)
-
-# 	score_board.queue_free()
-
-# 	emit_signal("test_score_board_completed")

@@ -4,14 +4,9 @@ extends Node
 var donuts_pair: DonutsPair = null
 var all_donuts: Array[Donut] = []
 
-var score_board: ScoreBoard = ScoreBoard.new()
 
 var player_sprite: Sprite2D = null
 var bot_sprite: Sprite2D = null
-
-func _ready() -> void:
-	add_child(score_board)
-
 
 func _process(delta: float) -> void:
 	Donut.sort_donuts_by_y_descending(all_donuts)
@@ -23,7 +18,6 @@ func _process(delta: float) -> void:
 			if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
 				Game.game_over()
 				set_process(false)
-				Main.start_rotation_loop(player_sprite)
 				return
 
 
@@ -56,12 +50,7 @@ func _process(delta: float) -> void:
 				for donut in clearable_donuts[0]:
 					Donut.clear_garbage_donuts(donut, all_donuts)
 				timer.queue_free()
-				score_board.render()
-				Main.jump(player_sprite, Vector2(0, -100), 0.3)
 			)
-			score_board.on_found_clearable_group(clearable_donuts[1])
-		else:
-			score_board.on_found_clearable_group(0)
 
 
 	for donut in all_donuts:

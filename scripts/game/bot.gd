@@ -47,17 +47,12 @@ func _process(delta: float) -> void:
 	if hp.value <= 0:
 		Game.game_over()
 		set_process(false)
-		Main.start_rotation_loop(sprite)
 		return
 
 	if combo_doing:
 		return
 
 	
-	if attack.value == 0:
-		Main.hop(sprite, Vector2(80, -80), 0.3, ATTACK)
-		
-		
 	var attack_increase = delta * 1000 / ATTACK_WAIT_TIME
 	attack.value = min(attack.value + attack_increase, attack.max_value)
 	combo = 0
@@ -72,7 +67,6 @@ func _process(delta: float) -> void:
 				timer.queue_free()
 				return
 			combo += 1
-			Main.jump(sprite, Vector2(0, 100), 0.3)
 			if combo == ATTACK:
 				timer.stop()
 				timer.queue_free()
@@ -92,7 +86,7 @@ func _ready():
 
 	hp = GameVSlider.new(Vector2(40, 400), Color(0, 1, 0))
 	node.add_child(hp)
-	Main.set_control_position(hp, Vector2(280, 0))
+	VisualEffect.set_control_position(hp, Vector2(280, 0))
 	hp.min_value = 0
 	hp.max_value = HP
 	hp.step = 1
@@ -101,7 +95,7 @@ func _ready():
 
 	attack = GameVSlider.new(Vector2(40, 400), Color(1, 0.6, 0))
 	node.add_child(attack)
-	Main.set_control_position(attack, Vector2(230, 0))
+	VisualEffect.set_control_position(attack, Vector2(230, 0))
 	attack.min_value = 0
 	attack.max_value = 1000
 	attack.step = 1

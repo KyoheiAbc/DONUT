@@ -18,11 +18,11 @@ func _ready():
 	add_child(rect)
 	rect.color = Color(0.3, 0.3, 0.3)
 	rect.size = Vector2(Donut.SPRITE_SIZE.x * 6, Donut.SPRITE_SIZE.y * 12)
-	Main.set_control_position(rect, Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500))
+	VisualEffect.set_control_position(rect, Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500))
 	
 	var label = Label.new()
 	add_child(label)
-	Main.setup_label(label)
+	VisualEffect.setup_label(label)
 
 	var loop = Loop.new()
 	add_child(loop)
@@ -71,7 +71,6 @@ func _ready():
 			return
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(loop.donuts_pair, loop.all_donuts)
-			Main.hop(loop.player_sprite, Vector2(80, -80), 0.3, 1)
 		else:
 			if DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts) != Vector2.ZERO:
 				loop.donuts_pair.freeze_count = 0
@@ -90,12 +89,12 @@ static func game_over() -> void:
 	var label = Label.new()
 	Game.SELF.add_child(label)
 	label.text = "GAME OVER"
-	Main.setup_label(label)
+	VisualEffect.setup_label(label)
 
 	var button = Button.new()
 	Game.SELF.add_child(button)
 	button.text = "FINISH"
-	Main.setup_button(button)
+	VisualEffect.setup_button(button)
 	button.pressed.connect(func() -> void:
 		Main.show_black(0.1)
 		Game.SELF.queue_free()

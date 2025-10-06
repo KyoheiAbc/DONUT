@@ -44,14 +44,14 @@ func _ready():
 		add_child(cursor)
 		cursor.color = Color.from_hsv(i * 0.5, 1, 1, 1)
 		cursor.size = Vector2(90, 90)
-		Main.set_control_position(cursor, sprites[i].position)
+		VisualEffect.set_control_position(cursor, sprites[i].position)
 		cursor.z_index = -1
 		cursors.append(cursor)
 
 	var button = Button.new()
 	add_child(button)
 	button.text = "OK"
-	Main.setup_button(button)
+	VisualEffect.setup_button(button)
 	button.pressed.connect(func() -> void:
 		Main.show_black(0.1)
 		self.queue_free()
