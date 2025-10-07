@@ -33,24 +33,19 @@ func _ready():
 	)
 	player.signal_damaged.connect(func(damage: int) -> void:
 		print("player signal_damaged:", damage, " frame_count:", frame_count)
-		ui.on_damaged(0)
+		ui.on_damaged(0, damage)
 		ui.on_attack(1)
 		offset.on_damaged(0, damage)
 	)
 	rival.signal_damaged.connect(func(damage: int) -> void:
 		print("rival signal_damaged:", damage, " frame_count:", frame_count)
-		ui.on_damaged(1)
+		ui.on_damaged(1, damage)
 		ui.on_attack(0)
 		offset.on_damaged(1, damage)
 	)
 	
 	rival.signal_progress.connect(ui.on_rival_progress)
 	
-	rival.signal_hp_changed.connect(func(hp: int) -> void:
-		var tween = ui.rival_hp_slider.create_tween()
-		tween.tween_property(ui.rival_hp_slider, "value", hp * 10, 3.0)
-	)
-
 
 func _process(delta: float) -> void:
 	frame_count += 1

@@ -47,9 +47,12 @@ func _init():
 	rival_attack_slider.editable = false
 	rival_attack_slider.value = rival_attack_slider.max_value
 
-func on_damaged(index: int) -> void:
+func on_damaged(index: int, damage: int) -> void:
 	VisualEffect.rotation(sprites[index], false)
-
+	if index == 1:
+		var tween = rival_hp_slider.create_tween()
+		tween.tween_property(rival_hp_slider, "value", -damage * 10, 3.0).as_relative()
+		
 func on_attack(index: int) -> void:
 	VisualEffect.jump(sprites[index], true if index == 1 else false)
 

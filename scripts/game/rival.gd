@@ -15,7 +15,6 @@ signal signal_combo(count)
 signal signal_damaged(damage)
 
 signal signal_progress(progress: int)
-signal signal_hp_changed(hp: int)
 
 func on_score_changed(new_score: int) -> void:
 	if is_building_combo:
@@ -23,7 +22,6 @@ func on_score_changed(new_score: int) -> void:
 			hp = max(hp - new_score, 0)
 			frame_count = frame_count - 30
 			emit_signal("signal_damaged", new_score)
-			emit_signal("signal_hp_changed", hp)
 
 
 func process():
