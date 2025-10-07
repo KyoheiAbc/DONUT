@@ -5,7 +5,7 @@ extends Node
 func _ready():
 	var label = Label.new()
 	add_child(label)
-	VisualEffect.setup_label(label)
+	Main.setup_label(label)
 	label.text = "DONUT"
 
 	var input_handler = InputHandler.new()

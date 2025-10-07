@@ -6,7 +6,7 @@ static var COLOR_NUMBER = 4
 func _ready():
 	var label = Label.new()
 	add_child(label)
-	VisualEffect.setup_label(label)
+	Main.setup_label(label)
 
 	var loop = Loop.new()
 	add_child(loop)

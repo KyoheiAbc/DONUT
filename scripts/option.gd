@@ -28,23 +28,23 @@ func _ready():
 	slider = CustomHSlider.new("inTh", InputHandler.THRESHOLD, 10, 300, 10)
 	add_child(slider)
 	slider.value_changed.connect(func(value): InputHandler.THRESHOLD = value)
-	VisualEffect.set_control_position(slider, Vector2(Main.WINDOW.x * 0.1, 150))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.1, 150))
 
 	slider = CustomHSlider.new("colorNum", Game.COLOR_NUMBER, 1, 5, 1)
 	add_child(slider)
 	slider.value_changed.connect(func(value): Game.COLOR_NUMBER = int(value))
-	VisualEffect.set_control_position(slider, Vector2(Main.WINDOW.x * 0.1, 300))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.1, 300))
 
 
 	slider = CustomHSlider.new("groupSize", Cleaner.GROUP_SIZE_TO_CLEAR, 1, 10, 1)
 	add_child(slider)
 	slider.value_changed.connect(func(value): Cleaner.GROUP_SIZE_TO_CLEAR = int(value))
-	VisualEffect.set_control_position(slider, Vector2(Main.WINDOW.x * 0.3, 150))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.3, 150))
 
 
 	var button = Button.new()
 	add_child(button)
-	VisualEffect.setup_button(button)
+	Main.setup_button(button)
 	button.text = "OK"
 	button.pressed.connect(func() -> void:
 		Main.show_black(0.1)
