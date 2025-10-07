@@ -44,7 +44,7 @@ func _ready():
 		offset.on_damaged(1, damage)
 	)
 	
-	rival.signal_progress.connect(ui.on_rival_progress)
+	rival.signal_progress.connect(ui.on_progress)
 	
 
 func _process(delta: float) -> void:

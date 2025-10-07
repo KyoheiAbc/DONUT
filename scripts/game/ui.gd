@@ -52,7 +52,7 @@ func on_damaged(index: int, damage: int) -> void:
 	if index == 1:
 		var tween = rival_hp_slider.create_tween()
 		tween.tween_property(rival_hp_slider, "value", -damage * 10, 3.0).as_relative()
-		
+
 func on_attack(index: int) -> void:
 	VisualEffect.jump(sprites[index], true if index == 1 else false)
 
@@ -66,7 +66,7 @@ func on_combo(index: int, count: int) -> void:
 	if index == 1:
 		rival_attack_motion_count = 0
 
-func on_rival_progress(progress: int) -> void:
+func on_progress(progress: int) -> void:
 	rival_attack_slider.value = progress
 
 	for i in range(rival_combo_count):
