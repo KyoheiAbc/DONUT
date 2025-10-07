@@ -10,8 +10,7 @@ func _ready():
 	call_deferred("ready")
 
 func ready():
-	ROOT.add_child(Initial.new())
-
+	ROOT.add_child(Game.new())
 
 static func show_black(duration: float) -> void:
 	var canvas = CanvasLayer.new()
