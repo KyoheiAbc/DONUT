@@ -20,11 +20,10 @@ func _init():
 
 
 func on_score_changed(new_score: int) -> void:
-	print("Player: on_score_changed ", new_score)
-	# if combo_is_doing:
-	# 	return
-	# if new_score < 0:
-	# 	emit_signal("signal_damaged", -new_score)
+	if combo_is_doing:
+		return
+	if new_score < 0:
+		emit_signal("signal_damaged", -new_score)
 
 func on_combo(count: int) -> void:
 	if count >= 0:

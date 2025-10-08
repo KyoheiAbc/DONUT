@@ -92,7 +92,7 @@ static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
 	return null
 
 
-static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> void:
+static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> int:
 	var spawn_count = 0
 	var y = 50
 	while true:
@@ -109,7 +109,10 @@ static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> v
 			node.add_child(donut)
 			spawn_count += 1
 			if spawn_count >= count:
-				return
+				return spawn_count
+			if spawn_count >= 36:
+				return spawn_count
+	return spawn_count
 
 static func get_around(target: Donut, all_donuts: Array[Donut]) -> Array[Donut]:
 	var result: Array[Donut] = []
@@ -121,19 +124,6 @@ static func get_around(target: Donut, all_donuts: Array[Donut]) -> Array[Donut]:
 			result.append(donut)
 	return result
 
-static func remove_donuts(donuts_to_remove: Array[Donut], all_donuts: Array[Donut]) -> void:
-	for donut in donuts_to_remove:
-		clear_donut(donut, all_donuts)
-
-
-static func clear_garbage_donuts(donut: Donut, all_donuts: Array[Donut]) -> void:
-	var arounf_donuts = Donut.get_around(donut, all_donuts)
-	for around_donut in arounf_donuts:
-		if around_donut.value != 10:
-			continue
-		if around_donut.freeze_count < Donut.FREEZE_COUNT:
-			continue
-		clear_donut(around_donut, all_donuts)
 
 static func clear_donut(donut: Donut, all_donuts: Array[Donut]) -> void:
 	var upper_donut = get_donut_at_position(donut.pos + Vector2(0, -100), all_donuts)
