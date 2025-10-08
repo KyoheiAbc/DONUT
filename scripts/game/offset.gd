@@ -25,5 +25,8 @@ func on_combo(index: int, combo: int) -> void:
 		return
 
 	if combo == -1:
-		score += scores_tmp[index]
+		if index == 0:
+			score += scores_tmp[0]
+		elif index == 1:
+			score -= scores_tmp[1]
 		scores_tmp[index] = 0
