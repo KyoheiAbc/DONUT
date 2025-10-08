@@ -27,8 +27,8 @@ func on_combo(count: int) -> void:
 			timer.queue_free()
 			label.text = "COMBO: 0"
 		)
+		emit_signal("signal_combo", -1)
 	else:
 		combo += count
 		label.text = "COMBO: " + str(combo)
-
-	emit_signal("signal_combo", count)
+		emit_signal("signal_combo", combo)
