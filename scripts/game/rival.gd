@@ -4,8 +4,9 @@ extends Node
 const BUILDING_COMBO_FRAME_COUNT = 3 * 3 * 30
 const ONE_COMBO_DO_FRAME_COUNT = 30
 const MAX_COMBO = 3
+static var HP_MAX: int = 100
 
-var hp: int = 100
+var hp: int = HP_MAX
 
 var frame_count: int = 0
 var is_building_combo: bool = true
