@@ -1,7 +1,7 @@
 class_name Game
 extends Node
 
-static var COLOR_NUMBER = 4
+static var COLOR_NUMBER = 3
 
 static var FRAME_COUNT: int = 0
 
@@ -39,6 +39,8 @@ func _ready():
 
 	setup(offset, player, rival, ui)
 
+	var input_handler = InputHandler.new()
+	add_child(input_handler)
 
 	label.text = "READY"
 	await get_tree().create_timer(1.5).timeout
@@ -46,7 +48,14 @@ func _ready():
 	await get_tree().create_timer(0.5).timeout
 	label.queue_free()
 
-
+	input_handler.pressed.connect(func(position: Vector2) -> void:
+		if position.x < Main.WINDOW.x * 0.75:
+			return
+		if loop.donuts_pair == null:
+			return
+		DonutsPair.rotation(loop.donuts_pair, loop.all_donuts)
+		loop.donuts_pair.freeze_count = 0
+	)
 	loop.set_process(true)
 	rival.set_process(true)
 
