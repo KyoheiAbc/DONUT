@@ -3,10 +3,7 @@ extends Node
 
 var combo: int = 0
 
-var combo_is_doing: bool = false
-
 signal signal_combo(count)
-signal signal_damaged(damage)
 
 var label: Label = null
 
@@ -18,18 +15,18 @@ func _init():
 	label.position = Vector2(600, 50)
 	label.text = "COMBO: 0"
 
-
-func on_score_changed(new_score: int) -> void:
-	if combo_is_doing:
-		return
-	if new_score < 0:
-		emit_signal("signal_damaged", -new_score)
-
 func on_combo(count: int) -> void:
-	if count >= 0:
-		combo = count
-		combo_is_doing = true
 	if count == -1:
 		combo = 0
-		combo_is_doing = false
+		var timer = Timer.new()
+		add_child(timer)
+		timer.start(1)
+		timer.timeout.connect(func():
+			timer.queue_free()
+			label.text = "COMBO: 0"
+		)
+	else:
+		combo += count
+		label.text = "COMBO: " + str(combo)
+
 	emit_signal("signal_combo", count)

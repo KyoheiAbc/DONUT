@@ -32,9 +32,6 @@ func _ready():
 	var offset = Offset.new()
 	add_child(offset)
 
-	var player = Player.new()
-	add_child(player)
-
 	var rival = Rival.new()
 	add_child(rival)
 
@@ -42,7 +39,7 @@ func _ready():
 	add_child(ui)
 	ui.z_index = -1
 
-	setup(offset, player, rival, ui)
+	setup(offset, loop.player, rival, ui)
 
 	var input_handler = InputHandler.new()
 	add_child(input_handler)
