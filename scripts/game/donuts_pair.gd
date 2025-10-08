@@ -5,8 +5,8 @@ var elements: Array[Donut]
 var child_relative_pos: Array[Vector2] = [Vector2.UP * 100, Vector2.RIGHT * 100, Vector2.DOWN * 100, Vector2.LEFT * 100]
 
 var freeze_count: int = 0
-static var FREEZE_COUNT = 60
-static var GRAVITY = 5
+static var FREEZE_COUNT = 30
+static var GRAVITY = 25
 
 func _init(pos: Vector2) -> void:
 	elements = [Donut.new(randi() % Game.COLOR_NUMBER), Donut.new(randi() % Game.COLOR_NUMBER)]

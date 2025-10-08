@@ -11,9 +11,10 @@ var pos: Vector2
 var sprite: Sprite2D
 
 var freeze_count: int = 0
-static var FREEZE_COUNT = 30
-static var GRAVITY = 30
+static var FREEZE_COUNT = 15
+static var GRAVITY = 50
 var to_clear: bool = false
+var to_clear_count: int = 0
 
 func _init(_value: int):
 	value = _value
@@ -34,6 +35,9 @@ func process(all_donuts: Array[Donut]) -> void:
 	if to_clear:
 		sprite.scale.y = 1.3
 		sprite.scale.x = 0.7
+		to_clear_count += 1
+		if to_clear_count > Cleaner.CLEAR_WAIT_COUNT:
+			Donut.clear_donut(self, all_donuts)
 		return
 
 	if move(self, Vector2(0, GRAVITY), all_donuts) == Vector2.ZERO:

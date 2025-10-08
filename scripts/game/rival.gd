@@ -24,7 +24,7 @@ func on_score_changed(new_score: int) -> void:
 			emit_signal("signal_damaged", new_score)
 
 
-func process():
+func _process(delta: float) -> void:
 	frame_count += 1
 
 	if is_building_combo:
