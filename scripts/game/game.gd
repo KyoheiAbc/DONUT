@@ -16,6 +16,8 @@ func _ready():
 	add_child(loop)
 	loop.set_process(false)
 
+	loop.donuts_pair = DonutsPair.spawn_donuts_pair(loop.all_donuts, loop)
+
 	for y in range(16):
 		for x in range(8):
 			if x == 0 or x == 7 or y == 15:
@@ -36,6 +38,7 @@ func _ready():
 
 	var ui = UI.new()
 	add_child(ui)
+	ui.z_index = -1
 
 	setup(offset, player, rival, ui)
 
@@ -48,6 +51,21 @@ func _ready():
 	await get_tree().create_timer(0.5).timeout
 	label.queue_free()
 
+	input_handler.direction.connect(func(direction: Vector2) -> void:
+		if loop.donuts_pair == null:
+			return
+		if direction == Vector2.UP:
+			DonutsPair.hard_drop(loop.donuts_pair, loop.all_donuts)
+			loop.donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
+			return
+		if direction == Vector2.DOWN:
+			if DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts) == Vector2.ZERO:
+				loop.donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
+			return
+		if DonutsPair.move(loop.donuts_pair, direction * 100, loop.all_donuts) != Vector2.ZERO:
+			loop.donuts_pair.freeze_count = 0
+	)
+
 	input_handler.pressed.connect(func(position: Vector2) -> void:
 		if position.x < Main.WINDOW.x * 0.75:
 			return
@@ -56,6 +74,7 @@ func _ready():
 		DonutsPair.rotation(loop.donuts_pair, loop.all_donuts)
 		loop.donuts_pair.freeze_count = 0
 	)
+
 	loop.set_process(true)
 	rival.set_process(true)
 
