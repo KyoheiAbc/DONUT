@@ -5,16 +5,19 @@ static var COLOR_NUMBER = 3
 
 static var FRAME_COUNT: int = 0
 
+
+var loop: Loop = Loop.new()
+
 func _ready():
 	Game.FRAME_COUNT = 0
+
+	set_process(false)
 
 	var label = Label.new()
 	add_child(label)
 	Main.setup_label(label)
 
-	var loop = Loop.new()
 	add_child(loop)
-	loop.set_process(false)
 
 	loop.donuts_pair = DonutsPair.spawn_donuts_pair(loop.all_donuts, loop)
 
@@ -34,7 +37,6 @@ func _ready():
 
 	var rival = Rival.new()
 	add_child(rival)
-	rival.set_process(false)
 
 	var ui = UI.new()
 	add_child(ui)
@@ -75,9 +77,31 @@ func _ready():
 		loop.donuts_pair.freeze_count = 0
 	)
 
-	loop.set_process(true)
-	rival.set_process(true)
+	set_process(true)
 
+func _process(delta: float) -> void:
+	Game.FRAME_COUNT += 1
+
+	if not loop.process():
+		game_over()
+
+func game_over() -> void:
+	set_process(false)
+
+	var label = Label.new()
+	add_child(label)
+	Main.setup_label(label)
+	label.text = "GAME OVER"
+
+	var button = Button.new()
+	add_child(button)
+	button.text = "END GAME"
+	Main.setup_button(button)
+	button.pressed.connect(func() -> void:
+		Main.show_black(0.1)
+		self.queue_free()
+		Main.ROOT.add_child(Initial.new())
+	)
 
 static func setup(offset: Offset, player: Player, rival: Rival, ui: UI) -> void:
 	# offset.signal_score_changed.connect(func(new_score: int) -> void:

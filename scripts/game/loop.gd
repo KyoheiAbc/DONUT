@@ -6,7 +6,7 @@ var donuts_pair: DonutsPair = null
 var garbage_donuts: Array[Donut] = []
 
 
-func _process(delta: float) -> void:
+func process() -> bool:
 	if donuts_pair != null:
 		donuts_pair.process(all_donuts)
 		if donuts_pair.freeze_count > DonutsPair.FREEZE_COUNT:
@@ -27,6 +27,12 @@ func _process(delta: float) -> void:
 
 			if clearable_donuts.size() == 0:
 				donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, self)
+				if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
+					return false
+				if Donut.get_colliding_donut(donuts_pair.elements[1], all_donuts) != null:
+					return false
 
 	for donut in all_donuts:
 		Donut.render(donut)
+
+	return true
