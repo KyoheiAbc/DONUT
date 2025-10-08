@@ -5,8 +5,8 @@ static var COLOR_NUMBER = 3
 
 static var FRAME_COUNT: int = 0
 
-
 var loop: Loop = Loop.new()
+var rival: Rival = Rival.new()
 
 func _ready():
 	Game.FRAME_COUNT = 0
@@ -32,7 +32,6 @@ func _ready():
 	var offset = Offset.new()
 	add_child(offset)
 
-	var rival = Rival.new()
 	add_child(rival)
 
 	var ui = UI.new()
@@ -82,6 +81,8 @@ func _process(delta: float) -> void:
 	if not loop.process():
 		game_over()
 
+	rival.process()
+
 func game_over() -> void:
 	set_process(false)
 
@@ -112,12 +113,12 @@ static func setup(offset: Offset, player: Player, rival: Rival, ui: UI) -> void:
 		if count > 0:
 			ui.on_combo(0, count)
 	)
-	# rival.signal_combo.connect(func(count: int) -> void:
-	# 	print("rival signal_combo:", count, " frame_count:", Game.FRAME_COUNT)
-	# 	offset.on_combo(1, count)
-	# 	if count > 0:
-	# 		ui.on_combo(1, count)
-	# )
+	rival.signal_combo.connect(func(count: int) -> void:
+		print("rival signal_combo:", count, " frame_count:", Game.FRAME_COUNT)
+		offset.on_combo(1, count)
+		if count > 0:
+			ui.on_combo(1, count)
+	)
 	# player.signal_damaged.connect(func(damage: int) -> void:
 	# 	print("player signal_damaged:", damage, " frame_count:", Game.FRAME_COUNT)
 	# 	ui.on_damaged(0, damage)
@@ -131,4 +132,4 @@ static func setup(offset: Offset, player: Player, rival: Rival, ui: UI) -> void:
 	# 	offset.on_damaged(1, damage)
 	# )
 	
-	# rival.signal_progress.connect(ui.on_progress)
+	rival.signal_progress.connect(ui.on_progress)

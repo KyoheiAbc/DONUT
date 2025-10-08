@@ -60,7 +60,7 @@ func on_progress(progress: int) -> void:
 	rival_attack_slider.value = progress
 
 	for i in range(rival_combo_count):
-		if progress >= rival_attack_slider.max_value * 0.333 * i and rival_attack_motion_count == i:
+		if progress >= rival_attack_slider.max_value / float(rival_combo_count) * i and rival_attack_motion_count == i:
 			if sprites[1].rotation == 0 and sprites[1].position == Vector2.ZERO:
 				VisualEffect.hop(sprites[1], 3 if i == 0 else 1)
 				rival_attack_motion_count += 1

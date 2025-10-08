@@ -5,7 +5,9 @@ var combo: int = 0
 
 signal signal_combo(count)
 
+
 var label: Label = null
+
 
 func _init():
 	label = Label.new()

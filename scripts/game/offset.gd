@@ -4,8 +4,6 @@ extends Node
 var score: int = 0
 var scores_tmp: Array[int] = [0, 0]
 
-signal signal_score_changed(new_score)
-
 var label: Label = null
 
 func _init():
@@ -17,11 +15,6 @@ func _init():
 func _process(delta: float) -> void:
 	label.text = "(" + str(scores_tmp[0]) + "), " + str(score) + ", (" + str(scores_tmp[1]) + ")"
 
-func on_damaged(index: int, damage: int) -> void:
-	if index == 0:
-		score += damage
-	elif index == 1:
-		score -= damage
 
 func on_combo(index: int, combo: int) -> void:
 	if combo == 0:
@@ -32,9 +25,5 @@ func on_combo(index: int, combo: int) -> void:
 		return
 
 	if combo == -1:
-		if index == 0:
-			score += scores_tmp[index]
-		elif index == 1:
-			score -= scores_tmp[index]
+		score += scores_tmp[index]
 		scores_tmp[index] = 0
-		emit_signal("signal_score_changed", score)
