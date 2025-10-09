@@ -3,29 +3,14 @@ extends Node
 
 static var COLOR_NUMBER = 3
 
-static var FRAME_COUNT: int = 0
-
-static var GAME_OVER: bool = false
-
 static var SPRITES: Array[Sprite2D] = []
-
-static var SCORE: int = 0
 
 var all_donuts: Array[Donut] = []
 var donuts_pairs: Array[DonutsPair] = []
 
-var combo: int = 0
 var rival: Rival = Rival.new()
 
 func _ready():
-	GAME_OVER = false
-
-	FRAME_COUNT = 0
-
-	SCORE = 0
-
-	add_child(rival)
-
 	for sprite in SPRITES:
 		sprite.queue_free()
 	SPRITES.clear()
@@ -70,7 +55,7 @@ func _ready():
 
 	set_process(true)
 
+	add_child(rival)
+
 func _process(delta: float) -> void:
-	if Game.GAME_OVER:
-		return
-	Game.FRAME_COUNT += 1
+	rival.process()

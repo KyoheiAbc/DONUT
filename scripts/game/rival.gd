@@ -1,37 +1,29 @@
 class_name Rival
 extends Node
 
-const BUILDING_COMBO_FRAME_COUNT = 3 * 3 * 30
-const ONE_COMBO_DO_FRAME_COUNT = 30
-const MAX_COMBO = 3
-static var HP_MAX: int = 100
+static var IDLE_FRAME_COUNT: int = 30
+static var ONE_ATTACK_FRAME_COUNT: int = 10
+static var ATTACK_NUMBER: int = 3
 
-var hp: int = HP_MAX
+static var HP: int = 100
+
+var hp: int = HP
 
 var frame_count: int = 0
-var is_building_combo: bool = true
+var is_idle: bool = true
 var combo: int = 0
-
-signal signal_progress(progress: int)
-signal signal_combo(count: int)
-
 
 func process() -> void:
 	frame_count += 1
 
-	if is_building_combo:
-		emit_signal("signal_progress", max(1000 * frame_count, 0) / BUILDING_COMBO_FRAME_COUNT)
-		if frame_count >= BUILDING_COMBO_FRAME_COUNT:
-			is_building_combo = false
+	if is_idle:
+		if frame_count > IDLE_FRAME_COUNT:
 			frame_count = 0
-
+			is_idle = false
 	else:
-		if frame_count >= ONE_COMBO_DO_FRAME_COUNT:
+		if frame_count >= ONE_ATTACK_FRAME_COUNT:
 			frame_count = 0
 			combo += 1
-			if combo <= MAX_COMBO:
-				emit_signal("signal_combo", combo)
-			else:
+			if combo > ATTACK_NUMBER:
+				is_idle = true
 				combo = 0
-				is_building_combo = true
-				emit_signal("signal_combo", -1)
