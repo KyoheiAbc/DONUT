@@ -8,7 +8,7 @@ class CustomHSlider extends HSlider:
 		step = step
 		value = initial_value
 
-		size = Vector2(200, 80)
+		size = Vector2(150, 40)
 
 		var label = Label.new()
 		add_child(label)
@@ -40,6 +40,11 @@ func _ready():
 	add_child(slider)
 	slider.value_changed.connect(func(value): Cleaner.GROUP_SIZE_TO_CLEAR = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.3, 150))
+
+	slider = CustomHSlider.new("rivalHP", Rival.HP, 1, 300, 1)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Rival.HP = int(value))
+	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 150))
 
 
 	var button = Button.new()
