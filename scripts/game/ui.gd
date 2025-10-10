@@ -59,7 +59,9 @@ func _init(game: Node) -> void:
 
 	add_child(score_slider)
 	Main.set_control_position(score_slider, Vector2(700, 200))
-	score_slider.value = 500
+	score_slider.max_value = 32
+	score_slider.min_value = -32
+	score_slider.value = 0
 
 	game.signal_next_donuts_pair.connect(func() -> void:
 		for i in range(next_donuts.size()):
@@ -70,6 +72,11 @@ func _init(game: Node) -> void:
 		combo_label.text = str(count) + " COMBO"
 		if count > 0:
 			UI.hop(player_sprite, 1)
+			score_slider.value += count * count
+	)
+	game.signal_damage.connect(func() -> void:
+		UI.jump(rival_sprite, false)
+		UI.rotation(player_sprite, false)
 	)
 	game.signal_hop.connect(func() -> void:
 		UI.hop(player_sprite, 1)
@@ -83,11 +90,19 @@ func _init(game: Node) -> void:
 					UI.hop(rival_sprite, 3 if i == 0 else 1)
 					rival_attack_motion_count += 1
 	)
-	game.rival.signal_hop.connect(func() -> void:
+	game.rival.signal_combo.connect(func(count: int) -> void:
 		UI.hop(rival_sprite, 1)
+		score_slider.value -= count * count
 	)
 	game.rival.signal_attack_end.connect(func() -> void:
 		rival_attack_motion_count = 0
+	)
+	game.rival.signal_damage.connect(func() -> void:
+		UI.jump(player_sprite, false)
+		UI.rotation(rival_sprite, false)
+	)
+	game.signal_score.connect(func(value: int) -> void:
+		score_slider.value = value
 	)
 
 class GameVSlider extends VSlider:

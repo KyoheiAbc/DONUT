@@ -9,14 +9,23 @@ var next_colors: Array[int] = [random_colors.get_color(), random_colors.get_colo
 var all_donuts: Array[Donut] = []
 var donuts_pair: DonutsPair = null
 
+var score: Score = Score.new()
+
 var rival: Rival = Rival.new()
 var ui: UI = null
 
 var combo: int = 0
 
+var is_damaging: bool = false
+
+class Score:
+	var value: int = 0
+
+signal signal_score(value: int)
 signal signal_next_donuts_pair()
 signal signal_hop()
 signal signal_combo(count: int)
+signal signal_damage()
 
 class RandomColors:
 	var bag: Array[int] = []
@@ -33,6 +42,7 @@ class RandomColors:
 func _ready():
 	set_process(false)
 
+	rival.score = score
 	add_child(rival)
 
 	for y in range(16):
@@ -65,6 +75,23 @@ func _ready():
 
 
 func _process(delta: float) -> void:
+	if is_damaging:
+		var donuts_except_pair = DonutsPair.copy_all_donuts_except_pair(all_donuts, donuts_pair)
+		for donut in donuts_except_pair:
+			donut.process(all_donuts)
+		
+		for donut in all_donuts:
+			Donut.render(donut)
+
+		if Donut.all_donuts_are_stopped(donuts_except_pair):
+			is_damaging = false
+			if donuts_pair == null:
+				next_donuts_pair()
+
+		rival.process()
+		return
+	
+
 	if donuts_pair != null:
 		donuts_pair.process(all_donuts)
 		if donuts_pair.freeze_count > DonutsPair.FREEZE_COUNT:
@@ -75,7 +102,7 @@ func _process(delta: float) -> void:
 		donut.process(all_donuts)
 			
 
-	if Donut.all_donuts_are_stopped(donuts_except_pair):
+	if donuts_pair == null and Donut.all_donuts_are_stopped(donuts_except_pair):
 		var find_clearable_donuts = Cleaner.find_clearable_donuts(donuts_except_pair, Cleaner.GROUP_SIZE_TO_CLEAR)
 		var clearable_donuts: Array[Donut] = find_clearable_donuts[0]
 		var group = find_clearable_donuts[1]
@@ -91,15 +118,29 @@ func _process(delta: float) -> void:
 				execute_after_wait(func() -> void:
 					emit_signal("signal_combo", 0)
 				)
+				score.value += combo * combo
 			combo = 0
-			if donuts_pair == null:
+			if score.value == 0:
 				next_donuts_pair()
-		
-		
+			if score.value > 0:
+				rival.reduce_hp(score.value)
+				next_donuts_pair()
+			elif score.value < 0 and not is_damaging:
+				emit_signal("signal_damage")
+				is_damaging = true
+				if score.value < -3:
+					Donut.spawn_garbage(3, all_donuts, self)
+					score.value += 3
+				else:
+					Donut.spawn_garbage(-score.value, all_donuts, self)
+					score.value = 0
+
+
 	for donut in all_donuts:
 		Donut.render(donut)
 
 	rival.process()
+
 
 func execute_after_wait(callback: Callable) -> void:
 	var timer = Timer.new()
