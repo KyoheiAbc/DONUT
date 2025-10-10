@@ -1,7 +1,7 @@
 class_name Rival
 extends Node
 
-static var IDLE_FRAME_COUNT: int = 900
+static var IDLE_FRAME_COUNT: int = 300
 static var ONE_ATTACK_FRAME_COUNT: int = 45
 static var ATTACK_NUMBER: int = 3
 
@@ -19,6 +19,8 @@ signal signal_frame_count(frame_count)
 signal signal_combo(count: int)
 signal signal_attack_end()
 signal signal_damage()
+signal signal_hp(value: int)
+signal signal_game_over()
 
 func reduce_hp(value: int) -> void:
 	var tween = create_tween()
@@ -27,7 +29,9 @@ func reduce_hp(value: int) -> void:
 
 func process() -> void:
 	if hp <= 0:
+		emit_signal("signal_game_over")
 		return
+	emit_signal("signal_hp", hp)
 
 	frame_count += 1
 
@@ -50,15 +54,8 @@ func process() -> void:
 			if combos.size() <= ATTACK_NUMBER:
 				emit_signal("signal_combo", combos.size())
 			if combos.size() > ATTACK_NUMBER:
-				score.value -= Rival.sum_of_powers(combos)
+				combos.pop_back()
+				score.value -= Game.sum_of_powers(combos)
 				combos.clear()
 				is_idle = true
 				emit_signal("signal_attack_end")
-
-static func sum_of_powers(array: Array[int]) -> int:
-	var sum = 0
-	var combo = 0
-	for value in array:
-		combo += value
-		sum += combo * combo
-	return sum

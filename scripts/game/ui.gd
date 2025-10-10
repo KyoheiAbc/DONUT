@@ -75,7 +75,7 @@ func _init(game: Node) -> void:
 			score_slider.value += count * count
 	)
 	game.signal_damage.connect(func() -> void:
-		UI.jump(rival_sprite, false)
+		UI.jump(rival_sprite, true)
 		UI.rotation(player_sprite, false)
 	)
 	game.signal_hop.connect(func() -> void:
@@ -94,6 +94,9 @@ func _init(game: Node) -> void:
 		UI.hop(rival_sprite, 1)
 		score_slider.value -= count * count
 	)
+	game.rival.signal_hp.connect(func(value: int) -> void:
+		rival_hp_slider.value = rival_hp_slider.max_value * float(value) / float(Rival.HP)
+	)
 	game.rival.signal_attack_end.connect(func() -> void:
 		rival_attack_motion_count = 0
 	)
@@ -102,7 +105,7 @@ func _init(game: Node) -> void:
 		UI.rotation(rival_sprite, false)
 	)
 	game.signal_score.connect(func(value: int) -> void:
-		score_slider.value = value
+		score_slider.value = value + Game.sum_of_powers(game.combos) - Game.sum_of_powers(game.rival.combos)
 	)
 
 class GameVSlider extends VSlider:

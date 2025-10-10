@@ -14,8 +14,7 @@ var score: Score = Score.new()
 var rival: Rival = Rival.new()
 var ui: UI = null
 
-var combo: int = 0
-
+var combos: Array[int] = []
 var is_damaging: bool = false
 
 class Score:
@@ -73,6 +72,10 @@ func _ready():
 	set_process(true)
 	setup_input()
 
+	rival.signal_game_over.connect(func() -> void:
+		game_over()
+	)
+
 
 func _process(delta: float) -> void:
 	if is_damaging:
@@ -89,6 +92,8 @@ func _process(delta: float) -> void:
 				next_donuts_pair()
 
 		rival.process()
+
+		emit_signal("signal_score", score.value)
 		return
 	
 
@@ -107,30 +112,27 @@ func _process(delta: float) -> void:
 		var clearable_donuts: Array[Donut] = find_clearable_donuts[0]
 		var group = find_clearable_donuts[1]
 		if clearable_donuts.size() > 0:
-			combo += group
+			combos.append(group)
 			for clearable_donut in clearable_donuts:
 				clearable_donut.to_clear = true
 			execute_after_wait(func() -> void:
-				emit_signal("signal_combo", combo)
+				emit_signal("signal_combo", combos.size())
 			)
 		elif clearable_donuts.size() == 0:
-			if combo > 0:
+			if combos.size() > 0:
 				execute_after_wait(func() -> void:
 					emit_signal("signal_combo", 0)
 				)
-				score.value += combo * combo
-			combo = 0
-			if score.value == 0:
-				next_donuts_pair()
-			if score.value > 0:
-				rival.reduce_hp(score.value)
+				score.value += Game.sum_of_powers(combos)
+			combos.clear()
+			if score.value >= 0:
 				next_donuts_pair()
 			elif score.value < 0 and not is_damaging:
 				emit_signal("signal_damage")
 				is_damaging = true
-				if score.value < -3:
-					Donut.spawn_garbage(3, all_donuts, self)
-					score.value += 3
+				if score.value < -6:
+					Donut.spawn_garbage(6, all_donuts, self)
+					score.value += 6
 				else:
 					Donut.spawn_garbage(-score.value, all_donuts, self)
 					score.value = 0
@@ -140,6 +142,8 @@ func _process(delta: float) -> void:
 		Donut.render(donut)
 
 	rival.process()
+
+	emit_signal("signal_score", score.value)
 
 
 func execute_after_wait(callback: Callable) -> void:
@@ -152,10 +156,30 @@ func execute_after_wait(callback: Callable) -> void:
 	)
 
 func next_donuts_pair() -> void:
+	if Donut.get_donut_at_position(Vector2(350, 350), all_donuts) != null:
+		game_over()
+
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.pop_front(), next_colors.pop_front()], self)
 	next_colors += [random_colors.get_color(), random_colors.get_color()]
 	emit_signal("signal_next_donuts_pair")
 
+
+func game_over() -> void:
+	set_process(false)
+	var label = Label.new()
+	add_child(label)
+	Main.setup_label(label)
+	label.text = "GAME OVER"
+
+	var button = Button.new()
+	add_child(button)
+	button.text = "END GAME"
+	Main.setup_button(button)
+	button.pressed.connect(func() -> void:
+		Main.show_black(0.1)
+		self.queue_free()
+		Main.ROOT.add_child(Initial.new())
+	)
 
 func setup_input() -> void:
 	var input_handler = InputHandler.new()
@@ -184,3 +208,11 @@ func setup_input() -> void:
 		DonutsPair.rotation(donuts_pair, all_donuts)
 		donuts_pair.freeze_count = 0
 	)
+
+static func sum_of_powers(array: Array[int]) -> int:
+	var sum = 0
+	var combo = 0
+	for value in array:
+		combo += value
+		sum += combo * combo
+	return sum
