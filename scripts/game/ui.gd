@@ -72,7 +72,6 @@ func _init(game: Node) -> void:
 		combo_label.text = str(count) + " COMBO"
 		if count > 0:
 			UI.hop(player_sprite, 1)
-			score_slider.value += count * count
 	)
 	game.signal_damage.connect(func() -> void:
 		UI.jump(rival_sprite, true)
@@ -92,7 +91,6 @@ func _init(game: Node) -> void:
 	)
 	game.rival.signal_combo.connect(func(count: int) -> void:
 		UI.hop(rival_sprite, 1)
-		score_slider.value -= count * count
 	)
 	game.rival.signal_hp.connect(func(value: int) -> void:
 		rival_hp_slider.value = rival_hp_slider.max_value * float(value) / float(Rival.HP)

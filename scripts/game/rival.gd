@@ -1,7 +1,7 @@
 class_name Rival
 extends Node
 
-static var IDLE_FRAME_COUNT: int = 300
+static var IDLE_FRAME_COUNT: int = 900
 static var ONE_ATTACK_FRAME_COUNT: int = 45
 static var ATTACK_NUMBER: int = 3
 
