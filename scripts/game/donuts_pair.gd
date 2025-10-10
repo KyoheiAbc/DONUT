@@ -8,8 +8,8 @@ var freeze_count: int = 0
 static var FREEZE_COUNT = 30
 static var GRAVITY = 25
 
-func _init(pos: Vector2) -> void:
-	elements = [Donut.new(randi() % Game.COLOR_NUMBER), Donut.new(randi() % Game.COLOR_NUMBER)]
+func _init(pos: Vector2, colors: Array[int]) -> void:
+	elements = [Donut.new(colors[0]), Donut.new(colors[1])]
 	add_child(elements[0])
 	add_child(elements[1])
 	elements[0].pos = pos
@@ -81,8 +81,8 @@ static func sync_position(pair: DonutsPair, to_parent: bool, donuts: Array[Donut
 	return false
 
 
-static func spawn_donuts_pair(all_donuts: Array[Donut], node: Node) -> DonutsPair:
-	var donuts_pair = DonutsPair.new(Vector2(350, 350))
+static func spawn_donuts_pair(all_donuts: Array[Donut], colors: Array[int], node: Node) -> DonutsPair:
+	var donuts_pair = DonutsPair.new(Vector2(350, 350), colors)
 	node.add_child(donuts_pair)
 	for donut in donuts_pair.elements:
 		all_donuts.append(donut)
