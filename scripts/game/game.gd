@@ -5,14 +5,14 @@ var all_donuts: Array[Donut] = []
 var donuts_pair: DonutsPair = null
 
 var combo: Array[int] = []
-var score: int = -36
+var score: int = 0
 var taking_damage: bool = false
 
 var rival: Rival = Rival.new()
 
 var ui: UI = UI.new()
 
-static var MAX_ONE_DAMAGE = 3
+static var MAX_ONE_DAMAGE = 6
 
 func _ready():
 	set_process(false)
@@ -29,6 +29,7 @@ func _ready():
 	create_walls()
 
 	var label = Label.new()
+	label.z_index = 1000
 	add_child(label)
 	Main.setup_label(label)
 	label.text = "READY"
@@ -47,7 +48,7 @@ func _process(delta: float) -> void:
 	if taking_damage:
 		loop_damage()
 
-	rival.process()
+	rival.process(self)
 
 	ui.process(self)
 
@@ -66,18 +67,28 @@ func loop() -> void:
 		var find_clearable_donuts = Cleaner.find_clearable_donuts(all_donuts, Cleaner.GROUP_SIZE_TO_CLEAR)
 
 		if find_clearable_donuts[0].size() > 0:
-			combo.append(find_clearable_donuts[1])
-			print("combo: ", combo)
 			for donut in find_clearable_donuts[0]:
 				donut.to_clear = true
+
+			execute_after_wait(func() -> void:
+				ui.combo(true)
+				combo.append(find_clearable_donuts[1])
+				print("combo: ", combo)
+				ui.combo_label.text = "%d COMBO" % Game.sum(combo)
+			)
 			return
 		
-		score += sum_of_powers(combo)
+		execute_after_wait(func() -> void:
+			ui.combo_label.text = "0 COMBO"
+		)
+
+		score += Game.sum_of_powers(combo)
 		combo.clear()
 		print("combo ended, score: ", score)
 
 		if score < 0:
 			taking_damage = true
+			ui.action_motion(false)
 			print("score is %d, taking damage" % score)
 			if score < -MAX_ONE_DAMAGE:
 				Donut.spawn_garbage(MAX_ONE_DAMAGE, all_donuts, self)
@@ -111,6 +122,9 @@ func execute_after_wait(callback: Callable) -> void:
 	)
 
 func next_donuts_pair() -> void:
+	if Donut.get_donut_at_position(Vector2(350, 350), all_donuts) != null:
+		game_over(true)
+		return
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.pop_front(), next_colors.pop_front()], self)
 	next_colors += [get_random_color(), get_random_color()]
 
@@ -126,13 +140,20 @@ func create_walls() -> void:
 				all_donuts.back().pos = Vector2(x * 100 + 50, y * 100 + 50)
 				# Donut.render(all_donuts.back())
 				all_donuts.back().visible = false
-				
-func game_over() -> void:
+
+func game_over(is_player: bool) -> void:
+	ui.game_over(is_player)
+
 	set_process(false)
 	var label = Label.new()
+	label.z_index = 1000
 	add_child(label)
 	Main.setup_label(label)
-	label.text = "GAME OVER"
+	if is_player:
+		label.add_theme_color_override("font_color", Color.from_hsv(0, 1, 1))
+		label.text = "YOU LOSE"
+	else:
+		label.text = "YOU WIN"
 
 	var button = Button.new()
 	add_child(button)
@@ -153,10 +174,12 @@ func setup_input() -> void:
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(donuts_pair, all_donuts)
 			donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
+			ui.combo(true)
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
 				donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
+				ui.combo(true)
 			return
 		if DonutsPair.move(donuts_pair, direction * 100, all_donuts) != Vector2.ZERO:
 			donuts_pair.freeze_count = 0
@@ -179,6 +202,11 @@ static func sum_of_powers(array: Array[int]) -> int:
 		sum += combo * combo
 	return sum
 
+static func sum(array: Array[int]) -> int:
+	var sum = 0
+	for value in array:
+		sum += value
+	return sum
 
 static var COLOR_NUMBER = 4
 var next_colors: Array[int] = []
