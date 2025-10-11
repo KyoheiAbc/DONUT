@@ -16,7 +16,7 @@ var score_slider: GameVSlider = GameVSlider.new(Vector2(30, 380), Color.from_hsv
 func _init() -> void:
 	var rect = ColorRect.new()
 	add_child(rect)
-	rect.color = Color(0.5, 0.5, 0.5)
+	rect.color = Color.from_hsv(0.5, 0.5, 0.5)
 	rect.size = Vector2(Donut.SPRITE_SIZE.x * 6, Donut.SPRITE_SIZE.y * 12)
 	Main.set_control_position(rect, Vector2(400 + Donut.SPRITE_SIZE.x * 3, 200))
 	rect.z_index = -1

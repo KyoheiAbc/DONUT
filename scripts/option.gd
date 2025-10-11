@@ -55,7 +55,7 @@ func _ready():
 	slider.value_changed.connect(func(value): Rival.ATTACK_NUMBER = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 280))
 
-	slider = CustomHSlider.new("garbageLv", Donut.GARBAGE_HARDNESS, 1, 10, 1)
+	slider = CustomHSlider.new("garbageLv", Donut.GARBAGE_HARDNESS, 1, 4, 1)
 	add_child(slider)
 	slider.value_changed.connect(func(value): Donut.GARBAGE_HARDNESS = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.8, 80))

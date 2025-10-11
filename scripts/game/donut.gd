@@ -25,7 +25,7 @@ func _init(_value: int):
 	add_child(sprite)
 	sprite.texture = DONUT_TEXTURE
 	if value >= 10:
-		sprite.modulate = Color(0.8, 0.8, 0.8)
+		sprite.modulate = Color(0.8, 0.8, 0.8).darkened((value - 10) * 0.1)
 	else:
 		sprite.modulate = Color.from_hsv(value / 5.0, 0.5, 1)
 
@@ -130,6 +130,9 @@ static func clear_donut(donut: Donut, all_donuts: Array[Donut]) -> void:
 	var around_donuts = get_around(donut, all_donuts)
 	for around_donut in around_donuts:
 		if around_donut.value < 10:
+			continue
+		if around_donut.value == 14:
+			print("cannot reduce garbage further")
 			continue
 		if around_donut.freeze_count < Donut.FREEZE_COUNT:
 			continue
