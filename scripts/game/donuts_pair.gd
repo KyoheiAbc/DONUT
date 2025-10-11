@@ -88,10 +88,3 @@ static func spawn_donuts_pair(all_donuts: Array[Donut], colors: Array[int], node
 		all_donuts.append(donut)
 		Donut.render(donut)
 	return donuts_pair
-
-static func copy_all_donuts_except_pair(all_donuts: Array[Donut], donuts_pair: DonutsPair) -> Array[Donut]:
-	var result: Array[Donut] = all_donuts.duplicate()
-	if donuts_pair != null:
-		result.erase(donuts_pair.elements[0])
-		result.erase(donuts_pair.elements[1])
-	return result

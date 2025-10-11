@@ -148,3 +148,7 @@ static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
 		if get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts_except_pair) == null:
 			return false
 	return true
+
+
+static func sort_donuts_by_y_descending(all_donuts: Array[Donut]) -> void:
+	all_donuts.sort_custom(func(a, b): return a.pos.y > b.pos.y)

@@ -5,11 +5,14 @@ var all_donuts: Array[Donut] = []
 var donuts_pair: DonutsPair = null
 
 var combo: Array[int] = []
-var score: int = 0
+var score: int = -36
+var taking_damage: bool = false
 
 var rival: Rival = Rival.new()
 
 var ui: UI = UI.new()
+
+static var MAX_ONE_DAMAGE = 3
 
 func _ready():
 	set_process(false)
@@ -38,21 +41,65 @@ func _ready():
 	set_process(true)
 	setup_input()
 
-
 func _process(delta: float) -> void:
-	if donuts_pair != null:
-		donuts_pair.process(all_donuts)
-		if donuts_pair.freeze_count > DonutsPair.FREEZE_COUNT:
-			donuts_pair = null
-
-	var donuts_except_pair = DonutsPair.copy_all_donuts_except_pair(all_donuts, donuts_pair)
-	for donut in donuts_except_pair:
-		donut.process(all_donuts)
+	if not taking_damage:
+		loop()
+	if taking_damage:
+		loop_damage()
 
 	rival.process()
 
 	ui.process(self)
 
+func loop() -> void:
+	if donuts_pair != null:
+		donuts_pair.process(all_donuts)
+		if donuts_pair.freeze_count > DonutsPair.FREEZE_COUNT:
+			Donut.sort_donuts_by_y_descending(all_donuts)
+			donuts_pair = null
+		return
+
+	else:
+		if not loop_all_donuts():
+			return
+
+		var find_clearable_donuts = Cleaner.find_clearable_donuts(all_donuts, Cleaner.GROUP_SIZE_TO_CLEAR)
+
+		if find_clearable_donuts[0].size() > 0:
+			combo.append(find_clearable_donuts[1])
+			print("combo: ", combo)
+			for donut in find_clearable_donuts[0]:
+				donut.to_clear = true
+			return
+		
+		score += sum_of_powers(combo)
+		combo.clear()
+		print("combo ended, score: ", score)
+
+		if score < 0:
+			taking_damage = true
+			print("score is %d, taking damage" % score)
+			if score < -MAX_ONE_DAMAGE:
+				Donut.spawn_garbage(MAX_ONE_DAMAGE, all_donuts, self)
+				score += MAX_ONE_DAMAGE
+			else:
+				Donut.spawn_garbage(-score, all_donuts, self)
+				score = 0
+			print("after damage, score: ", score)
+			return
+
+		next_donuts_pair()
+
+func loop_damage() -> void:
+	if not loop_all_donuts():
+		return
+	taking_damage = false
+	next_donuts_pair()
+
+func loop_all_donuts() -> bool:
+	for donut in all_donuts:
+		donut.process(all_donuts)
+	return Donut.all_donuts_are_stopped(all_donuts)
 
 func execute_after_wait(callback: Callable) -> void:
 	var timer = Timer.new()
@@ -66,6 +113,8 @@ func execute_after_wait(callback: Callable) -> void:
 func next_donuts_pair() -> void:
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.pop_front(), next_colors.pop_front()], self)
 	next_colors += [get_random_color(), get_random_color()]
+
+	ui.next_donuts_updated(next_colors)
 
 
 func create_walls() -> void:

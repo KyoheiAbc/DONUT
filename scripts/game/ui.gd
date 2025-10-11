@@ -69,7 +69,7 @@ func process(game: Game) -> void:
 
 func next_donuts_updated(next_colors: Array[int]) -> void:
 	for i in range(next_donuts.size()):
-		next_donuts[i].modulate = Color.from_hsv(next_colors[i] / Game.COLOR_NUMBER, 0.5, 1)
+		next_donuts[i].modulate = Color.from_hsv(next_colors[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
 
 class GameVSlider extends VSlider:
 	func _init(_size: Vector2, color: Color) -> void:
