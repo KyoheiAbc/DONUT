@@ -13,19 +13,19 @@ var rival_attack_motion_count: int = 0
 var combo_label: Label = Label.new()
 var score_slider: GameVSlider = GameVSlider.new(Vector2(30, 380), Color.from_hsv(0.2, 0.8, 1))
 
-func _init(game: Node) -> void:
+func _init() -> void:
 	var rect = ColorRect.new()
 	add_child(rect)
 	rect.color = Color(0.5, 0.5, 0.5)
 	rect.size = Vector2(Donut.SPRITE_SIZE.x * 6, Donut.SPRITE_SIZE.y * 12)
 	Main.set_control_position(rect, Vector2(400 + Donut.SPRITE_SIZE.x * 3, 200))
+	rect.z_index = -1
 
 	for i in range(next_donuts.size()):
 		var next_donut = next_donuts[i]
 		add_child(next_donut)
 		next_donut.texture = Donut.DONUT_TEXTURE
 		next_donut.z_index = 1000
-		# next_donut.modulate = Color.from_hsv(game.next_colors[i] / 5.0, 0.5, 1)
 	next_donuts[0].position = Vector2(630, 50 + 32)
 	next_donuts[1].position = Vector2(630, 50 + 0)
 	next_donuts[2].position = Vector2(630, 50 + 128)
@@ -59,52 +59,17 @@ func _init(game: Node) -> void:
 
 	add_child(score_slider)
 	Main.set_control_position(score_slider, Vector2(700, 200))
-	score_slider.max_value = 32
-	score_slider.min_value = -32
+	score_slider.max_value = 64
+	score_slider.min_value = -64
 	score_slider.value = 0
 
-	game.signal_next_donuts_pair.connect(func() -> void:
-		for i in range(next_donuts.size()):
-			var next_donut = next_donuts[i]
-			next_donut.modulate = Color.from_hsv(game.next_colors[i] / 5.0, 0.5, 1)
-		)
-	game.signal_combo.connect(func(count: int) -> void:
-		combo_label.text = str(count) + " COMBO"
-		if count > 0:
-			UI.hop(player_sprite, 1)
-	)
-	game.signal_damage.connect(func() -> void:
-		UI.jump(rival_sprite, true)
-		UI.rotation(player_sprite, false)
-	)
-	game.signal_hop.connect(func() -> void:
-		UI.hop(player_sprite, 1)
-	)
-	game.rival.signal_frame_count.connect(func(frame_count: int) -> void:
-		rival_idle_slider.value = float(frame_count) / float(Rival.IDLE_FRAME_COUNT) * rival_idle_slider.max_value
+func process(game: Game) -> void:
+	for donut in game.all_donuts:
+		Donut.render(donut)
 
-		for i in range(Rival.ATTACK_NUMBER):
-			if rival_idle_slider.value >= rival_idle_slider.max_value / float(Rival.ATTACK_NUMBER) * i and rival_attack_motion_count == i:
-				if rival_sprite.rotation == 0 and rival_sprite.position == Vector2.ZERO:
-					UI.hop(rival_sprite, 3 if i == 0 else 1)
-					rival_attack_motion_count += 1
-	)
-	game.rival.signal_combo.connect(func(count: int) -> void:
-		UI.hop(rival_sprite, 1)
-	)
-	game.rival.signal_hp.connect(func(value: int) -> void:
-		rival_hp_slider.value = rival_hp_slider.max_value * float(value) / float(Rival.HP)
-	)
-	game.rival.signal_attack_end.connect(func() -> void:
-		rival_attack_motion_count = 0
-	)
-	game.rival.signal_damage.connect(func() -> void:
-		UI.jump(player_sprite, false)
-		UI.rotation(rival_sprite, false)
-	)
-	game.signal_score.connect(func(value: int) -> void:
-		score_slider.value = value + Game.sum_of_powers(game.combos) - Game.sum_of_powers(game.rival.combos)
-	)
+func next_donuts_updated(next_colors: Array[int]) -> void:
+	for i in range(next_donuts.size()):
+		next_donuts[i].modulate = Color.from_hsv(next_colors[i] / Game.COLOR_NUMBER, 0.5, 1)
 
 class GameVSlider extends VSlider:
 	func _init(_size: Vector2, color: Color) -> void:
