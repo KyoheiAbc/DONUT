@@ -6,7 +6,7 @@ func _ready():
 	var label = Label.new()
 	add_child(label)
 	Main.setup_label(label)
-	label.text = "DONUT"
+	label.text = "DONUTS POP"
 
 	var input_handler = InputHandler.new()
 	add_child(input_handler)
