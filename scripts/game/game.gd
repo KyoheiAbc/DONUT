@@ -70,16 +70,16 @@ func loop() -> void:
 			for donut in find_clearable_donuts[0]:
 				donut.to_clear = true
 
+			combo.append(find_clearable_donuts[1])
 			execute_after_wait(func() -> void:
 				ui.combo(true)
-				combo.append(find_clearable_donuts[1])
 				print("combo: ", combo)
 				ui.combo_label.text = "%d COMBO" % Game.sum(combo)
 			)
 			return
 		
 		execute_after_wait(func() -> void:
-			ui.combo_label.text = "0 COMBO"
+			ui.combo_label.text = ""
 		)
 
 		score += Game.sum_of_powers(combo)

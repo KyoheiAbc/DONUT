@@ -25,7 +25,6 @@ func _init() -> void:
 		var next_donut = next_donuts[i]
 		add_child(next_donut)
 		next_donut.texture = Donut.DONUT_TEXTURE
-		next_donut.z_index = 1000
 	next_donuts[0].position = Vector2(630, 50 + 32)
 	next_donuts[1].position = Vector2(630, 50 + 0)
 	next_donuts[2].position = Vector2(630, 50 + 128)
@@ -51,7 +50,7 @@ func _init() -> void:
 	rival_idle_slider.value = 0
 
 	add_child(combo_label)
-	combo_label.text = "0 COMBO"
+	combo_label.text = ""
 	combo_label.add_theme_font_size_override("font_size", 32)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 	combo_label.position = Vector2(500, 220)
@@ -143,8 +142,6 @@ static func jump(sprite: Sprite2D, down: bool) -> void:
 	var height = 80 if down else -80
 	tween.tween_property(sprite, "position", Vector2(0, height), 0.2).as_relative()
 	tween.tween_property(sprite, "position", Vector2.ZERO, 0.2)
-	await tween.finished
-	sprite.position = Vector2.ZERO
 
 static func hop(sprite: Sprite2D, iterations: int) -> void:
 	if iterations == -1:
@@ -159,9 +156,6 @@ static func hop(sprite: Sprite2D, iterations: int) -> void:
 		tween.parallel().tween_property(sprite, "rotation", PI / 6 if delta.x > 0 else -PI / 6, duration).as_relative()
 		tween.chain().tween_property(sprite, "position", Vector2.ZERO, duration)
 		tween.parallel().tween_property(sprite, "rotation", 0, duration)
-		await tween.finished
-		sprite.position = Vector2.ZERO
-		sprite.rotation = 0
 
 static func rotation(sprite: Sprite2D, loop: bool) -> void:
 	var tween = sprite.create_tween()
