@@ -142,6 +142,8 @@ static func jump(sprite: Sprite2D, down: bool) -> void:
 	var height = 80 if down else -80
 	tween.tween_property(sprite, "position", Vector2(0, height), 0.2).as_relative()
 	tween.tween_property(sprite, "position", Vector2.ZERO, 0.2)
+	await tween.finished
+	sprite.position = Vector2.ZERO
 
 static func hop(sprite: Sprite2D, iterations: int) -> void:
 	if iterations == -1:
@@ -156,6 +158,9 @@ static func hop(sprite: Sprite2D, iterations: int) -> void:
 		tween.parallel().tween_property(sprite, "rotation", PI / 6 if delta.x > 0 else -PI / 6, duration).as_relative()
 		tween.chain().tween_property(sprite, "position", Vector2.ZERO, duration)
 		tween.parallel().tween_property(sprite, "rotation", 0, duration)
+		await tween.finished
+		sprite.position = Vector2.ZERO
+		sprite.rotation = 0
 
 static func rotation(sprite: Sprite2D, loop: bool) -> void:
 	var tween = sprite.create_tween()
