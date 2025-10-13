@@ -1,18 +1,20 @@
 class_name Rival
 extends Node
 
-static var IDLE_FRAME_COUNT: int = 150
+static var ONE_COMBO_CREATION_TIME: int = 3
 static var ONE_ATTACK_FRAME_COUNT: int = 30
 static var ATTACK_NUMBER: int = 3
 static var STUN_COUNT: int = 90
 
-static var HP: int = 100
+static var HP: int = 7
 
-var hp: int = HP * 100
+var hp: int = HP * HP
 
 var frame_count: int = 0
 var is_idle: bool = true
 var combo: Array[int] = []
+
+var IDLE_FRAME_COUNT = ONE_COMBO_CREATION_TIME * ATTACK_NUMBER * Main.FPS
 
 
 func reduce_hp(damage: int) -> void:

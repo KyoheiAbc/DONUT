@@ -25,7 +25,7 @@ class CustomHSlider extends HSlider:
 func _ready():
 	var slider: CustomHSlider
 	
-	slider = CustomHSlider.new("inTh", InputHandler.THRESHOLD, 10, 300, 10)
+	slider = CustomHSlider.new("inTh", InputHandler.THRESHOLD, 8, 64, 8)
 	add_child(slider)
 	slider.value_changed.connect(func(value): InputHandler.THRESHOLD = value)
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.2, 80))
@@ -35,22 +35,22 @@ func _ready():
 	slider.value_changed.connect(func(value): Game.COLOR_NUMBER = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.2, 180))
 
-	slider = CustomHSlider.new("groupSize", Cleaner.GROUP_SIZE_TO_CLEAR, 1, 10, 1)
+	slider = CustomHSlider.new("groupSize", Cleaner.GROUP_SIZE_TO_CLEAR, 1, 8, 1)
 	add_child(slider)
 	slider.value_changed.connect(func(value): Cleaner.GROUP_SIZE_TO_CLEAR = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.2, 280))
 
-	slider = CustomHSlider.new("rivalHP", Rival.HP, 1, 300, 1)
+	slider = CustomHSlider.new("rivalHP", Rival.HP, 1, 16, 1)
 	add_child(slider)
 	slider.value_changed.connect(func(value): Rival.HP = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 80))
 
-	slider = CustomHSlider.new("rivalIdle", Rival.IDLE_FRAME_COUNT, 1, 900, 1)
+	slider = CustomHSlider.new("rivalPrepareTime", Rival.ONE_COMBO_CREATION_TIME, 1, 16, 1)
 	add_child(slider)
-	slider.value_changed.connect(func(value): Rival.IDLE_FRAME_COUNT = int(value))
+	slider.value_changed.connect(func(value): Rival.ONE_COMBO_CREATION_TIME = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 180))
 
-	slider = CustomHSlider.new("rivalAttack", Rival.ATTACK_NUMBER, 1, 5, 1)
+	slider = CustomHSlider.new("rivalAttack", Rival.ATTACK_NUMBER, 1, 7, 1)
 	add_child(slider)
 	slider.value_changed.connect(func(value): Rival.ATTACK_NUMBER = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.5, 280))

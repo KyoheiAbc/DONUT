@@ -66,9 +66,9 @@ func process(game: Game) -> void:
 	rival_hp_slider.value = rival.hp / float(Rival.HP * 100) * rival_hp_slider.max_value
 
 	if rival.is_idle:
-		rival_idle_slider.value = rival.frame_count / float(Rival.IDLE_FRAME_COUNT) * rival_idle_slider.max_value
+		rival_idle_slider.value = rival.frame_count / float(game.rival.IDLE_FRAME_COUNT) * rival_idle_slider.max_value
 		for i in range(Rival.ATTACK_NUMBER):
-			if rival.frame_count >= Rival.IDLE_FRAME_COUNT * i / float(Rival.ATTACK_NUMBER) and rival_attack_motion_count == i:
+			if rival.frame_count >= game.rival.IDLE_FRAME_COUNT * i / float(Rival.ATTACK_NUMBER) and rival_attack_motion_count == i:
 				if rival_sprite.rotation == 0 and rival_sprite.position == Vector2.ZERO:
 					print("Rival idle motion %d" % (i + 1))
 					UI.hop(rival_sprite, Rival.ATTACK_NUMBER if i == 0 else 1)
