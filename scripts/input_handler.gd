@@ -41,13 +41,14 @@ func _input(event: InputEvent) -> void:
 		var delta = event.position - base_position
 		if delta.x > THRESHOLD:
 			emit_signal("direction", Vector2(1, 0))
-			base_position.x = event.position.x
+			base_position = event.position
 		if delta.x < -THRESHOLD:
 			emit_signal("direction", Vector2(-1, 0))
-			base_position.x = event.position.x
-		if delta.y > THRESHOLD:
+			base_position = event.position
+		if delta.y > THRESHOLD * 1.5:
 			emit_signal("direction", Vector2(0, 1))
-			base_position.y = event.position.y
-		if delta.y < -THRESHOLD:
+			base_position = event.position
+		if delta.y < -THRESHOLD * 2:
+			print("swipe up")
 			emit_signal("direction", Vector2(0, -1))
-			base_position.y = event.position.y
+			base_position = event.position

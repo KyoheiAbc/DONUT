@@ -1,10 +1,12 @@
 class_name Main
 extends Node
 
+static var FPS: int = 30
 static var WINDOW: Vector2 = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
 static var ROOT: Node
 
 func _ready():
+	Engine.max_fps = FPS
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 0.5, 0.8))
 	ROOT = get_tree().root
 	call_deferred("ready")
