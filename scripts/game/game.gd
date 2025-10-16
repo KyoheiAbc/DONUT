@@ -115,7 +115,7 @@ func loop_all_donuts() -> bool:
 func execute_after_wait(callback: Callable) -> void:
 	var timer = Timer.new()
 	add_child(timer)
-	timer.start(Cleaner.CLEAR_WAIT_COUNT / 30.0)
+	timer.start(Cleaner.CLEAR_WAIT_COUNT / 60.0)
 	timer.timeout.connect(func() -> void:
 		timer.queue_free()
 		callback.call()

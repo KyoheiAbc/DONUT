@@ -60,15 +60,6 @@ func _ready():
 	slider.value_changed.connect(func(value): Donut.GARBAGE_HARDNESS = int(value))
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.8, 80))
 
-	slider = CustomHSlider.new("maxDmg", Game.MAX_ONE_DAMAGE, 1, 18, 1)
-	add_child(slider)
-	slider.value_changed.connect(func(value): Game.MAX_ONE_DAMAGE = int(value))
-	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.8, 180))
-
-	slider = CustomHSlider.new("gravity", DonutsPair.GRAVITY, 1, 99, 1)
-	add_child(slider)
-	slider.value_changed.connect(func(value): DonutsPair.GRAVITY = int(value))
-	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.8, 280))
 
 	var button = Button.new()
 	add_child(button)
