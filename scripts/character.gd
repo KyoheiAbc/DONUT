@@ -26,8 +26,8 @@ func _ready():
 		add_child(sprites.back())
 		sprites.back().scale = Vector2(0.4, 0.4)
 		sprites.back().texture = SPRITES[i]
-		sprites.back().position = Vector2(i * 100, 270)
-		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 100) / 2
+		sprites.back().position = Vector2(i * 90, 270)
+		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 90) / 2
 
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
@@ -53,9 +53,8 @@ func _ready():
 	button.text = "OK"
 	Main.setup_button(button)
 	button.pressed.connect(func() -> void:
-		Main.show_black(0.1)
 		self.queue_free()
-		Main.ROOT.add_child(Option.new())
+		Main.NODE.add_child(Option.new())
 	)
 
 	var input_handler = InputHandler.new()
@@ -73,6 +72,12 @@ func _ready():
 		elif direction.x < 0:
 			Array2D.move_value(MAP, target_index, Vector2(-1, 0))
 	)
+
+	var label = Label.new()
+	add_child(label)
+	label.text = "VS"
+	Main.setup_label(label)
+	Main.set_control_position(label, Vector2(Main.WINDOW.x / 2, 120))
 
 
 func _process(_delta: float) -> void:

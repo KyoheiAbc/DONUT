@@ -4,12 +4,13 @@ extends Node
 var next_donuts: Array[Sprite2D] = [Sprite2D.new(), Sprite2D.new(), Sprite2D.new(), Sprite2D.new()]
 
 var player_sprite: Sprite2D = Sprite2D.new()
+var player_latest_combo: int = 0
 
 var rival_sprite: Sprite2D = Sprite2D.new()
 var rival_hp_slider: GameVSlider = GameVSlider.new(Vector2(20, 200), Color(0, 1, 0))
 var rival_idle_slider: GameVSlider = GameVSlider.new(Vector2(20, 200), Color(1, 0.7, 0))
 var rival_attack_motion_count: int = 0
-
+var rival_latest_combo: int = 0
 var combo_label: Label = Label.new()
 var score_slider: GameVSlider = GameVSlider.new(Vector2(30, 380), Color.from_hsv(0.2, 0.8, 1))
 
@@ -49,12 +50,13 @@ func _init() -> void:
 	Main.set_control_position(rival_idle_slider, Vector2(225 + 110, 100))
 	rival_idle_slider.value = 0
 
+
 	add_child(combo_label)
 	combo_label.text = ""
 	combo_label.add_theme_font_size_override("font_size", 32)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 	combo_label.position = Vector2(500, 220)
-	combo_label.z_index = 100
+	combo_label.visible = false
 
 	add_child(score_slider)
 	Main.set_control_position(score_slider, Vector2(700, 200))
@@ -63,38 +65,48 @@ func _init() -> void:
 func process(game: Game) -> void:
 	var rival = game.rival
 
-	rival_hp_slider.value = rival.hp / float(Rival.HP * 100) * rival_hp_slider.max_value
+	rival_hp_slider.value = rival.hp / float(Rival.HP) * rival_hp_slider.max_value
 
 	if rival.is_idle:
-		rival_idle_slider.value = rival.frame_count / float(game.rival.IDLE_FRAME_COUNT) * rival_idle_slider.max_value
-		for i in range(Rival.ATTACK_NUMBER):
-			if rival.frame_count >= game.rival.IDLE_FRAME_COUNT * i / float(Rival.ATTACK_NUMBER) and rival_attack_motion_count == i:
-				if rival_sprite.rotation == 0 and rival_sprite.position == Vector2.ZERO:
-					print("Rival idle motion %d" % (i + 1))
-					UI.hop(rival_sprite, Rival.ATTACK_NUMBER if i == 0 else 1)
+		rival_idle_slider.value = rival.frame_count / float(rival.attack_prepare_count) * rival_idle_slider.max_value
+		for i in range(rival.attack_count):
+			if rival.frame_count >= rival.attack_prepare_count / float(rival.attack_count) * i:
+				if rival_sprite.rotation == 0 and rival_sprite.position == Vector2.ZERO and rival_attack_motion_count == i:
 					rival_attack_motion_count += 1
+					if i == 0:
+						hop(rival_sprite, rival.attack_count)
+					else:
+						hop(rival_sprite, 1)
 	else:
 		rival_attack_motion_count = 0
-		var combo = Game.sum(rival.combo)
-		rival_idle_slider.value = (Rival.ATTACK_NUMBER - combo) / float(Rival.ATTACK_NUMBER) * rival_idle_slider.max_value
+		rival_idle_slider.value = (rival.attack_count - rival.combo) / float(rival.attack_count) * rival_idle_slider.max_value
 
+	if rival.combo > rival_latest_combo:
+		hop(rival_sprite, 1)
+		rival_latest_combo = rival.combo
+	elif rival.combo < rival_latest_combo:
+		rival_latest_combo = 0
 
-	score_slider.value = score_slider.max_value / 2
-	score_slider.value += (game.score + Game.sum_of_powers(game.combo) - Game.sum_of_powers(game.rival.combo)) * 10
+	if game.combo > player_latest_combo:
+		player_latest_combo = game.combo
+		execute_after_wait(func() -> void:
+			hop(player_sprite, 1)
+			combo_label.visible = true
+			combo_label.text = str(game.combo) + " COMBO!"
+		)
+	elif game.combo < player_latest_combo:
+		player_latest_combo = 0
+		execute_after_wait(func() -> void:
+			combo_label.visible = false
+		)
+
+	score_slider.value = score_slider.max_value * 0.5
+	score_slider.value += (game.score + game.combo * game.combo - rival.combo * rival.combo) * 32
+	
 	for donut in game.all_donuts:
 		Donut.render(donut)
 
-func next_donuts_updated(next_colors: Array[int]) -> void:
-	for i in range(next_donuts.size()):
-		next_donuts[i].modulate = Color.from_hsv(next_colors[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
-
-func combo(is_player: bool) -> void:
-	if is_player:
-		UI.hop(player_sprite, 1)
-	else:
-		UI.hop(rival_sprite, 1)
-
-func action_motion(is_attack: bool) -> void:
+func attack(is_attack: bool) -> void:
 	if is_attack:
 		UI.jump(player_sprite, false)
 		UI.rotation(rival_sprite, false)
@@ -102,13 +114,19 @@ func action_motion(is_attack: bool) -> void:
 		UI.jump(rival_sprite, true)
 		UI.rotation(player_sprite, false)
 
-func game_over(is_player: bool = true) -> void:
-	if is_player:
-		UI.hop(rival_sprite, -1)
-		UI.rotation(player_sprite, true)
-	else:
-		UI.hop(player_sprite, -1)
-		UI.rotation(rival_sprite, true)
+func execute_after_wait(callback: Callable) -> void:
+	var timer = Timer.new()
+	add_child(timer)
+	timer.start(Cleaner.CLEAR_WAIT_COUNT / 60.0)
+	timer.timeout.connect(func() -> void:
+		timer.queue_free()
+		callback.call()
+	)
+
+func next_donuts_updated(next_colors: Array[int]) -> void:
+	for i in range(next_donuts.size()):
+		next_donuts[i].modulate = Color.from_hsv(next_colors[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
+
 
 class GameVSlider extends VSlider:
 	func _init(_size: Vector2, color: Color) -> void:
@@ -132,7 +150,6 @@ class GameVSlider extends VSlider:
 
 		min_value = 0
 		max_value = 1000
-		step = 1
 		editable = false
 		value = max_value
 
@@ -143,6 +160,7 @@ static func jump(sprite: Sprite2D, down: bool) -> void:
 	tween.tween_property(sprite, "position", Vector2(0, height), 0.2).as_relative()
 	tween.tween_property(sprite, "position", Vector2.ZERO, 0.2)
 	await tween.finished
+	tween.kill()
 	sprite.position = Vector2.ZERO
 
 static func hop(sprite: Sprite2D, iterations: int) -> void:
@@ -159,6 +177,7 @@ static func hop(sprite: Sprite2D, iterations: int) -> void:
 		tween.chain().tween_property(sprite, "position", Vector2.ZERO, duration)
 		tween.parallel().tween_property(sprite, "rotation", 0, duration)
 		await tween.finished
+		tween.kill()
 		sprite.position = Vector2.ZERO
 		sprite.rotation = 0
 
@@ -168,4 +187,5 @@ static func rotation(sprite: Sprite2D, loop: bool) -> void:
 		tween.set_loops()
 	tween.tween_property(sprite, "rotation", 2 * PI, 1 if not loop else 1.25).as_relative()
 	await tween.finished
+	tween.kill()
 	sprite.rotation = 0

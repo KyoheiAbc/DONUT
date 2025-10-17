@@ -1,54 +1,55 @@
 class_name Rival
 extends Node
 
-static var ONE_COMBO_CREATION_TIME: int = 3
-static var ONE_ATTACK_FRAME_COUNT: int = 60
-static var ATTACK_NUMBER: int = 3
+static var HP: int = 72
+static var MAX_ATTACK_COUNT: int = 3
+static var ONE_ATTACK_PREPARE_COUNT: int = 180
 
-static var HP: int = 7
+const COUNT_TO_ONE_ATTACK: int = Cleaner.CLEAR_WAIT_COUNT + Donut.FREEZE_COUNT + 30
+var hp: int = HP
 
-var hp: int = HP * HP * 100
+var combo: int = 0
+var is_idle: bool = true
+
+var attack_count: int = 0
+var attack_prepare_count: int = 0
 
 var frame_count: int = 0
-var is_idle: bool = true
-var combo: Array[int] = []
 
-var IDLE_FRAME_COUNT = ONE_COMBO_CREATION_TIME * ATTACK_NUMBER * Main.FPS
+signal signal_combo_ended(combo: int)
 
-
-func reduce_hp(damage: int) -> void:
+func reduce_hp(amount: int) -> int:
+	if not is_idle:
+		return 0
+	if amount <= 0:
+		return 0
 	var tween = create_tween()
-	tween.tween_property(self, "hp", -damage * 100, 3.0).as_relative()
+	tween.tween_property(self, "hp", -amount, 1).as_relative()
+	frame_count -= COUNT_TO_ONE_ATTACK
+	return amount
 
+func _ready() -> void:
+	attack_count = MAX_ATTACK_COUNT if randf() > 0.35 else round(MAX_ATTACK_COUNT / 2.0)
 
-func process(game: Game) -> void:
+	attack_prepare_count = attack_count * ONE_ATTACK_PREPARE_COUNT
+
+func process():
 	frame_count += 1
 
-	if hp <= 0:
-		game.game_over(false)
-		return
-
 	if is_idle:
-		if game.score > 0:
-			reduce_hp(game.score)
-			game.score = 0
-			frame_count -= 180
-			game.ui.action_motion(true)
-
-		if frame_count > IDLE_FRAME_COUNT:
-			frame_count = 0
+		if frame_count > attack_prepare_count:
 			is_idle = false
-
-	
-	else:
-		if frame_count >= ONE_ATTACK_FRAME_COUNT:
 			frame_count = 0
-			combo.append(1)
-			if Game.sum(combo) <= ATTACK_NUMBER:
-				print("Rival attacks! Combo: %d" % Game.sum(combo))
-				game.ui.combo(false)
-			else:
-				combo.pop_back()
-				game.score -= Game.sum_of_powers(combo)
-				combo.clear()
+
+	else:
+		if frame_count > COUNT_TO_ONE_ATTACK:
+			frame_count = 0
+			if combo >= attack_count:
+				var final_combo = combo
+				combo = 0
 				is_idle = true
+				attack_count = MAX_ATTACK_COUNT if randf() > 0.35 else round(MAX_ATTACK_COUNT / 2.0)
+				attack_prepare_count = attack_count * ONE_ATTACK_PREPARE_COUNT
+				emit_signal("signal_combo_ended", final_combo)
+			else:
+				combo += 1

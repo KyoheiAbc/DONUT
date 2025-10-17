@@ -4,32 +4,30 @@ extends Node
 var all_donuts: Array[Donut] = []
 var donuts_pair: DonutsPair = null
 
-var combo: Array[int] = []
-var score: int = 0
-var taking_damage: bool = false
-
 var rival: Rival = Rival.new()
-
 var ui: UI = UI.new()
 
-static var MAX_ONE_DAMAGE = 6
+var score: int = 0
+var combo: int = 0
+var is_damaging: bool = false
+
+var max_combo: int = 0
+var total_damage: int = 0
 
 func _ready():
 	set_process(false)
 
-	add_child(rival)
-	add_child(ui)
-
 	init_random_colors_bag()
 	next_colors = [get_random_color(), get_random_color(), get_random_color(), get_random_color()]
-
+	
 	next_donuts_pair()
 	ui.next_donuts_updated(next_colors)
 
 	create_walls()
 
+	add_child(ui)
+
 	var label = Label.new()
-	label.z_index = 1000
 	add_child(label)
 	Main.setup_label(label)
 	label.text = "READY"
@@ -37,20 +35,21 @@ func _ready():
 	label.text = "GO!"
 	await get_tree().create_timer(0.5).timeout
 	label.queue_free()
-
-
-	set_process(true)
 	setup_input()
 
-func _process(delta: float) -> void:
-	if not taking_damage:
-		loop()
-	if taking_damage:
-		loop_damage()
 
-	rival.process(self)
+	add_child(rival)
+	rival.signal_combo_ended.connect(func(combo: int) -> void:
+		score -= combo * combo
+		if score > 0:
+			var reduced = rival.reduce_hp(score)
+			if reduced > 0:
+				ui.attack(true)
+			score -= reduced
+	)
 
-	ui.process(self)
+	set_process(true)
+
 
 func loop() -> void:
 	if donuts_pair != null:
@@ -59,67 +58,69 @@ func loop() -> void:
 			Donut.sort_donuts_by_y_descending(all_donuts)
 			donuts_pair = null
 		return
-
-	else:
-		if not loop_all_donuts():
-			return
-
-		var find_clearable_donuts = Cleaner.find_clearable_donuts(all_donuts, Cleaner.GROUP_SIZE_TO_CLEAR)
-
-		if find_clearable_donuts[0].size() > 0:
-			for donut in find_clearable_donuts[0]:
-				donut.to_clear = true
-
-			combo.append(find_clearable_donuts[1])
-			execute_after_wait(func() -> void:
-				ui.combo(true)
-				print("combo: ", combo)
-				ui.combo_label.text = "%d COMBO" % Game.sum(combo)
-			)
-			return
-		
-		execute_after_wait(func() -> void:
-			ui.combo_label.text = ""
-		)
-
-		score += Game.sum_of_powers(combo)
-		combo.clear()
-		print("combo ended, score: ", score)
-
-		if score < 0:
-			taking_damage = true
-			ui.action_motion(false)
-			print("score is %d, taking damage" % score)
-			if score < -MAX_ONE_DAMAGE:
-				Donut.spawn_garbage(MAX_ONE_DAMAGE, all_donuts, self)
-				score += MAX_ONE_DAMAGE
-			else:
-				Donut.spawn_garbage(-score, all_donuts, self)
-				score = 0
-			print("after damage, score: ", score)
-			return
-
-		next_donuts_pair()
-
-func loop_damage() -> void:
+	
 	if not loop_all_donuts():
 		return
-	taking_damage = false
-	next_donuts_pair()
 
+	var find_clearable_donuts = Cleaner.find_clearable_donuts(all_donuts, Cleaner.GROUP_SIZE_TO_CLEAR)
+	if find_clearable_donuts[0].size() == 0:
+		score += combo * combo
+		if combo > max_combo:
+			max_combo = combo
+		combo = 0
+		if score < 0:
+			is_damaging = true
+			ui.attack(false)
+			if score < -6:
+				Donut.spawn_garbage(6, all_donuts, self)
+				total_damage += 6
+				score += 6
+			else:
+				Donut.spawn_garbage(-score, all_donuts, self)
+				total_damage -= score
+				score = 0
+			return
+		else:
+			if score > 0:
+				var reduced = rival.reduce_hp(score)
+				if reduced > 0:
+					ui.attack(true)
+				score -= reduced
+			if donuts_pair == null:
+				next_donuts_pair()
+				return
+	else:
+		combo += find_clearable_donuts[1]
+		for donut in find_clearable_donuts[0]:
+			donut.to_clear = true
+
+	
 func loop_all_donuts() -> bool:
 	for donut in all_donuts:
 		donut.process(all_donuts)
 	return Donut.all_donuts_are_stopped(all_donuts)
 
-func execute_after_wait(callback: Callable) -> void:
-	var timer = Timer.new()
-	add_child(timer)
-	timer.start(Cleaner.CLEAR_WAIT_COUNT / 60.0)
-	timer.timeout.connect(func() -> void:
-		timer.queue_free()
-		callback.call()
-	)
+func loop_damage() -> void:
+	if not loop_all_donuts():
+		return
+	is_damaging = false
+	if donuts_pair == null:
+		next_donuts_pair()
+
+
+func _process(delta: float) -> void:
+	if is_damaging:
+		loop_damage()
+	else:
+		loop()
+	
+	rival.process()
+	if rival.hp <= 0:
+		game_over(false)
+		return
+	
+	ui.process(self)
+	
 
 func next_donuts_pair() -> void:
 	if Donut.get_donut_at_position(Vector2(350, 350), all_donuts) != null:
@@ -142,7 +143,18 @@ func create_walls() -> void:
 				all_donuts.back().visible = false
 
 func game_over(is_player: bool) -> void:
-	ui.game_over(is_player)
+	if is_player:
+		UI.jump(ui.rival_sprite, true)
+		UI.rotation(ui.player_sprite, true)
+	else:
+		UI.jump(ui.player_sprite, false)
+		UI.rotation(ui.rival_sprite, true)
+
+	var rect = ColorRect.new()
+	add_child(rect)
+	rect.color = Color(0, 0, 0, 0.5)
+	rect.size = Main.WINDOW * 2
+	Main.set_control_position(rect, Main.WINDOW / 2)
 
 	set_process(false)
 	var label = Label.new()
@@ -154,15 +166,44 @@ func game_over(is_player: bool) -> void:
 		label.text = "YOU LOSE"
 	else:
 		label.text = "YOU WIN"
+	Main.set_control_position(label, Vector2(Main.WINDOW.x / 2, Main.WINDOW.y * 0.25))
+
+	var max_combo_label = Label.new()
+	add_child(max_combo_label)
+	max_combo_label.text = "MAX COMBO: " + str(max_combo)
+	max_combo_label.add_theme_font_size_override("font_size", 32)
+	if is_player:
+		max_combo_label.add_theme_color_override("font_color", Color.from_hsv(0, 1, 1))
+	else:
+		max_combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+	Main.set_control_position(max_combo_label, Vector2(Main.WINDOW.x * 0.3, Main.WINDOW.y * 0.5))
+	max_combo_label.visible = false
+
+	var total_damage_label = Label.new()
+	add_child(total_damage_label)
+	total_damage_label.text = "TOTAL DAMAGE: " + str(total_damage)
+	total_damage_label.add_theme_font_size_override("font_size", 32)
+	if is_player:
+		total_damage_label.add_theme_color_override("font_color", Color.from_hsv(0, 1, 1))
+	else:
+		total_damage_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+	Main.set_control_position(total_damage_label, Vector2(Main.WINDOW.x * 0.7, Main.WINDOW.y * 0.5))
+	total_damage_label.visible = false
+
 
 	var button = Button.new()
 	add_child(button)
-	button.text = "END GAME"
+	button.text = "NEXT"
 	Main.setup_button(button)
 	button.pressed.connect(func() -> void:
-		Main.show_black(0.1)
+		if max_combo_label.visible == false:
+			max_combo_label.visible = true
+			return
+		if total_damage_label.visible == false:
+			total_damage_label.visible = true
+			return
 		self.queue_free()
-		Main.ROOT.add_child(Initial.new())
+		Main.NODE.add_child(Initial.new())
 	)
 
 func setup_input() -> void:
@@ -174,12 +215,12 @@ func setup_input() -> void:
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(donuts_pair, all_donuts)
 			donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
-			ui.combo(true)
+			UI.hop(ui.player_sprite, 1)
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
 				donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
-				ui.combo(true)
+				UI.hop(ui.player_sprite, 1)
 			return
 		if DonutsPair.move(donuts_pair, direction * 100, all_donuts) != Vector2.ZERO:
 			donuts_pair.freeze_count = 0
@@ -193,20 +234,6 @@ func setup_input() -> void:
 		DonutsPair.rotation(donuts_pair, all_donuts)
 		donuts_pair.freeze_count = 0
 	)
-
-static func sum_of_powers(array: Array[int]) -> int:
-	var sum = 0
-	var combo = 0
-	for value in array:
-		combo += value
-		sum += combo * combo
-	return sum
-
-static func sum(array: Array[int]) -> int:
-	var sum = 0
-	for value in array:
-		sum += value
-	return sum
 
 static var COLOR_NUMBER = 4
 var next_colors: Array[int] = []

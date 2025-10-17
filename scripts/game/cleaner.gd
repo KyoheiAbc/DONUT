@@ -2,7 +2,7 @@ class_name Cleaner
 extends Node
 
 static var GROUP_SIZE_TO_CLEAR = 4
-static var CLEAR_WAIT_COUNT = 30
+const CLEAR_WAIT_COUNT = 30
 
 static func find_clearable_donuts(donuts: Array[Donut], group_size_to_clear: int):
 	var ret = mapping_donuts_to_2d_array(donuts)

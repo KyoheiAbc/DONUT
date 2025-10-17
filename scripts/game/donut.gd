@@ -13,8 +13,8 @@ var pos: Vector2
 var sprite: Sprite2D
 
 var freeze_count: int = 0
-static var FREEZE_COUNT = 15
-static var GRAVITY = 50
+const FREEZE_COUNT = 15
+static var GRAVITY = 30
 var to_clear: bool = false
 var to_clear_count: int = 0
 
