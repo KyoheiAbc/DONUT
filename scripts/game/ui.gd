@@ -14,6 +14,8 @@ var rival_latest_combo: int = 0
 var combo_label: Label = Label.new()
 var score_slider: GameVSlider = GameVSlider.new(Vector2(30, 380), Color.from_hsv(0.2, 0.8, 1))
 
+var tweens: Array[Tween] = [null, null]
+
 func _init() -> void:
 	var rect = ColorRect.new()
 	add_child(rect)
@@ -50,7 +52,7 @@ func _init() -> void:
 	Main.set_control_position(rival_idle_slider, Vector2(225 + 110, 100))
 	rival_idle_slider.value = 0
 
-
+	
 	add_child(combo_label)
 	combo_label.text = ""
 	combo_label.add_theme_font_size_override("font_size", 32)
@@ -101,7 +103,7 @@ func process(game: Game) -> void:
 		)
 
 	score_slider.value = score_slider.max_value * 0.5
-	score_slider.value += (game.score + game.combo * game.combo - rival.combo * rival.combo) * 32
+	score_slider.value += (game.score + game.combo * game.combo - rival.combo * rival.combo) * 10
 	
 	for donut in game.all_donuts:
 		Donut.render(donut)
@@ -164,14 +166,10 @@ static func jump(sprite: Sprite2D, down: bool) -> void:
 	sprite.position = Vector2.ZERO
 
 static func hop(sprite: Sprite2D, iterations: int) -> void:
-	if iterations == -1:
-		iterations = 1000
 	for i in range(iterations):
 		var tween = sprite.create_tween()
-		if iterations > 1000:
-			tween.set_loops()
 		var delta = Vector2(30, -30) if randf() < 0.5 else Vector2(-30, -30)
-		var duration = 0.22 if iterations >= 1000 else 0.15
+		var duration = 0.15
 		tween.tween_property(sprite, "position", delta, duration).as_relative()
 		tween.parallel().tween_property(sprite, "rotation", PI / 6 if delta.x > 0 else -PI / 6, duration).as_relative()
 		tween.chain().tween_property(sprite, "position", Vector2.ZERO, duration)
@@ -180,6 +178,18 @@ static func hop(sprite: Sprite2D, iterations: int) -> void:
 		tween.kill()
 		sprite.position = Vector2.ZERO
 		sprite.rotation = 0
+
+static func hop_loop(sprite: Sprite2D) -> void:
+	var tween = sprite.create_tween()
+	tween.set_loops()
+	tween.tween_property(sprite, "position", Vector2(30, -30), 0.22).as_relative()
+	tween.parallel().tween_property(sprite, "rotation", PI / 6, 0.22).as_relative()
+	tween.chain().tween_property(sprite, "position", Vector2.ZERO, 0.22)
+	tween.parallel().tween_property(sprite, "rotation", 0, 0.22)
+	tween.chain().tween_property(sprite, "position", Vector2(-30, -30), 0.22).as_relative()
+	tween.parallel().tween_property(sprite, "rotation", -PI / 6, 0.22).as_relative()
+	tween.chain().tween_property(sprite, "position", Vector2.ZERO, 0.22)
+	tween.parallel().tween_property(sprite, "rotation", 0, 0.22)
 
 static func rotation(sprite: Sprite2D, loop: bool) -> void:
 	var tween = sprite.create_tween()

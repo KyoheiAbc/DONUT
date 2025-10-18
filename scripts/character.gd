@@ -1,7 +1,7 @@
 class_name Character
 extends Node
 
-static var MAP = [[0, 1, -1, -1, -1, -1, -1, -1]]
+static var MAP = [[0, 1, -1, -1, -1, -1, -1, -1, -1]]
 const SPRITES: Array[Texture2D] = [
 	preload("res://assets/a_edited.png"),
 	preload("res://assets/b_edited.png"),
@@ -11,6 +11,7 @@ const SPRITES: Array[Texture2D] = [
 	preload("res://assets/f_edited.png"),
 	preload("res://assets/g_edited.png"),
 	preload("res://assets/h_edited.png"),
+	preload("res://assets/i_edited.png"),
 ]
 
 var sprites: Array[Sprite2D]
@@ -24,10 +25,10 @@ func _ready():
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
 		add_child(sprites.back())
-		sprites.back().scale = Vector2(0.4, 0.4)
+		sprites.back().scale = Vector2(0.35, 0.35)
 		sprites.back().texture = SPRITES[i]
-		sprites.back().position = Vector2(i * 90, 270)
-		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 90) / 2
+		sprites.back().position = Vector2(i * 80, 270)
+		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 80) / 2
 
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
@@ -43,7 +44,7 @@ func _ready():
 		var cursor = ColorRect.new()
 		add_child(cursor)
 		cursor.color = Color.from_hsv(i * 0.5, 1, 1, 1)
-		cursor.size = Vector2(90, 90)
+		cursor.size = Vector2(80, 80)
 		Main.set_control_position(cursor, sprites[i].position)
 		cursor.z_index = -1
 		cursors.append(cursor)

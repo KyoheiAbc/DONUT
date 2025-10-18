@@ -39,7 +39,7 @@ func _ready():
 	slider.value_changed.connect(func(value): Rival.MAX_ATTACK_COUNT = value)
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.25, 280))
 
-	slider = CustomHSlider.new("rivalAtkPrep", Rival.ONE_ATTACK_PREPARE_COUNT, 15, 300)
+	slider = CustomHSlider.new("rivalAtkPrep", Rival.ONE_ATTACK_PREPARE_COUNT, 30, 600)
 	add_child(slider)
 	slider.value_changed.connect(func(value): Rival.ONE_ATTACK_PREPARE_COUNT = value)
 	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.75, 80))
