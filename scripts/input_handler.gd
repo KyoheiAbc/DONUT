@@ -45,10 +45,9 @@ func _input(event: InputEvent) -> void:
 		if delta.x < -THRESHOLD:
 			emit_signal("direction", Vector2(-1, 0))
 			base_position = event.position
-		if delta.y > THRESHOLD * 1.5:
+		if delta.y > THRESHOLD:
 			emit_signal("direction", Vector2(0, 1))
 			base_position = event.position
-		if delta.y < -THRESHOLD * 2:
-			print("swipe up")
+		if delta.y < -THRESHOLD:
 			emit_signal("direction", Vector2(0, -1))
 			base_position = event.position
