@@ -36,13 +36,13 @@ func get_average_color(input_path: String) -> Color:
 	return color
 
 func _init():
-	create_sprite_with_background("res://assets/a.png", Vector2i(200, 200), Color.from_hsv(0 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/b.png", Vector2i(200, 200), Color.from_hsv(1 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/c.png", Vector2i(200, 200), Color.from_hsv(2 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/d.png", Vector2i(200, 200), Color.from_hsv(3 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/e.png", Vector2i(200, 200), Color.from_hsv(4 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/f.png", Vector2i(200, 200), Color.from_hsv(5 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/g.png", Vector2i(200, 200), Color.from_hsv(6 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/h.png", Vector2i(200, 200), Color.from_hsv(7 / 9.0, 0.5, 1))
-	create_sprite_with_background("res://assets/i.png", Vector2i(200, 200), Color.from_hsv(8 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/a.png", Vector2i(400, 400), Color.from_hsv(0 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/b.png", Vector2i(400, 400), Color.from_hsv(1 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/c.png", Vector2i(400, 400), Color.from_hsv(2 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/d.png", Vector2i(400, 400), Color.from_hsv(3 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/e.png", Vector2i(400, 400), Color.from_hsv(4 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/f.png", Vector2i(400, 400), Color.from_hsv(5 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/g.png", Vector2i(400, 400), Color.from_hsv(6 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/h.png", Vector2i(400, 400), Color.from_hsv(7 / 9.0, 0.5, 1))
+	create_sprite_with_background("res://assets/i.png", Vector2i(400, 400), Color.from_hsv(8 / 9.0, 0.5, 1))
 	quit()

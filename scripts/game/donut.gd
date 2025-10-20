@@ -1,8 +1,8 @@
 class_name Donut
 extends Node2D
 
-static var SPRITE_SIZE = Vector2(32, 32)
-static var POSITION_OFFSET = Vector2(400 - SPRITE_SIZE.x, 200 - SPRITE_SIZE.y * 9)
+static var SPRITE_SIZE = Vector2(64, 64)
+static var POSITION_OFFSET = Vector2(1000 - SPRITE_SIZE.x, 500 - SPRITE_SIZE.y * 9)
 
 const DONUT_TEXTURE: Texture2D = preload("res://assets/donut.png")
 

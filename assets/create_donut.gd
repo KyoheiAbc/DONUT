@@ -1,6 +1,6 @@
 extends SceneTree
 
-const SIZE = 32
+const SIZE = 64
 const INNER_RADIUS_RATIO = 0.3
 
 func _init():

@@ -11,14 +11,39 @@ var score: int = 0
 var combo: int = 0
 var is_damaging: bool = false
 
+var player_sprite: Sprite2D = Sprite2D.new()
+
 func _ready():
+	var rect = ColorRect.new()
+	add_child(rect)
+	rect.color = Color.from_hsv(0.5, 0.5, 0.5)
+	rect.size = Vector2(Donut.SPRITE_SIZE.x * 6, Donut.SPRITE_SIZE.y * 12)
+	Main.set_control_position(rect, Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500))
+	rect.z_index = -1
+
+	for i in range(next_donuts.size()):
+		var next_donut = next_donuts[i]
+		add_child(next_donut)
+		next_donut.texture = Donut.DONUT_TEXTURE
+	next_donuts[0].position = Vector2(1500, 100 + 64)
+	next_donuts[1].position = Vector2(1500, 100 + 0)
+	next_donuts[2].position = Vector2(1500, 100 + 256)
+	next_donuts[3].position = Vector2(1500, 100 + 192)
+
+	var player = Node2D.new()
+	add_child(player)
+	player.add_child(player_sprite)
+	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+	player.position = Vector2(700, 750)
+	
+
 	set_process(false)
 
 	init_random_colors_bag()
 	next_colors = [get_random_color(), get_random_color(), get_random_color(), get_random_color()]
+	next_donuts_updated(next_colors)
 	
 	next_donuts_pair()
-	ui.next_donuts_updated(next_colors)
 
 	create_walls()
 
@@ -40,8 +65,6 @@ func _ready():
 		score -= combo_to_score(combo)
 		if score > 0:
 			var reduced = rival.reduce_hp(score)
-			if reduced > 0:
-				ui.attack(true)
 			score -= reduced
 	)
 
@@ -65,7 +88,6 @@ func loop() -> void:
 		combo = 0
 		if score < 0:
 			is_damaging = true
-			ui.attack(false)
 			if score < -18:
 				Donut.spawn_garbage(18, all_donuts, self)
 				score += 18
@@ -76,8 +98,6 @@ func loop() -> void:
 		else:
 			if score > 0:
 				var reduced = rival.reduce_hp(score)
-				if reduced > 0:
-					ui.attack(true)
 				score -= reduced
 			if donuts_pair == null:
 				next_donuts_pair()
@@ -108,10 +128,11 @@ func _process(delta: float) -> void:
 		loop()
 	
 	rival.process()
-	
-	ui.process(self)
-	
 
+	for donut in all_donuts:
+		Donut.render(donut)
+	
+	
 	if rival.hp <= 0:
 		game_over(false)
 
@@ -122,7 +143,12 @@ func next_donuts_pair() -> void:
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.pop_front(), next_colors.pop_front()], self)
 	next_colors += [get_random_color(), get_random_color()]
 
-	ui.next_donuts_updated(next_colors)
+	next_donuts_updated(next_colors)
+
+
+func next_donuts_updated(next_colors: Array[int]) -> void:
+	for i in range(next_donuts.size()):
+		next_donuts[i].modulate = Color.from_hsv(next_colors[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
 
 
 func create_walls() -> void:
@@ -136,13 +162,6 @@ func create_walls() -> void:
 				all_donuts.back().visible = false
 
 func game_over(is_player: bool) -> void:
-	if is_player:
-		UI.hop_loop(ui.rival_sprite)
-		UI.rotation(ui.player_sprite, true)
-	else:
-		UI.hop_loop(ui.player_sprite)
-		UI.rotation(ui.rival_sprite, true)
-
 	set_process(false)
 	var label = Label.new()
 	label.z_index = 1000
@@ -158,7 +177,7 @@ func game_over(is_player: bool) -> void:
 
 	var button = Button.new()
 	add_child(button)
-	button.text = "END GAME"
+	button.text = "END"
 	Main.setup_button(button)
 	button.pressed.connect(func() -> void:
 		self.queue_free()
@@ -174,12 +193,10 @@ func setup_input() -> void:
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(donuts_pair, all_donuts)
 			donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
-			UI.hop(ui.player_sprite, 1)
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
 				donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
-				UI.hop(ui.player_sprite, 1)
 			return
 		if DonutsPair.move(donuts_pair, direction * 100, all_donuts) != Vector2.ZERO:
 			donuts_pair.freeze_count = 0
@@ -193,6 +210,8 @@ func setup_input() -> void:
 		DonutsPair.rotation(donuts_pair, all_donuts)
 		donuts_pair.freeze_count = 0
 	)
+
+var next_donuts: Array[Sprite2D] = [Sprite2D.new(), Sprite2D.new(), Sprite2D.new(), Sprite2D.new()]
 
 static var COLOR_NUMBER = 4
 var next_colors: Array[int] = []

@@ -25,26 +25,26 @@ func _ready():
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
 		add_child(sprites.back())
-		sprites.back().scale = Vector2(0.35, 0.35)
+		sprites.back().scale = Vector2(0.45, 0.45)
 		sprites.back().texture = SPRITES[i]
-		sprites.back().position = Vector2(i * 80, 270)
-		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 80) / 2
+		sprites.back().position = Vector2(i * 200, 650)
+		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 200) / 2
 
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
 		sprites_a.back().texture = SPRITES[i]
-		sprites_a.back().position = Vector2(200, 110)
+		sprites_a.back().position = Vector2(600, 250)
 
 		sprites_b.append(Sprite2D.new())
 		add_child(sprites_b[i])
 		sprites_b.back().texture = SPRITES[i]
-		sprites_b.back().position = Vector2(600, 110)
+		sprites_b.back().position = Vector2(1400, 250)
 
 	for i in range(2):
 		var cursor = ColorRect.new()
 		add_child(cursor)
 		cursor.color = Color.from_hsv(i * 0.5, 1, 1, 1)
-		cursor.size = Vector2(80, 80)
+		cursor.size = Vector2(200, 200)
 		Main.set_control_position(cursor, sprites[i].position)
 		cursor.z_index = -1
 		cursors.append(cursor)
@@ -78,7 +78,7 @@ func _ready():
 	add_child(label)
 	label.text = "VS"
 	Main.setup_label(label)
-	Main.set_control_position(label, Vector2(Main.WINDOW.x / 2, 120))
+	Main.set_control_position(label, Vector2(Main.WINDOW.x / 2, 300))
 
 
 func _process(_delta: float) -> void:
