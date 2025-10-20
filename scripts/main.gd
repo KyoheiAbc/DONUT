@@ -9,7 +9,7 @@ func _ready():
 	Engine.max_fps = FPS
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 1, 0.75))
 	NODE = self
-	NODE.add_child(Game.new())
+	NODE.add_child(Initial.new())
 
 
 static func setup_label(label: Label) -> void:

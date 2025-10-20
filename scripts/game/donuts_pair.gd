@@ -1,17 +1,14 @@
 class_name DonutsPair
-extends Node
 
 var elements: Array[Donut]
 var child_relative_pos: Array[Vector2] = [Vector2.UP * 100, Vector2.RIGHT * 100, Vector2.DOWN * 100, Vector2.LEFT * 100]
 
 var freeze_count: int = 0
 static var FREEZE_COUNT = 60
-static var GRAVITY = 5
+static var GRAVITY = 1
 
 func _init(pos: Vector2, colors: Array[int]) -> void:
 	elements = [Donut.new(colors[0]), Donut.new(colors[1])]
-	add_child(elements[0])
-	add_child(elements[1])
 	elements[0].pos = pos
 	elements[1].pos = pos + child_relative_pos[0]
 
@@ -83,8 +80,8 @@ static func sync_position(pair: DonutsPair, to_parent: bool, donuts: Array[Donut
 
 static func spawn_donuts_pair(all_donuts: Array[Donut], colors: Array[int], node: Node) -> DonutsPair:
 	var donuts_pair = DonutsPair.new(Vector2(350, 350), colors)
-	node.add_child(donuts_pair)
 	for donut in donuts_pair.elements:
+		node.add_child(donut)
 		all_donuts.append(donut)
 		Donut.render(donut)
 	return donuts_pair

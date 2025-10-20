@@ -5,7 +5,6 @@ var all_donuts: Array[Donut] = []
 var donuts_pair: DonutsPair = null
 
 var rival: Rival = Rival.new()
-var ui: UI = UI.new()
 
 var score: int = 0
 var combo: int = 0
@@ -47,7 +46,7 @@ func _ready():
 
 	create_walls()
 
-	add_child(ui)
+	add_child(rival)
 
 	var label = Label.new()
 	add_child(label)
@@ -60,7 +59,6 @@ func _ready():
 	setup_input()
 
 
-	add_child(rival)
 	rival.signal_combo_ended.connect(func(combo: int) -> void:
 		score -= combo_to_score(combo)
 		if score > 0:
@@ -109,9 +107,11 @@ func loop() -> void:
 
 	
 func loop_all_donuts() -> bool:
+	var all_stopped = true
 	for donut in all_donuts:
-		donut.process(all_donuts)
-	return Donut.all_donuts_are_stopped(all_donuts)
+		if donut.process(all_donuts):
+			all_stopped = false
+	return all_stopped
 
 func loop_damage() -> void:
 	if not loop_all_donuts():
@@ -192,11 +192,11 @@ func setup_input() -> void:
 			return
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(donuts_pair, all_donuts)
-			donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
+			donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT + 1
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
-				donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT
+				donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT + 1
 			return
 		if DonutsPair.move(donuts_pair, direction * 100, all_donuts) != Vector2.ZERO:
 			donuts_pair.freeze_count = 0
@@ -233,3 +233,117 @@ static func combo_to_score(combo: int) -> int:
 	for i in range(1, combo + 1):
 		total += i * i
 	return total
+
+
+class Rival extends Node:
+	static var HP: int = 50
+	static var MAX_ATTACK_COUNT: int = 3
+	static var ONE_ATTACK_PREPARE_COUNT: int = 180
+
+	const COUNT_TO_ONE_ATTACK: int = Cleaner.CLEAR_WAIT_COUNT + Donut.FREEZE_COUNT + 30
+	var hp: float = HP
+	var next_hp: float = HP
+
+	var combo: int = 0
+	var is_idle: bool = true
+
+	var attack_count: int = 0
+	var attack_prepare_count: int = 0
+
+	var frame_count: int = 0
+	var tween: Tween = null
+	var sprite: Sprite2D = Sprite2D.new()
+
+	signal signal_combo_ended(combo: int)
+
+	func reduce_hp(amount: int) -> int:
+		if not is_idle:
+			return 0
+		if amount <= 0:
+			return 0
+		if tween:
+			tween.kill()
+		next_hp -= amount
+		tween = create_tween()
+		tween.tween_property(self, "hp", next_hp, 3)
+
+		frame_count -= COUNT_TO_ONE_ATTACK
+		return amount
+
+	func _ready() -> void:
+		attack_count = next_attack_count()
+
+		attack_prepare_count = attack_count * ONE_ATTACK_PREPARE_COUNT
+
+
+		var rival = Node2D.new()
+		add_child(rival)
+		rival.add_child(sprite)
+		sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)]
+		rival.position = Vector2(700, 250)
+
+		add_child(rival_hp_slider)
+		Main.set_control_position(rival_hp_slider, Vector2(700 + 200 + 45, 250))
+
+		add_child(rival_idle_slider)
+		Main.set_control_position(rival_idle_slider, Vector2(700 + 200 + 15, 250))
+		rival_idle_slider.value = 0
+
+	func process():
+		frame_count += 1
+
+		if is_idle:
+			if frame_count > attack_prepare_count:
+				is_idle = false
+				frame_count = 0
+
+		else:
+			if frame_count > COUNT_TO_ONE_ATTACK:
+				frame_count = 0
+				if combo >= attack_count:
+					var final_combo = combo
+					combo = 0
+					is_idle = true
+					attack_count = next_attack_count()
+					attack_prepare_count = attack_count * ONE_ATTACK_PREPARE_COUNT
+					emit_signal("signal_combo_ended", final_combo)
+				else:
+					combo += 1
+
+	static func next_attack_count() -> int:
+		var attack_counts: Array[int] = []
+		for i in range(1, MAX_ATTACK_COUNT + 1):
+			for j in range(i):
+				attack_counts.append(i)
+		attack_counts.shuffle()
+		return attack_counts[0]
+
+
+	var rival_hp_slider: GameVSlider = GameVSlider.new(Vector2(30, 400), Color(0, 1, 0))
+	var rival_idle_slider: GameVSlider = GameVSlider.new(Vector2(30, 400), Color(1, 0.7, 0))
+
+
+	class GameVSlider extends VSlider:
+		func _init(_size: Vector2, color: Color) -> void:
+			var empty_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
+			empty_image.fill(Color(0, 0, 0, 0))
+			var empty_texture = ImageTexture.create_from_image(empty_image)
+			add_theme_icon_override("grabber", empty_texture)
+			add_theme_icon_override("grabber_highlight", empty_texture)
+			add_theme_icon_override("grabber_disabled", empty_texture)
+
+			var stylebox = StyleBoxFlat.new()
+			stylebox.bg_color = color
+			add_theme_stylebox_override("grabber_area_highlight", stylebox)
+			add_theme_stylebox_override("grabber_area", stylebox)
+			stylebox = StyleBoxFlat.new()
+			stylebox.bg_color = Color(0.4, 0.4, 0.4)
+			stylebox.content_margin_left = _size.x
+			add_theme_stylebox_override("slider", stylebox)
+
+			size = _size
+
+			min_value = 0
+			max_value = 1000
+			editable = false
+			value = max_value

@@ -13,7 +13,7 @@ var pos: Vector2
 var sprite: Sprite2D
 
 var freeze_count: int = 0
-const FREEZE_COUNT = 15
+const FREEZE_COUNT = 1
 static var GRAVITY = 30
 var to_clear: bool = false
 var to_clear_count: int = 0
@@ -30,17 +30,17 @@ func _init(_value: int):
 		sprite.modulate = Color.from_hsv(value / 5.0, 0.5, 1)
 
 
-func process(all_donuts: Array[Donut]) -> void:
+func process(all_donuts: Array[Donut]) -> bool:
 	if value == -1:
-		return
+		return false
 
 	if to_clear:
-		sprite.scale.y = 1.3
-		sprite.scale.x = 0.7
+		sprite.scale.y = 1.25
+		sprite.scale.x = 1.25
 		to_clear_count += 1
 		if to_clear_count > Cleaner.CLEAR_WAIT_COUNT:
 			Donut.clear_donut(self, all_donuts)
-		return
+		return true
 
 	if move(self, Vector2(0, GRAVITY), all_donuts) == Vector2.ZERO:
 		freeze_count += 1
@@ -50,6 +50,11 @@ func process(all_donuts: Array[Donut]) -> void:
 		sprite.position.y = 15 * sin(animation_progress)
 	else:
 		freeze_count = 0
+
+	if freeze_count > FREEZE_COUNT:
+		return false
+	else:
+		return true
 
 static func render(donut: Donut) -> void:
 	donut.position = donut.pos / 100 * SPRITE_SIZE + POSITION_OFFSET
@@ -143,19 +148,6 @@ static func clear_donut(donut: Donut, all_donuts: Array[Donut]) -> void:
 
 	all_donuts.erase(donut)
 	donut.queue_free()
-
-static func all_donuts_are_stopped(donuts_except_pair: Array[Donut]) -> bool:
-	for donut in donuts_except_pair:
-		if donut.value == -1:
-			continue
-		if donut.freeze_count < Donut.FREEZE_COUNT:
-			return false
-		if donut.to_clear:
-			return false
-		if get_donut_at_position(donut.pos + Vector2.DOWN * 100, donuts_except_pair) == null:
-			return false
-	return true
-
 
 static func sort_donuts_by_y_descending(all_donuts: Array[Donut]) -> void:
 	all_donuts.sort_custom(func(a, b): return a.pos.y > b.pos.y)
