@@ -3,21 +3,22 @@ extends Node
 
 static var COLOR_NUMBER = 4
 
-var all_donuts: Array[Donut] = []
 var donuts_pair: DonutsPair = null
+var next_colors: NextColors = NextColors.new()
+var player_sprite: Sprite2D = Sprite2D.new()
+var tween_sprite: Tween = null
+var combo: int = 0
+var combo_label: Label = Label.new()
+var score: int = 0
+
+var all_donuts: Array[Donut] = []
 
 var rival: Rival = Rival.new()
 
-var player_sprite: Sprite2D = Sprite2D.new()
-
-var next_colors: NextColors = NextColors.new()
-
-var score: int = 0
+var clearable_donuts: Array[Donut] = []
+var timer_clear: Timer = Timer.new()
 
 func _ready():
-	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
-	Main.BUTTON.visible = false
-
 	var rect = ColorRect.new()
 	add_child(rect)
 	rect.color = Color.from_hsv(0.5, 0.5, 0.5)
@@ -25,19 +26,36 @@ func _ready():
 	rect.position = Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500) - rect.size / 2
 	rect.z_index = -1
 
+	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
+	Main.BUTTON.visible = false
+
+	set_process(false)
+	var node = Node2D.new()
+	add_child(node)
+	node.add_child(player_sprite)
+	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+	node.position = Vector2(700, 750)
+
+	add_child(next_colors)
+
+	add_child(rival)
+
+	add_child(combo_label)
+	combo_label.add_theme_font_size_override("font_size", 48)
+	combo_label.position = Vector2(1400, 800)
+
+	next_donuts_pair()
+
+	create_walls()
+
 	Main.LABEL.visible = true
 	Main.LABEL.text = "READY"
 	await get_tree().create_timer(1.5).timeout
 	Main.LABEL.text = "GO!"
 	await get_tree().create_timer(0.5).timeout
 	Main.LABEL.visible = false
-
-
-	var player = Node2D.new()
-	add_child(player)
-	player.add_child(player_sprite)
-	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
-	player.position = Vector2(700, 750)
+	set_process(true)
+	setup_input()
 
 	rival.signal_combo_ended.connect(func(combo: int) -> void:
 		score -= combo_to_score(combo)
@@ -46,16 +64,64 @@ func _ready():
 			score -= reduced
 	)
 
-	add_child(rival)
+	add_child(timer_clear)
+	timer_clear.wait_time = Cleaner.CLEAR_WAIT_COUNT / 60.0
+	timer_clear.one_shot = true
+	timer_clear.timeout.connect(func() -> void:
+		for donut in clearable_donuts:
+			all_donuts.erase(donut)
+			donut.queue_free()
+		clearable_donuts.clear()
+		combo += 1
+		if combo > 0:
+			combo_label.text = str(combo) + " COMBO!"
+		else:
+			combo_label.text = ""
+	)
 
-	add_child(next_colors)
+func loop_donuts_pair() -> void:
+	donuts_pair.process(all_donuts)
+	donuts_pair.render()
 
+func loop_all_donuts() -> bool:
+	var still_moving = false
+	for donut in all_donuts:
+		if donut.value == -1:
+			continue
+		if donut.process(all_donuts):
+			still_moving = true
+		donut.render()
+	return still_moving
+
+func loop() -> void:
+	if donuts_pair:
+		loop_donuts_pair()
+	else:
+		if clearable_donuts.size() > 0:
+			return
+
+		if loop_all_donuts():
+			return
+
+		clearable_donuts = Cleaner.find_clearable_donuts(all_donuts, Cleaner.GROUP_SIZE_TO_CLEAR)[0]
+		if clearable_donuts.size() > 0:
+			for donut in clearable_donuts:
+				donut.sprite.scale = Vector2(0.7, 1.3)
+			timer_clear.start()
+		else:
+			combo = 0
+			combo_label.text = ""
+			next_donuts_pair()
+
+func _process(delta: float) -> void:
+	loop()
+	rival.process()
 
 func next_donuts_pair() -> void:
 	if Donut.get_donut_at_position(Vector2(350, 350), all_donuts) != null:
+		game_over()
 		return
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.next_color(), next_colors.next_color()], self)
-
 
 func create_walls() -> void:
 	for y in range(16):
@@ -64,9 +130,7 @@ func create_walls() -> void:
 				all_donuts.append(Donut.new(-1))
 				add_child(all_donuts.back())
 				all_donuts.back().pos = Vector2(x * 100 + 50, y * 100 + 50)
-				# Donut.render(all_donuts.back())
 				all_donuts.back().visible = false
-
 
 func setup_input() -> void:
 	var input_handler = InputHandler.new()
@@ -76,14 +140,19 @@ func setup_input() -> void:
 			return
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(donuts_pair, all_donuts)
-			donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT + 1
+			all_donuts.append(donuts_pair.elements[0])
+			all_donuts.append(donuts_pair.elements[1])
+			Donut.sort_donuts_by_y_descending(all_donuts)
+			donuts_pair = null
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
-				donuts_pair.freeze_count = DonutsPair.FREEZE_COUNT + 1
+				all_donuts.append(donuts_pair.elements[0])
+				all_donuts.append(donuts_pair.elements[1])
+				Donut.sort_donuts_by_y_descending(all_donuts)
+				donuts_pair = null
 			return
-		if DonutsPair.move(donuts_pair, direction * 100, all_donuts) != Vector2.ZERO:
-			donuts_pair.freeze_count = 0
+		DonutsPair.move(donuts_pair, direction * 100, all_donuts)
 	)
 
 	input_handler.pressed.connect(func(position: Vector2) -> void:
@@ -92,7 +161,6 @@ func setup_input() -> void:
 		if donuts_pair == null:
 			return
 		DonutsPair.rotation(donuts_pair, all_donuts)
-		donuts_pair.freeze_count = 0
 	)
 
 class NextColors extends Node:
@@ -118,6 +186,7 @@ class NextColors extends Node:
 
 
 	func next_color() -> int:
+		var color = bag.pop_front()
 		if bag.size() < 4:
 			var append_array: Array[int] = []
 			for i in range(Game.COLOR_NUMBER):
@@ -125,7 +194,6 @@ class NextColors extends Node:
 					append_array.append(i)
 			append_array.shuffle()
 			bag += append_array
-		var color = bag.pop_front()
 		for i in range(next_donuts.size()):
 			next_donuts[i].modulate = Color.from_hsv(bag[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
 		return color
@@ -135,3 +203,16 @@ static func combo_to_score(combo: int) -> int:
 	for i in range(1, combo + 1):
 		total += i * i
 	return total
+
+
+func game_over() -> void:
+	set_process(false)
+	Main.LABEL.visible = true
+	Main.LABEL.text = "GAME OVER"
+
+	Main.BUTTON.text = "END"
+	Main.BUTTON.visible = true
+	Main.BUTTON.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Character.new())
+	)

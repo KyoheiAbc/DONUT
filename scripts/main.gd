@@ -27,6 +27,7 @@ func _ready():
 	BUTTON.size = Vector2(384, 96)
 	BUTTON.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.9) - BUTTON.size / 2
 	BUTTON.text = "START"
+	BUTTON.z_index = 1000
 
 	BUTTON.pressed.connect(func() -> void:
 		NODE.add_child(Character.new())

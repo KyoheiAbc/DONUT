@@ -13,10 +13,8 @@ var pos: Vector2
 var sprite: Sprite2D
 
 var freeze_count: int = 0
-const FREEZE_COUNT = 1
+const FREEZE_COUNT = 15
 static var GRAVITY = 30
-var to_clear: bool = false
-var to_clear_count: int = 0
 
 func _init(_value: int):
 	value = _value
@@ -34,13 +32,6 @@ func process(all_donuts: Array[Donut]) -> bool:
 	if value == -1:
 		return false
 
-	if to_clear:
-		sprite.scale.y = 1.25
-		sprite.scale.x = 1.25
-		to_clear_count += 1
-		if to_clear_count > Cleaner.CLEAR_WAIT_COUNT:
-			Donut.clear_donut(self, all_donuts)
-		return true
 
 	if move(self, Vector2(0, GRAVITY), all_donuts) == Vector2.ZERO:
 		freeze_count += 1
@@ -56,8 +47,8 @@ func process(all_donuts: Array[Donut]) -> bool:
 	else:
 		return true
 
-static func render(donut: Donut) -> void:
-	donut.position = donut.pos / 100 * SPRITE_SIZE + POSITION_OFFSET
+func render() -> void:
+	position = pos / 100 * SPRITE_SIZE + POSITION_OFFSET
 
 
 static func move(donut: Donut, delta: Vector2, donuts: Array[Donut]) -> Vector2:
@@ -131,23 +122,6 @@ static func get_around(target: Donut, all_donuts: Array[Donut]) -> Array[Donut]:
 			result.append(donut)
 	return result
 
-static func clear_donut(donut: Donut, all_donuts: Array[Donut]) -> void:
-	var around_donuts = get_around(donut, all_donuts)
-	for around_donut in around_donuts:
-		if around_donut.value < 10:
-			continue
-		if around_donut.value == 14:
-			print("cannot reduce garbage further")
-			continue
-		if around_donut.freeze_count < Donut.FREEZE_COUNT:
-			continue
-		around_donut.value -= 1
-		if around_donut.value == 10:
-			around_donut.queue_free()
-			all_donuts.erase(around_donut)
-
-	all_donuts.erase(donut)
-	donut.queue_free()
 
 static func sort_donuts_by_y_descending(all_donuts: Array[Donut]) -> void:
 	all_donuts.sort_custom(func(a, b): return a.pos.y > b.pos.y)

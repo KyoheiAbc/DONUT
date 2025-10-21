@@ -13,7 +13,7 @@ var frame_count: int = 0
 
 static var COOL_COUNT_TO_ONE_COMBO: int = 180
 static var MAX_COMBO_CHOICES_ARRAY: Array[int] = [1, 2, 2, 3, 3, 3]
-const ONE_COMBO_DURATION: int = 60
+const ONE_COMBO_DURATION: int = 90
 var combo: int = 0
 
 var is_cool: bool = true

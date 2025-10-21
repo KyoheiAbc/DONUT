@@ -3,20 +3,13 @@ class_name DonutsPair
 var elements: Array[Donut]
 var child_relative_pos: Array[Vector2] = [Vector2.UP * 100, Vector2.RIGHT * 100, Vector2.DOWN * 100, Vector2.LEFT * 100]
 
-var freeze_count: int = 0
-static var FREEZE_COUNT = 60
-static var GRAVITY = 1
-
 func _init(pos: Vector2, colors: Array[int]) -> void:
 	elements = [Donut.new(colors[0]), Donut.new(colors[1])]
 	elements[0].pos = pos
 	elements[1].pos = pos + child_relative_pos[0]
 
 func process(all_donuts: Array[Donut]) -> void:
-	if DonutsPair.move(self, Vector2.DOWN * GRAVITY, all_donuts) == Vector2.ZERO:
-		freeze_count += 1
-	else:
-		freeze_count = 0
+	DonutsPair.move(self, Vector2.DOWN, all_donuts)
 	
 static func rotation(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 	var initial_pos = donuts_pair.elements[0].pos
@@ -62,7 +55,6 @@ static func hard_drop(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 		var moved = move(donuts_pair, Vector2.DOWN * 100, donuts)
 		if moved == Vector2.ZERO:
 			break
-	donuts_pair.freeze_count = FREEZE_COUNT
 
 static func sync_position(pair: DonutsPair, to_parent: bool, donuts: Array[Donut]) -> bool:
 	var base_donut = pair.elements[0] if to_parent else pair.elements[1]
@@ -77,11 +69,14 @@ static func sync_position(pair: DonutsPair, to_parent: bool, donuts: Array[Donut
 	child_donut.pos = initial_pos
 	return false
 
+func render() -> void:
+	for donut in elements:
+		donut.render()
 
 static func spawn_donuts_pair(all_donuts: Array[Donut], colors: Array[int], node: Node) -> DonutsPair:
 	var donuts_pair = DonutsPair.new(Vector2(350, 350), colors)
 	for donut in donuts_pair.elements:
 		node.add_child(donut)
-		all_donuts.append(donut)
-		Donut.render(donut)
+		# all_donuts.append(donut)
+		donut.render()
 	return donuts_pair
