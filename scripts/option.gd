@@ -23,19 +23,17 @@ class CustomHSlider extends HSlider:
 
 
 func _ready():
+	Main.LABEL.visible = false
+	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
+	Main.BUTTON.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Game.new())
+	)
+	Main.BUTTON.text = "OK"
+	
 	var slider: CustomHSlider
 
 	slider = CustomHSlider.new("inThreshold", InputHandler.THRESHOLD, 8, 128, 8)
 	add_child(slider)
 	slider.value_changed.connect(func(value): InputHandler.THRESHOLD = value)
-	Main.set_control_position(slider, Vector2(Main.WINDOW.x * 0.25, 200))
-
-
-	var button = Button.new()
-	add_child(button)
-	Main.setup_button(button)
-	button.text = "OK"
-	button.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Game.new())
-	)
+	slider.position = Vector2(Main.WINDOW.x * 0.25, 200) - slider.size / 2

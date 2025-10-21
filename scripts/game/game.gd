@@ -1,63 +1,43 @@
 class_name Game
 extends Node
 
+static var COLOR_NUMBER = 4
+
 var all_donuts: Array[Donut] = []
 var donuts_pair: DonutsPair = null
 
 var rival: Rival = Rival.new()
 
-var score: int = 0
-var combo: int = 0
-var is_damaging: bool = false
-
 var player_sprite: Sprite2D = Sprite2D.new()
 
+var next_colors: NextColors = NextColors.new()
+
+var score: int = 0
+
 func _ready():
+	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
+	Main.BUTTON.visible = false
+
 	var rect = ColorRect.new()
 	add_child(rect)
 	rect.color = Color.from_hsv(0.5, 0.5, 0.5)
 	rect.size = Vector2(Donut.SPRITE_SIZE.x * 6, Donut.SPRITE_SIZE.y * 12)
-	Main.set_control_position(rect, Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500))
+	rect.position = Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500) - rect.size / 2
 	rect.z_index = -1
 
-	for i in range(next_donuts.size()):
-		var next_donut = next_donuts[i]
-		add_child(next_donut)
-		next_donut.texture = Donut.DONUT_TEXTURE
-	next_donuts[0].position = Vector2(1500, 100 + 64)
-	next_donuts[1].position = Vector2(1500, 100 + 0)
-	next_donuts[2].position = Vector2(1500, 100 + 256)
-	next_donuts[3].position = Vector2(1500, 100 + 192)
+	Main.LABEL.visible = true
+	Main.LABEL.text = "READY"
+	await get_tree().create_timer(1.5).timeout
+	Main.LABEL.text = "GO!"
+	await get_tree().create_timer(0.5).timeout
+	Main.LABEL.visible = false
+
 
 	var player = Node2D.new()
 	add_child(player)
 	player.add_child(player_sprite)
 	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
 	player.position = Vector2(700, 750)
-	
-
-	set_process(false)
-
-	init_random_colors_bag()
-	next_colors = [get_random_color(), get_random_color(), get_random_color(), get_random_color()]
-	next_donuts_updated(next_colors)
-	
-	next_donuts_pair()
-
-	create_walls()
-
-	add_child(rival)
-
-	var label = Label.new()
-	add_child(label)
-	Main.setup_label(label)
-	label.text = "READY"
-	await get_tree().create_timer(1.5).timeout
-	label.text = "GO!"
-	await get_tree().create_timer(0.5).timeout
-	label.queue_free()
-	setup_input()
-
 
 	rival.signal_combo_ended.connect(func(combo: int) -> void:
 		score -= combo_to_score(combo)
@@ -66,89 +46,15 @@ func _ready():
 			score -= reduced
 	)
 
-	set_process(true)
+	add_child(rival)
 
+	add_child(next_colors)
 
-func loop() -> void:
-	if donuts_pair != null:
-		donuts_pair.process(all_donuts)
-		if donuts_pair.freeze_count > DonutsPair.FREEZE_COUNT:
-			Donut.sort_donuts_by_y_descending(all_donuts)
-			donuts_pair = null
-		return
-	
-	if not loop_all_donuts():
-		return
-
-	var find_clearable_donuts = Cleaner.find_clearable_donuts(all_donuts, Cleaner.GROUP_SIZE_TO_CLEAR)
-	if find_clearable_donuts[0].size() == 0:
-		score += combo_to_score(combo)
-		combo = 0
-		if score < 0:
-			is_damaging = true
-			if score < -18:
-				Donut.spawn_garbage(18, all_donuts, self)
-				score += 18
-			else:
-				Donut.spawn_garbage(-score, all_donuts, self)
-				score = 0
-			return
-		else:
-			if score > 0:
-				var reduced = rival.reduce_hp(score)
-				score -= reduced
-			if donuts_pair == null:
-				next_donuts_pair()
-				return
-	else:
-		combo += find_clearable_donuts[1]
-		for donut in find_clearable_donuts[0]:
-			donut.to_clear = true
-
-	
-func loop_all_donuts() -> bool:
-	var all_stopped = true
-	for donut in all_donuts:
-		if donut.process(all_donuts):
-			all_stopped = false
-	return all_stopped
-
-func loop_damage() -> void:
-	if not loop_all_donuts():
-		return
-	is_damaging = false
-	if donuts_pair == null:
-		next_donuts_pair()
-
-
-func _process(delta: float) -> void:
-	if is_damaging:
-		loop_damage()
-	else:
-		loop()
-	
-	rival.process()
-
-	for donut in all_donuts:
-		Donut.render(donut)
-	
-	
-	if rival.hp <= 0:
-		game_over(false)
 
 func next_donuts_pair() -> void:
 	if Donut.get_donut_at_position(Vector2(350, 350), all_donuts) != null:
-		game_over(true)
 		return
-	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.pop_front(), next_colors.pop_front()], self)
-	next_colors += [get_random_color(), get_random_color()]
-
-	next_donuts_updated(next_colors)
-
-
-func next_donuts_updated(next_colors: Array[int]) -> void:
-	for i in range(next_donuts.size()):
-		next_donuts[i].modulate = Color.from_hsv(next_colors[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
+	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.next_color(), next_colors.next_color()], self)
 
 
 func create_walls() -> void:
@@ -161,28 +67,6 @@ func create_walls() -> void:
 				# Donut.render(all_donuts.back())
 				all_donuts.back().visible = false
 
-func game_over(is_player: bool) -> void:
-	set_process(false)
-	var label = Label.new()
-	label.z_index = 1000
-	add_child(label)
-	Main.setup_label(label)
-	if is_player:
-		label.add_theme_color_override("font_color", Color.from_hsv(0, 1, 1))
-		label.text = "YOU LOSE"
-	else:
-		label.text = "YOU WIN"
-	Main.set_control_position(label, Vector2(Main.WINDOW.x / 2, Main.WINDOW.y * 0.5))
-
-
-	var button = Button.new()
-	add_child(button)
-	button.text = "END"
-	Main.setup_button(button)
-	button.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Initial.new())
-	)
 
 func setup_input() -> void:
 	var input_handler = InputHandler.new()
@@ -211,139 +95,43 @@ func setup_input() -> void:
 		donuts_pair.freeze_count = 0
 	)
 
-var next_donuts: Array[Sprite2D] = [Sprite2D.new(), Sprite2D.new(), Sprite2D.new(), Sprite2D.new()]
+class NextColors extends Node:
+	var next_donuts: Array[Sprite2D] = [Sprite2D.new(), Sprite2D.new(), Sprite2D.new(), Sprite2D.new()]
+	var bag: Array[int] = []
 
-static var COLOR_NUMBER = 4
-var next_colors: Array[int] = []
-static var RANDOM_COLORS_BAG: Array[int] = []
-static func init_random_colors_bag() -> void:
-	RANDOM_COLORS_BAG.clear()
-	for i in range(COLOR_NUMBER):
-		for j in range(4):
-			RANDOM_COLORS_BAG.append(i)
-	RANDOM_COLORS_BAG.shuffle()
-static func get_random_color() -> int:
-	if RANDOM_COLORS_BAG.size() == 0:
-		init_random_colors_bag()
-	return RANDOM_COLORS_BAG.pop_front()
+	func _init():
+		for i in range(Game.COLOR_NUMBER):
+			for j in range(4):
+				bag.append(i)
+		bag.shuffle()
 
+		for i in range(next_donuts.size()):
+			add_child(next_donuts[i])
+			next_donuts[i].texture = Donut.DONUT_TEXTURE
+
+		next_donuts[0].position = Vector2(1500, 100 + 64)
+		next_donuts[1].position = Vector2(1500, 100 + 0)
+		next_donuts[2].position = Vector2(1500, 100 + 256)
+		next_donuts[3].position = Vector2(1500, 100 + 192)
+		for i in range(next_donuts.size()):
+			next_donuts[i].modulate = Color.from_hsv(bag[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
+
+
+	func next_color() -> int:
+		if bag.size() < 4:
+			var append_array: Array[int] = []
+			for i in range(Game.COLOR_NUMBER):
+				for j in range(4):
+					append_array.append(i)
+			append_array.shuffle()
+			bag += append_array
+		var color = bag.pop_front()
+		for i in range(next_donuts.size()):
+			next_donuts[i].modulate = Color.from_hsv(bag[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
+		return color
 
 static func combo_to_score(combo: int) -> int:
 	var total: int = 0
 	for i in range(1, combo + 1):
 		total += i * i
 	return total
-
-
-class Rival extends Node:
-	static var HP: int = 50
-	static var MAX_ATTACK_COUNT: int = 3
-	static var ONE_ATTACK_PREPARE_COUNT: int = 180
-
-	const COUNT_TO_ONE_ATTACK: int = Cleaner.CLEAR_WAIT_COUNT + Donut.FREEZE_COUNT + 30
-	var hp: float = HP
-	var next_hp: float = HP
-
-	var combo: int = 0
-	var is_idle: bool = true
-
-	var attack_count: int = 0
-	var attack_prepare_count: int = 0
-
-	var frame_count: int = 0
-	var tween: Tween = null
-	var sprite: Sprite2D = Sprite2D.new()
-
-	signal signal_combo_ended(combo: int)
-
-	func reduce_hp(amount: int) -> int:
-		if not is_idle:
-			return 0
-		if amount <= 0:
-			return 0
-		if tween:
-			tween.kill()
-		next_hp -= amount
-		tween = create_tween()
-		tween.tween_property(self, "hp", next_hp, 3)
-
-		frame_count -= COUNT_TO_ONE_ATTACK
-		return amount
-
-	func _ready() -> void:
-		attack_count = next_attack_count()
-
-		attack_prepare_count = attack_count * ONE_ATTACK_PREPARE_COUNT
-
-
-		var rival = Node2D.new()
-		add_child(rival)
-		rival.add_child(sprite)
-		sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)]
-		rival.position = Vector2(700, 250)
-
-		add_child(rival_hp_slider)
-		Main.set_control_position(rival_hp_slider, Vector2(700 + 200 + 45, 250))
-
-		add_child(rival_idle_slider)
-		Main.set_control_position(rival_idle_slider, Vector2(700 + 200 + 15, 250))
-		rival_idle_slider.value = 0
-
-	func process():
-		frame_count += 1
-
-		if is_idle:
-			if frame_count > attack_prepare_count:
-				is_idle = false
-				frame_count = 0
-
-		else:
-			if frame_count > COUNT_TO_ONE_ATTACK:
-				frame_count = 0
-				if combo >= attack_count:
-					var final_combo = combo
-					combo = 0
-					is_idle = true
-					attack_count = next_attack_count()
-					attack_prepare_count = attack_count * ONE_ATTACK_PREPARE_COUNT
-					emit_signal("signal_combo_ended", final_combo)
-				else:
-					combo += 1
-
-	static func next_attack_count() -> int:
-		var attack_counts: Array[int] = []
-		for i in range(1, MAX_ATTACK_COUNT + 1):
-			for j in range(i):
-				attack_counts.append(i)
-		attack_counts.shuffle()
-		return attack_counts[0]
-
-
-	var rival_hp_slider: GameVSlider = GameVSlider.new(Vector2(30, 400), Color(0, 1, 0))
-	var rival_idle_slider: GameVSlider = GameVSlider.new(Vector2(30, 400), Color(1, 0.7, 0))
-
-
-	class GameVSlider extends VSlider:
-		func _init(_size: Vector2, color: Color) -> void:
-			var empty_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
-			empty_image.fill(Color(0, 0, 0, 0))
-			var empty_texture = ImageTexture.create_from_image(empty_image)
-			add_theme_icon_override("grabber", empty_texture)
-			add_theme_icon_override("grabber_highlight", empty_texture)
-			add_theme_icon_override("grabber_disabled", empty_texture)
-
-			var stylebox = StyleBoxFlat.new()
-			stylebox.bg_color = color
-			add_theme_stylebox_override("grabber_area_highlight", stylebox)
-			add_theme_stylebox_override("grabber_area", stylebox)
-			stylebox = StyleBoxFlat.new()
-			stylebox.bg_color = Color(0.4, 0.4, 0.4)
-			stylebox.content_margin_left = _size.x
-			add_theme_stylebox_override("slider", stylebox)
-
-			size = _size
-
-			min_value = 0
-			max_value = 1000
-			editable = false
-			value = max_value

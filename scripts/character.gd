@@ -22,6 +22,15 @@ var cursors: Array[ColorRect]
 var target_index: int = 0
 
 func _ready():
+	Main.LABEL.text = "VS\n\n"
+
+	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
+	Main.BUTTON.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Option.new())
+	)
+	Main.BUTTON.text = "OK"
+
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
 		add_child(sprites.back())
@@ -45,18 +54,10 @@ func _ready():
 		add_child(cursor)
 		cursor.color = Color.from_hsv(i * 0.5, 1, 1, 1)
 		cursor.size = Vector2(200, 200)
-		Main.set_control_position(cursor, sprites[i].position)
+		cursor.position = sprites[i].position - cursor.size / 2
 		cursor.z_index = -1
 		cursors.append(cursor)
 
-	var button = Button.new()
-	add_child(button)
-	button.text = "OK"
-	Main.setup_button(button)
-	button.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Option.new())
-	)
 
 	var input_handler = InputHandler.new()
 	input_handler.drag_area_end_x = 8000
@@ -73,12 +74,6 @@ func _ready():
 		elif direction.x < 0:
 			Array2D.move_value(MAP, target_index, Vector2(-1, 0))
 	)
-
-	var label = Label.new()
-	add_child(label)
-	label.text = "VS"
-	Main.setup_label(label)
-	Main.set_control_position(label, Vector2(Main.WINDOW.x / 2, 300))
 
 
 func _process(_delta: float) -> void:
