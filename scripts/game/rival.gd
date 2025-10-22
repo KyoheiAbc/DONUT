@@ -7,7 +7,7 @@ var hp_slider: RivalVSlider = RivalVSlider.new(Vector2(30, 400), Color(0, 1, 0))
 
 var attack_gauge: RivalVSlider = RivalVSlider.new(Vector2(30, 400), Color(1, 0.5, 0))
 
-var sprite: Sprite2D = Sprite2D.new()
+var sprite: Game.ActionSprite = Game.ActionSprite.new()
 
 var frame_count: int = 0
 
@@ -18,7 +18,6 @@ var combo: int = 0
 
 var is_cool: bool = true
 var cooled_motion_count: int = 0
-var tween_sprite: Tween = null
 
 signal signal_combo_ended(combo: int)
 signal signal_debug(msg: String)
@@ -61,7 +60,7 @@ func process():
 			emit_signal("signal_debug", "combo started, max combo: %d" % MAX_COMBO_CHOICES_ARRAY[0])
 
 		elif frame_count >= cooled_motion_count * COOL_COUNT_TO_ONE_COMBO:
-			hop(MAX_COMBO_CHOICES_ARRAY[0] if cooled_motion_count == 0 else 1)
+			sprite.hop(MAX_COMBO_CHOICES_ARRAY[0] if cooled_motion_count == 0 else 1)
 			cooled_motion_count += 1
 
 		
@@ -79,40 +78,9 @@ func process():
 			else:
 				attack_gauge.value -= attack_gauge.max_value / MAX_COMBO_CHOICES_ARRAY[0]
 				emit_signal("signal_debug", "combo increased to %d" % combo)
-				hop(1)
+				sprite.hop(1)
 
-func hop(count: int) -> void:
-	if tween_sprite:
-		if tween_sprite.is_running():
-			await tween_sprite.finished
-		tween_sprite.kill()
-	tween_sprite = create_tween()
-	for i in range(count):
-		tween_sprite.tween_property(sprite, "position", Vector2(50, -50), 0.13)
-		tween_sprite.parallel().tween_property(sprite, "rotation", PI / 8, 0.13)
-		tween_sprite.tween_property(sprite, "position", Vector2.ZERO, 0.13)
-		tween_sprite.parallel().tween_property(sprite, "rotation", 0, 0.13)
-
-func jump() -> void:
-	if tween_sprite:
-		if tween_sprite.is_running():
-			await tween_sprite.finished
-		tween_sprite.kill()
-	tween_sprite = create_tween()
-	tween_sprite.tween_property(sprite, "position", Vector2(0, 100), 0.18)
-	tween_sprite.tween_property(sprite, "position", Vector2.ZERO, 0.18)
-
-func rotation() -> void:
-	if tween_sprite:
-		if tween_sprite.is_running():
-			await tween_sprite.finished
-		tween_sprite.kill()
-	tween_sprite = create_tween()
-	tween_sprite.tween_property(sprite, "rotation", 2 * PI, 0.7)
-	await tween_sprite.finished
-	sprite.rotation = 0
 		
-
 class RivalVSlider extends VSlider:
 	func _init(_size: Vector2, color: Color) -> void:
 		var empty_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)

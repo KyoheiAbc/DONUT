@@ -5,8 +5,7 @@ static var COLOR_NUMBER = 4
 
 var donuts_pair: DonutsPair = null
 var next_colors: NextColors = NextColors.new()
-var player_sprite: Sprite2D = Sprite2D.new()
-var tween_sprite: Tween = null
+var player_sprite: ActionSprite = ActionSprite.new()
 var combo: int = 0
 var combo_label: Label = Label.new()
 var score: int = 0
@@ -72,6 +71,7 @@ func _ready():
 			all_donuts.erase(donut)
 			donut.queue_free()
 		clearable_donuts.clear()
+		player_sprite.hop(1)
 		combo += 1
 		if combo > 0:
 			combo_label.text = str(combo) + " COMBO!"
@@ -144,6 +144,7 @@ func setup_input() -> void:
 			all_donuts.append(donuts_pair.elements[1])
 			Donut.sort_donuts_by_y_descending(all_donuts)
 			donuts_pair = null
+			player_sprite.hop(1)
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
@@ -151,7 +152,9 @@ func setup_input() -> void:
 				all_donuts.append(donuts_pair.elements[1])
 				Donut.sort_donuts_by_y_descending(all_donuts)
 				donuts_pair = null
+				player_sprite.hop(1)
 			return
+		
 		DonutsPair.move(donuts_pair, direction * 100, all_donuts)
 	)
 
@@ -216,3 +219,37 @@ func game_over() -> void:
 		self.queue_free()
 		Main.NODE.add_child(Character.new())
 	)
+
+class ActionSprite extends Sprite2D:
+	var tween: Tween = null
+
+	func hop(count: int) -> void:
+		if tween:
+			if tween.is_running():
+				await tween.finished
+			tween.kill()
+		tween = create_tween()
+		for i in range(count):
+			tween.tween_property(self, "position", Vector2(50, -50), 0.13)
+			tween.parallel().tween_property(self, "rotation_degrees", 30, 0.13)
+			tween.tween_property(self, "position", Vector2.ZERO, 0.13)
+			tween.parallel().tween_property(self, "rotation_degrees", 0, 0.13)
+
+	func jump(up: bool) -> void:
+		if tween:
+			if tween.is_running():
+				await tween.finished
+			tween.kill()
+		tween = create_tween()
+		tween.tween_property(self, "position", Vector2(0, -100 if up else 100), 0.18)
+		tween.tween_property(self, "position", Vector2.ZERO, 0.18)
+
+	func rotation() -> void:
+		if tween:
+			if tween.is_running():
+				await tween.finished
+			tween.kill()
+		tween = create_tween()
+		tween.tween_property(self, "rotation_degrees", 360, 0.75)
+		await tween.finished
+		self.rotation_degrees = 0
