@@ -27,8 +27,16 @@ func process(all_donuts: Array[Donut]) -> bool:
 		clearable_donuts = find_clearable_donuts(all_donuts, GROUP_SIZE_TO_CLEAR)[0]
 		if clearable_donuts.size() > 0:
 			for donut in clearable_donuts:
+				if donut.value == 10:
+					continue
 				donut.sprite.scale = Vector2(0.7, 1.3)
 				all_donuts.erase(donut)
+
+				var around_garbage = donut.get_around_garbage(all_donuts)
+				for garbage in around_garbage:
+					all_donuts.erase(garbage)
+					clearable_donuts.append(garbage)
+
 			timer.start()
 			return true
 		else:
