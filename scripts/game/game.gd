@@ -8,16 +8,54 @@ var next_colors: NextColors = NextColors.new()
 var player_sprite: ActionSprite = ActionSprite.new()
 var combo: int = 0
 var combo_label: Label = Label.new()
+var combo_label_destroy_timer: Timer = Timer.new()
 var score: int = 0
 
 var all_donuts: Array[Donut] = []
 
+var cleaner: Cleaner = Cleaner.new()
+
 var rival: Rival = Rival.new()
 
-var clearable_donuts: Array[Donut] = []
-var timer_clear: Timer = Timer.new()
 
 func _ready():
+	var player_sprite_node = Node2D.new()
+	add_child(player_sprite_node)
+	player_sprite_node.position = Vector2(700, 750)
+	player_sprite_node.add_child(player_sprite)
+	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+
+	add_child(next_colors)
+	next_donuts_pair()
+
+	add_child(cleaner)
+
+	add_child(rival)
+
+	Donut.create_walls(self, all_donuts)
+	
+	ready_go()
+
+	setup_input()
+
+	add_child(combo_label)
+	combo_label.position = Vector2(1450, 700)
+	combo_label.add_theme_font_size_override("font_size", 64)
+	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+	add_child(combo_label_destroy_timer)
+	combo_label_destroy_timer.timeout.connect(func() -> void:
+		combo_label.text = ""
+		combo_label_destroy_timer.stop()
+	)
+
+	cleaner.signal_cleared.connect(func() -> void:
+		combo += 1
+		combo_label.text = "%d COMBO!" % combo
+		player_sprite.hop(1)
+		combo_label_destroy_timer.stop()
+	)
+
+func ready_go() -> void:
 	var rect = ColorRect.new()
 	add_child(rect)
 	rect.color = Color.from_hsv(0.5, 0.5, 0.5)
@@ -27,26 +65,7 @@ func _ready():
 
 	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
 	Main.BUTTON.visible = false
-
 	set_process(false)
-	var node = Node2D.new()
-	add_child(node)
-	node.add_child(player_sprite)
-	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
-	node.position = Vector2(700, 750)
-
-	add_child(next_colors)
-
-	add_child(rival)
-
-	add_child(combo_label)
-	combo_label.add_theme_font_size_override("font_size", 48)
-	combo_label.position = Vector2(1400, 800)
-
-	next_donuts_pair()
-
-	create_walls()
-
 	Main.LABEL.visible = true
 	Main.LABEL.text = "READY"
 	await get_tree().create_timer(1.5).timeout
@@ -54,83 +73,44 @@ func _ready():
 	await get_tree().create_timer(0.5).timeout
 	Main.LABEL.visible = false
 	set_process(true)
-	setup_input()
 
-	rival.signal_combo_ended.connect(func(combo: int) -> void:
-		score -= combo_to_score(combo)
-		if score > 0:
-			var reduced = rival.reduce_hp(score)
-			score -= reduced
-	)
+func player_loop() -> void:
+	if donuts_pair != null:
+		donuts_pair.process(all_donuts)
+		return
 
-	add_child(timer_clear)
-	timer_clear.wait_time = Cleaner.CLEAR_WAIT_COUNT / 60.0
-	timer_clear.one_shot = true
-	timer_clear.timeout.connect(func() -> void:
-		for donut in clearable_donuts:
-			all_donuts.erase(donut)
-			donut.queue_free()
-		clearable_donuts.clear()
-		player_sprite.hop(1)
-		combo += 1
-		if combo > 0:
-			combo_label.text = str(combo) + " COMBO!"
-		else:
-			combo_label.text = ""
-	)
+	if not cleaner.timer.is_stopped():
+		return
 
-func loop_donuts_pair() -> void:
-	donuts_pair.process(all_donuts)
-	donuts_pair.render()
-
-func loop_all_donuts() -> bool:
-	var still_moving = false
+	var updated = false
 	for donut in all_donuts:
-		if donut.value == -1:
-			continue
 		if donut.process(all_donuts):
-			still_moving = true
-		donut.render()
-	return still_moving
+			updated = true
+	if updated:
+		return
 
-func loop() -> void:
-	if donuts_pair:
-		loop_donuts_pair()
-	else:
-		if clearable_donuts.size() > 0:
-			return
+	if cleaner.process(all_donuts):
+		return
 
-		if loop_all_donuts():
-			return
+	combo_ended()
 
-		clearable_donuts = Cleaner.find_clearable_donuts(all_donuts, Cleaner.GROUP_SIZE_TO_CLEAR)[0]
-		if clearable_donuts.size() > 0:
-			for donut in clearable_donuts:
-				donut.sprite.scale = Vector2(0.7, 1.3)
-			timer_clear.start()
-		else:
-			combo = 0
-			combo_label.text = ""
-			next_donuts_pair()
+	next_donuts_pair()
+
+func combo_ended() -> void:
+	combo = 0
+	if combo_label_destroy_timer.is_stopped():
+		combo_label_destroy_timer.start(1)
+
 
 func _process(delta: float) -> void:
-	loop()
+	player_loop()
 	rival.process()
 
 func next_donuts_pair() -> void:
-	if Donut.get_donut_at_position(Vector2(350, 350), all_donuts) != null:
-		game_over()
-		return
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.next_color(), next_colors.next_color()], self)
+	if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
+		game_over()
 
-func create_walls() -> void:
-	for y in range(16):
-		for x in range(8):
-			if x == 0 or x == 7 or y == 15:
-				all_donuts.append(Donut.new(-1))
-				add_child(all_donuts.back())
-				all_donuts.back().pos = Vector2(x * 100 + 50, y * 100 + 50)
-				all_donuts.back().visible = false
 
 func setup_input() -> void:
 	var input_handler = InputHandler.new()
@@ -140,17 +120,17 @@ func setup_input() -> void:
 			return
 		if direction == Vector2.UP:
 			DonutsPair.hard_drop(donuts_pair, all_donuts)
-			all_donuts.append(donuts_pair.elements[0])
-			all_donuts.append(donuts_pair.elements[1])
-			Donut.sort_donuts_by_y_descending(all_donuts)
+			var append_donuts: Array[Donut] = [donuts_pair.elements[0], donuts_pair.elements[1]]
+			Donut.sort_donuts_by_y_descending(append_donuts)
+			all_donuts += append_donuts
 			donuts_pair = null
 			player_sprite.hop(1)
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
-				all_donuts.append(donuts_pair.elements[0])
-				all_donuts.append(donuts_pair.elements[1])
-				Donut.sort_donuts_by_y_descending(all_donuts)
+				var append_donuts: Array[Donut] = [donuts_pair.elements[0], donuts_pair.elements[1]]
+				Donut.sort_donuts_by_y_descending(append_donuts)
+				all_donuts += append_donuts
 				donuts_pair = null
 				player_sprite.hop(1)
 			return
@@ -206,7 +186,6 @@ static func combo_to_score(combo: int) -> int:
 	for i in range(1, combo + 1):
 		total += i * i
 	return total
-
 
 func game_over() -> void:
 	set_process(false)

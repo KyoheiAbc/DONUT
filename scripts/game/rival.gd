@@ -46,6 +46,7 @@ func _init() -> void:
 
 	MAX_COMBO_CHOICES_ARRAY.shuffle()
 
+	attack_gauge.value = 0
 
 func process():
 	frame_count += 1

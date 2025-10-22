@@ -41,6 +41,8 @@ func process(all_donuts: Array[Donut]) -> bool:
 		sprite.position.y = 15 * sin(animation_progress)
 	else:
 		freeze_count = 0
+		
+	render()
 
 	if freeze_count > FREEZE_COUNT:
 		return false
@@ -82,14 +84,6 @@ static func get_colliding_donut(donut: Donut, donuts: Array[Donut]) -> Donut:
 			return other_donut
 	return null
 
-
-static func get_donut_at_position(pos: Vector2, donuts: Array[Donut]) -> Donut:
-	for donut in donuts:
-		if donut.pos == pos:
-			return donut
-	return null
-
-
 static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> int:
 	var spawn_count = 0
 	var y = 50
@@ -112,16 +106,15 @@ static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> i
 				return spawn_count
 	return spawn_count
 
-static func get_around(target: Donut, all_donuts: Array[Donut]) -> Array[Donut]:
-	var result: Array[Donut] = []
-	var directions = [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
-	for dir in directions:
-		var pos = target.pos + dir * 100
-		var donut = get_donut_at_position(pos, all_donuts)
-		if donut != null:
-			result.append(donut)
-	return result
-
-
 static func sort_donuts_by_y_descending(all_donuts: Array[Donut]) -> void:
 	all_donuts.sort_custom(func(a, b): return a.pos.y > b.pos.y)
+
+
+static func create_walls(node: Node, all_donuts: Array[Donut]) -> void:
+	for y in range(16):
+		for x in range(8):
+			if x == 0 or x == 7 or y == 15:
+				all_donuts.append(Donut.new(-1))
+				node.add_child(all_donuts.back())
+				all_donuts.back().pos = Vector2(x * 100 + 50, y * 100 + 50)
+				all_donuts.back().visible = false

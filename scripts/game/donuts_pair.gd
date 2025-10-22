@@ -10,6 +10,7 @@ func _init(pos: Vector2, colors: Array[int]) -> void:
 
 func process(all_donuts: Array[Donut]) -> void:
 	DonutsPair.move(self, Vector2.DOWN, all_donuts)
+	render()
 	
 static func rotation(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 	var initial_pos = donuts_pair.elements[0].pos
@@ -77,6 +78,5 @@ static func spawn_donuts_pair(all_donuts: Array[Donut], colors: Array[int], node
 	var donuts_pair = DonutsPair.new(Vector2(350, 350), colors)
 	for donut in donuts_pair.elements:
 		node.add_child(donut)
-		# all_donuts.append(donut)
 		donut.render()
 	return donuts_pair

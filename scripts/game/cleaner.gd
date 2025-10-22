@@ -4,6 +4,38 @@ extends Node
 static var GROUP_SIZE_TO_CLEAR = 4
 const CLEAR_WAIT_COUNT = 30
 
+var clearable_donuts: Array[Donut] = []
+var timer: Timer = Timer.new()
+
+signal signal_cleared()
+
+func _init():
+	add_child(timer)
+	timer.wait_time = CLEAR_WAIT_COUNT / 60.0
+	timer.one_shot = true
+	timer.timeout.connect(func() -> void:
+		if clearable_donuts.size() == 0:
+			return
+		for donut in clearable_donuts:
+			donut.queue_free()
+		clearable_donuts.clear()
+		emit_signal("signal_cleared")
+	)
+
+func process(all_donuts: Array[Donut]) -> bool:
+	if timer.is_stopped():
+		clearable_donuts = find_clearable_donuts(all_donuts, GROUP_SIZE_TO_CLEAR)[0]
+		if clearable_donuts.size() > 0:
+			for donut in clearable_donuts:
+				donut.sprite.scale = Vector2(0.7, 1.3)
+				all_donuts.erase(donut)
+			timer.start()
+			return true
+		else:
+			return false
+	return false
+
+
 static func find_clearable_donuts(donuts: Array[Donut], group_size_to_clear: int):
 	var ret = mapping_donuts_to_2d_array(donuts)
 	var donuts_map = ret[1]

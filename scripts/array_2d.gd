@@ -9,11 +9,6 @@ static func new_array_2d(size: Vector2, default_value) -> Array:
 		array_2d.append(row)
 	return array_2d
 
-static func print_array_2d(array_2d: Array) -> void:
-	for row in array_2d:
-		print(row)
-	print("")
-
 static func out_of_bounds(pos: Vector2, array_2d: Array) -> bool:
 	if pos.x < 0 or pos.y < 0:
 		return true
@@ -69,8 +64,3 @@ static func move_value(array_2d: Array, value, delta: Vector2) -> bool:
 static func vector2_to_value(array_2d: Array, vector2: Vector2) -> int:
 	var size = get_size(array_2d)
 	return int(vector2.y) * int(size.x) + int(vector2.x)
-static func value_to_vector2(array_2d: Array, value: int) -> Vector2:
-	var size = get_size(array_2d)
-	var x = value % int(size.x)
-	var y = value / int(size.x)
-	return Vector2(x, y)
