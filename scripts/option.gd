@@ -8,7 +8,7 @@ class CustomHSlider extends HSlider:
 		value = initial_value
 		self.step = step
 
-		size = Vector2(600, 250)
+		size = Vector2(800, 250)
 
 		var label = Label.new()
 		add_child(label)
@@ -33,7 +33,28 @@ func _ready():
 	
 	var slider: CustomHSlider
 
-	slider = CustomHSlider.new("inThreshold", InputHandler.THRESHOLD, 8, 128, 8)
+	slider = CustomHSlider.new("input_threshold", InputHandler.THRESHOLD, 8, 128, 8)
 	add_child(slider)
 	slider.value_changed.connect(func(value): InputHandler.THRESHOLD = value)
 	slider.position = Vector2(Main.WINDOW.x * 0.25, 200) - slider.size / 2
+
+	slider = CustomHSlider.new("rival_hp", Rival.HP, 32, 256, 32)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Rival.HP = value)
+	slider.position = Vector2(Main.WINDOW.x * 0.75, 200) - slider.size / 2
+
+	slider = CustomHSlider.new("rival_max_combo", 3, 1, 9, 2)
+	add_child(slider)
+	slider.value_changed.connect(func(value):
+		Rival.MAX_COMBO_CHOICES_ARRAY = []
+		for i in range(1, value + 1):
+			for j in range(i):
+				Rival.MAX_COMBO_CHOICES_ARRAY.append(i)
+		print(Rival.MAX_COMBO_CHOICES_ARRAY)
+	)
+	slider.position = Vector2(Main.WINDOW.x * 0.75, 400) - slider.size / 2
+
+	slider = CustomHSlider.new("rival_cool_time", Rival.COOL_COUNT_TO_ONE_COMBO, 60, 600, 60)
+	add_child(slider)
+	slider.value_changed.connect(func(value): Rival.COOL_COUNT_TO_ONE_COMBO = value)
+	slider.position = Vector2(Main.WINDOW.x * 0.75, 600) - slider.size / 2

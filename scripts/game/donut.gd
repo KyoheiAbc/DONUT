@@ -6,8 +6,6 @@ static var POSITION_OFFSET = Vector2(1000 - SPRITE_SIZE.x, 500 - SPRITE_SIZE.y *
 
 const DONUT_TEXTURE: Texture2D = preload("res://assets/donut.png")
 
-static var GARBAGE_HARDNESS = 1
-
 var value: int
 var pos: Vector2
 var sprite: Sprite2D
@@ -92,7 +90,7 @@ static func spawn_garbage(count: int, all_donuts: Array[Donut], node: Node) -> i
 		var x_positions = [150, 250, 350, 450, 550, 650]
 		x_positions.shuffle()
 		for x in range(x_positions.size()):
-			var donut = Donut.new(10 + GARBAGE_HARDNESS)
+			var donut = Donut.new(10)
 			donut.pos = Vector2(x_positions[x], y)
 			if Donut.get_colliding_donut(donut, all_donuts) != null:
 				donut.queue_free()

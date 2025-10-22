@@ -4,6 +4,7 @@ extends Node2D
 static var HP: int = 64
 var hp: int = HP
 var hp_slider: Game.GameVSlider = Game.GameVSlider.new(Vector2(30, 400), Color(0, 1, 0))
+var hp_slider_tween: Tween
 
 var attack_gauge: Game.GameVSlider = Game.GameVSlider.new(Vector2(30, 400), Color(1, 0.75, 0))
 
@@ -27,7 +28,12 @@ func reduce_hp(amount: int) -> int:
 		emit_signal("signal_debug", "no damage taken (not cool)")
 		return 0
 	hp -= amount
-	hp_slider.value = hp_slider.max_value * hp / HP
+
+	if hp_slider_tween:
+		hp_slider_tween.kill()
+	hp_slider_tween = create_tween()
+	hp_slider_tween.tween_property(hp_slider, "value", hp_slider.max_value * hp / HP, 3)
+
 	frame_count -= 60
 	emit_signal("signal_debug", "took %d damage, hp: %d" % [amount, hp])
 	return amount

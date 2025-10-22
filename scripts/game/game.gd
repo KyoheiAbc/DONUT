@@ -147,6 +147,9 @@ func _process(delta: float) -> void:
 
 	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
+	if rival.hp_slider.value <= 0:
+		game_over()
+
 func next_donuts_pair() -> void:
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.next_color(), next_colors.next_color()], self)
 	if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
