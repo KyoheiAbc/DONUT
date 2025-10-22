@@ -3,9 +3,9 @@ extends Node2D
 
 static var HP: int = 64
 var hp: int = HP
-var hp_slider: RivalVSlider = RivalVSlider.new(Vector2(30, 400), Color(0, 1, 0))
+var hp_slider: Game.GameVSlider = Game.GameVSlider.new(Vector2(30, 400), Color(0, 1, 0))
 
-var attack_gauge: RivalVSlider = RivalVSlider.new(Vector2(30, 400), Color(1, 0.5, 0))
+var attack_gauge: Game.GameVSlider = Game.GameVSlider.new(Vector2(30, 400), Color(1, 0.75, 0))
 
 var sprite: Game.ActionSprite = Game.ActionSprite.new()
 
@@ -70,7 +70,7 @@ func process():
 			frame_count = 0
 			combo += 1
 			if combo > MAX_COMBO_CHOICES_ARRAY[0]:
-				var final_combo = combo
+				var final_combo = combo - 1
 				MAX_COMBO_CHOICES_ARRAY.shuffle()
 				combo = 0
 				is_cool = true
@@ -80,29 +80,3 @@ func process():
 				attack_gauge.value -= attack_gauge.max_value / MAX_COMBO_CHOICES_ARRAY[0]
 				emit_signal("signal_debug", "combo increased to %d" % combo)
 				sprite.hop(1)
-
-		
-class RivalVSlider extends VSlider:
-	func _init(_size: Vector2, color: Color) -> void:
-		var empty_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
-		empty_image.fill(Color(0, 0, 0, 0))
-		var empty_texture = ImageTexture.create_from_image(empty_image)
-		add_theme_icon_override("grabber", empty_texture)
-		add_theme_icon_override("grabber_highlight", empty_texture)
-		add_theme_icon_override("grabber_disabled", empty_texture)
-
-		var stylebox = StyleBoxFlat.new()
-		stylebox.bg_color = color
-		add_theme_stylebox_override("grabber_area_highlight", stylebox)
-		add_theme_stylebox_override("grabber_area", stylebox)
-		stylebox = StyleBoxFlat.new()
-		stylebox.bg_color = Color(0.4, 0.4, 0.4)
-		stylebox.content_margin_left = _size.x
-		add_theme_stylebox_override("slider", stylebox)
-
-		size = _size
-
-		min_value = 0
-		max_value = 1000
-		editable = false
-		value = max_value

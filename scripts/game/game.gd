@@ -10,6 +10,7 @@ var combo: int = 0
 var combo_label: Label = Label.new()
 var combo_label_destroy_timer: Timer = Timer.new()
 var score: int = 0
+var score_slider: GameVSlider = GameVSlider.new(Vector2(50, 800), Color(1, 1, 0))
 
 var all_donuts: Array[Donut] = []
 
@@ -17,6 +18,7 @@ var cleaner: Cleaner = Cleaner.new()
 
 var rival: Rival = Rival.new()
 
+var is_damaging: bool = false
 
 func _ready():
 	var player_sprite_node = Node2D.new()
@@ -31,6 +33,10 @@ func _ready():
 	add_child(cleaner)
 
 	add_child(rival)
+
+	add_child(score_slider)
+	score_slider.position = Vector2(1650, 500) - score_slider.size / 2
+	score_slider.value = score_slider.max_value * 0.5
 
 	Donut.create_walls(self, all_donuts)
 	
@@ -53,6 +59,15 @@ func _ready():
 		combo_label.text = "%d COMBO!" % combo
 		player_sprite.hop(1)
 		combo_label_destroy_timer.stop()
+	)
+
+	rival.signal_combo_ended.connect(func(rival_combo: int) -> void:
+		score -= combo_to_score(rival_combo)
+		if score > 0:
+			var reduced = rival.reduce_hp(score)
+			if reduced > 0:
+				action_effect(true)
+			score -= reduced
 	)
 
 func ready_go() -> void:
@@ -82,6 +97,17 @@ func player_loop() -> void:
 	if not cleaner.timer.is_stopped():
 		return
 
+	if is_damaging:
+		var updated = false
+		for donut in all_donuts:
+			if donut.process(all_donuts):
+				updated = true
+		if updated:
+			return
+		is_damaging = false
+		next_donuts_pair()
+		return
+
 	var updated = false
 	for donut in all_donuts:
 		if donut.process(all_donuts):
@@ -94,23 +120,37 @@ func player_loop() -> void:
 
 	combo_ended()
 
-	next_donuts_pair()
+	if not is_damaging:
+		next_donuts_pair()
 
 func combo_ended() -> void:
+	score += combo_to_score(combo)
 	combo = 0
 	if combo_label_destroy_timer.is_stopped():
 		combo_label_destroy_timer.start(1)
-
+	if score > 0:
+		var reduced = rival.reduce_hp(score)
+		if reduced > 0:
+			action_effect(true)
+		score -= reduced
+	elif score < 0:
+		var garbage_count = min(18, -score)
+		var spawn_count = Donut.spawn_garbage(garbage_count, all_donuts, self)
+		score += spawn_count
+		is_damaging = true
+		action_effect(false)
 
 func _process(delta: float) -> void:
 	player_loop()
+
 	rival.process()
+
+	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
 func next_donuts_pair() -> void:
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.next_color(), next_colors.next_color()], self)
 	if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
 		game_over()
-
 
 func setup_input() -> void:
 	var input_handler = InputHandler.new()
@@ -232,3 +272,36 @@ class ActionSprite extends Sprite2D:
 		tween.tween_property(self, "rotation_degrees", 360, 0.75)
 		await tween.finished
 		self.rotation_degrees = 0
+
+func action_effect(attack: bool) -> void:
+	if attack:
+		player_sprite.jump(true)
+		rival.sprite.rotation()
+	else:
+		rival.sprite.jump(false)
+		player_sprite.rotation()
+
+class GameVSlider extends VSlider:
+	func _init(_size: Vector2, color: Color) -> void:
+		var empty_image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
+		empty_image.fill(Color(0, 0, 0, 0))
+		var empty_texture = ImageTexture.create_from_image(empty_image)
+		add_theme_icon_override("grabber", empty_texture)
+		add_theme_icon_override("grabber_highlight", empty_texture)
+		add_theme_icon_override("grabber_disabled", empty_texture)
+
+		var stylebox = StyleBoxFlat.new()
+		stylebox.bg_color = color
+		add_theme_stylebox_override("grabber_area_highlight", stylebox)
+		add_theme_stylebox_override("grabber_area", stylebox)
+		stylebox = StyleBoxFlat.new()
+		stylebox.bg_color = Color(0.4, 0.4, 0.4)
+		stylebox.content_margin_left = _size.x
+		add_theme_stylebox_override("slider", stylebox)
+
+		size = _size
+
+		min_value = 0
+		max_value = 1000
+		editable = false
+		value = max_value
