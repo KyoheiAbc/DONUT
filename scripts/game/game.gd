@@ -10,7 +10,7 @@ var combo: int = 0
 var combo_label: Label = Label.new()
 var score: int = 0
 var score_slider: GameVSlider = GameVSlider.new(Vector2(50, 800), Color(1, 1, 0))
-
+var input_handler: InputHandler = InputHandler.new()
 var all_donuts: Array[Donut] = []
 
 var cleaner: Cleaner = Cleaner.new()
@@ -39,7 +39,7 @@ func _ready():
 
 	Donut.create_walls(self, all_donuts)
 	
-	ready_go()
+	await ready_go()
 
 	setup_input()
 
@@ -130,15 +130,14 @@ func _process(delta: float) -> void:
 	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
 	if rival.hp_slider.value <= 0:
-		game_over()
+		game_over(false)
 
 func next_donuts_pair() -> void:
 	donuts_pair = DonutsPair.spawn_donuts_pair(all_donuts, [next_colors.next_color(), next_colors.next_color()], self)
 	if Donut.get_colliding_donut(donuts_pair.elements[0], all_donuts) != null:
-		game_over()
+		game_over(true)
 
 func setup_input() -> void:
-	var input_handler = InputHandler.new()
 	add_child(input_handler)
 	input_handler.direction.connect(func(direction: Vector2) -> void:
 		if donuts_pair == null:
@@ -214,10 +213,18 @@ static func combo_to_score(combo: int) -> int:
 		total += i * i
 	return total
 
-func game_over() -> void:
+func game_over(is_player: bool) -> void:
 	set_process(false)
+
+	input_handler.queue_free()
+
 	Main.LABEL.visible = true
-	Main.LABEL.text = "GAME OVER"
+	if is_player:
+		Main.LABEL.text = "YOU LOSE"
+		action_effect(false)
+	else:
+		Main.LABEL.text = "YOU WIN"
+		action_effect(true)
 
 	Main.BUTTON.text = "END"
 	Main.BUTTON.visible = true
@@ -228,6 +235,7 @@ func game_over() -> void:
 
 class ActionSprite extends Sprite2D:
 	var tween: Tween = null
+	var hop_switch: bool = true
 
 	func hop(count: int) -> void:
 		if tween:
@@ -236,10 +244,11 @@ class ActionSprite extends Sprite2D:
 			tween.kill()
 		tween = create_tween()
 		for i in range(count):
-			tween.tween_property(self, "position", Vector2(50, -50), 0.13)
-			tween.parallel().tween_property(self, "rotation_degrees", 30, 0.13)
+			tween.tween_property(self, "position", Vector2(50 if hop_switch else -50, -50), 0.13)
+			tween.parallel().tween_property(self, "rotation_degrees", 30 if hop_switch else -30, 0.13)
 			tween.tween_property(self, "position", Vector2.ZERO, 0.13)
 			tween.parallel().tween_property(self, "rotation_degrees", 0, 0.13)
+			hop_switch = not hop_switch
 
 	func jump(up: bool) -> void:
 		if tween:
@@ -256,7 +265,7 @@ class ActionSprite extends Sprite2D:
 				await tween.finished
 			tween.kill()
 		tween = create_tween()
-		tween.tween_property(self, "rotation_degrees", 360, 0.75)
+		tween.tween_property(self, "rotation_degrees", 360, 0.8)
 		await tween.finished
 		self.rotation_degrees = 0
 
