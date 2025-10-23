@@ -48,8 +48,8 @@ func _ready():
 	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 
-	cleaner.signal_cleared.connect(func() -> void:
-		combo += 1
+	cleaner.signal_cleared.connect(func(group_count: int) -> void:
+		combo += group_count
 		combo_label.text = "%d COMBO!" % combo
 		player_sprite.hop(1)
 	)

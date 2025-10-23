@@ -33,7 +33,7 @@ func _ready():
 	
 	var slider: CustomHSlider
 
-	slider = CustomHSlider.new("input_threshold", InputHandler.THRESHOLD, 8, 128, 8)
+	slider = CustomHSlider.new("input_threshold", InputHandler.THRESHOLD, 16, 128, 16)
 	add_child(slider)
 	slider.value_changed.connect(func(value): InputHandler.THRESHOLD = value)
 	slider.position = Vector2(Main.WINDOW.x * 0.25, 200) - slider.size / 2

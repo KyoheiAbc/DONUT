@@ -5,9 +5,10 @@ static var GROUP_SIZE_TO_CLEAR = 4
 const CLEAR_WAIT_COUNT = 15
 
 var clearable_donuts: Array[Donut] = []
+var group_count = 0
 var timer: Timer = Timer.new()
 
-signal signal_cleared()
+signal signal_cleared(group_count: int)
 
 func _init():
 	add_child(timer)
@@ -19,12 +20,15 @@ func _init():
 		for donut in clearable_donuts:
 			donut.queue_free()
 		clearable_donuts.clear()
-		emit_signal("signal_cleared")
+		emit_signal("signal_cleared", group_count)
+		group_count = 0
 	)
 
 func process(all_donuts: Array[Donut]) -> bool:
 	if timer.is_stopped():
-		clearable_donuts = find_clearable_donuts(all_donuts, GROUP_SIZE_TO_CLEAR)[0]
+		var find_clearable_donuts = find_clearable_donuts(all_donuts, GROUP_SIZE_TO_CLEAR)
+		clearable_donuts = find_clearable_donuts[0]
+		group_count = find_clearable_donuts[1]
 		if clearable_donuts.size() > 0:
 			for donut in clearable_donuts:
 				if not donut.value == 10:
