@@ -90,17 +90,6 @@ func player_loop() -> void:
 	if not cleaner.timer.is_stopped():
 		return
 
-	if is_damaging:
-		var updated = false
-		for donut in all_donuts:
-			if donut.process(all_donuts):
-				updated = true
-		if updated:
-			return
-		is_damaging = false
-		next_donuts_pair()
-		return
-
 	var updated = false
 	for donut in all_donuts:
 		if donut.process(all_donuts):
@@ -113,9 +102,6 @@ func player_loop() -> void:
 
 	combo_ended()
 
-	if not is_damaging:
-		next_donuts_pair()
-
 func combo_ended() -> void:
 	score += combo_to_score(combo)
 	combo = 0
@@ -125,11 +111,16 @@ func combo_ended() -> void:
 			action_effect(true)
 		score -= reduced
 	elif score < 0:
-		var garbage_count = min(18, -score)
-		var spawn_count = Donut.spawn_garbage(garbage_count, all_donuts, self)
-		score += spawn_count
-		is_damaging = true
-		action_effect(false)
+		if not is_damaging:
+			var garbage_count = min(18, -score)
+			var spawn_count = Donut.spawn_garbage(garbage_count, all_donuts, self)
+			score += spawn_count
+			is_damaging = true
+			return
+			action_effect(false)
+
+	next_donuts_pair()
+	is_damaging = false
 
 func _process(delta: float) -> void:
 	player_loop()

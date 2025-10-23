@@ -2,7 +2,7 @@ class_name Cleaner
 extends Node
 
 static var GROUP_SIZE_TO_CLEAR = 4
-const CLEAR_WAIT_COUNT = 30
+const CLEAR_WAIT_COUNT = 15
 
 var clearable_donuts: Array[Donut] = []
 var timer: Timer = Timer.new()
