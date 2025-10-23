@@ -3,8 +3,10 @@ extends Node
 
 signal pressed(position: Vector2)
 signal direction(direction: Vector2)
+signal released()
 
 static var THRESHOLD: int = 64
+var threshold: int = THRESHOLD
 
 var base_position = null
 var drag_area_end_x: float = Main.WINDOW.x * 0.75
@@ -31,6 +33,7 @@ func _input(event: InputEvent) -> void:
 			if event.position.x < drag_area_end_x:
 				base_position = event.position
 		if not event.pressed:
+			emit_signal("released")
 			base_position = null
 
 	if event is InputEventScreenDrag:
@@ -39,15 +42,15 @@ func _input(event: InputEvent) -> void:
 		if event.position.x > drag_area_end_x:
 			return
 		var delta = event.position - base_position
-		if delta.x > THRESHOLD:
+		if delta.x > threshold:
 			emit_signal("direction", Vector2(1, 0))
 			base_position = event.position
-		if delta.x < -THRESHOLD:
+		if delta.x < -threshold:
 			emit_signal("direction", Vector2(-1, 0))
 			base_position = event.position
-		if delta.y > THRESHOLD:
+		if delta.y > threshold:
 			emit_signal("direction", Vector2(0, 1))
 			base_position = event.position
-		if delta.y < -THRESHOLD:
+		if delta.y < -threshold:
 			emit_signal("direction", Vector2(0, -1))
 			base_position = event.position

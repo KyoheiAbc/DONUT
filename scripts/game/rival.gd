@@ -16,6 +16,7 @@ static var COOL_COUNT_TO_ONE_COMBO: int = 180
 static var MAX_COMBO_CHOICES_ARRAY: Array[int] = [1, 2, 2, 3, 3, 3]
 static var ONE_COMBO_DURATION: int = 90
 var combo: int = 0
+var combo_label: Label = Label.new()
 
 var is_cool: bool = true
 var cooled_motion_count: int = 0
@@ -50,6 +51,11 @@ func _init() -> void:
 	add_child(sprite)
 	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)]
 
+	add_child(combo_label)
+	combo_label.add_theme_font_size_override("font_size", 48)
+	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+	combo_label.position = Vector2(-400, -200)
+
 	MAX_COMBO_CHOICES_ARRAY.shuffle()
 
 	attack_gauge.value = 0
@@ -82,7 +88,9 @@ func process():
 				is_cool = true
 				emit_signal("signal_combo_ended", final_combo)
 				emit_signal("signal_debug", "combo ended, next max combo: %d" % MAX_COMBO_CHOICES_ARRAY[0])
+				combo_label.text = ""
 			else:
 				attack_gauge.value -= attack_gauge.max_value / MAX_COMBO_CHOICES_ARRAY[0]
 				emit_signal("signal_debug", "combo increased to %d" % combo)
 				sprite.hop(1)
+				combo_label.text = "%d COMBO!" % combo

@@ -19,7 +19,7 @@ var sprites_a: Array[Sprite2D]
 var sprites_b: Array[Sprite2D]
 var cursors: Array[ColorRect]
 
-var target_index: int = 0
+var target_index: int = -1
 
 func _ready():
 	Main.LABEL.text = "VS\n\n"
@@ -52,7 +52,7 @@ func _ready():
 	for i in range(2):
 		var cursor = ColorRect.new()
 		add_child(cursor)
-		cursor.color = Color.from_hsv(i * 0.5, 1, 1, 1)
+		cursor.color = Color.from_hsv(i * 0.5, 1, 1)
 		cursor.size = Vector2(200, 200)
 		cursor.position = sprites[i].position - cursor.size / 2
 		cursor.z_index = -1
@@ -60,21 +60,32 @@ func _ready():
 
 
 	var input_handler = InputHandler.new()
+	input_handler.threshold = 400 * 0.45
 	input_handler.drag_area_end_x = 8000
 	add_child(input_handler)
 	input_handler.pressed.connect(func(position: Vector2) -> void:
-		if position.x < Main.WINDOW.x / 2:
+		if Rect2(cursors[0].position, cursors[0].size).has_point(position):
 			target_index = 0
-		else:
+			cursors[0].color = Color(1, 1, 0)
+		elif Rect2(cursors[1].position, cursors[1].size).has_point(position):
 			target_index = 1
+			cursors[1].color = Color(1, 1, 0)
+		else:
+			target_index = -1
+	)
+	input_handler.released.connect(func() -> void:
+		target_index = -1
+		cursors[0].color = Color.from_hsv(0, 1, 1, 1)
+		cursors[1].color = Color.from_hsv(0.5, 1, 1, 1)
 	)
 	input_handler.direction.connect(func(direction: Vector2) -> void:
+		if target_index == -1:
+			return
 		if direction.x > 0:
 			Array2D.move_value(MAP, target_index, Vector2(1, 0))
 		elif direction.x < 0:
 			Array2D.move_value(MAP, target_index, Vector2(-1, 0))
 	)
-
 
 func _process(_delta: float) -> void:
 	for i in cursors.size():
