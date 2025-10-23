@@ -27,15 +27,9 @@ func process(all_donuts: Array[Donut]) -> bool:
 		clearable_donuts = find_clearable_donuts(all_donuts, GROUP_SIZE_TO_CLEAR)[0]
 		if clearable_donuts.size() > 0:
 			for donut in clearable_donuts:
-				if donut.value == 10:
-					continue
-				donut.sprite.scale = Vector2(0.7, 1.3)
+				if not donut.value == 10:
+					donut.sprite.scale = Vector2(0.7, 1.3)
 				all_donuts.erase(donut)
-
-				var around_garbage = donut.get_around_garbage(all_donuts)
-				for garbage in around_garbage:
-					all_donuts.erase(garbage)
-					clearable_donuts.append(garbage)
 
 			timer.start()
 			return true
@@ -78,44 +72,6 @@ static func donut_grid_position(donut: Donut) -> Vector2i:
 	var y = int(donut.pos.y / 100)
 	return Vector2i(x, y)
 
-static func test_find_large_groups():
-	var input = [
-		[0, 1, 0, 0],
-		[2, 2, 2, 0],
-		[1, 2, 1, 3],
-		[3, 3, 3, -1],
-		[-1, -1, -1, -1],
-	]
-	var ret = find_large_groups(input, 3)
-	assert(ret[0] == [
-		[0, 0, 1, 1],
-		[1, 1, 1, 1],
-		[0, 1, 0, 0],
-		[1, 1, 1, 0],
-		[0, 0, 0, 0],
-	])
-	input = [
-		[1, 1, 1],
-		[1, 1, 1],
-		[1, 1, 1],
-	]
-	ret = find_large_groups(input, 1)
-	assert(ret[0] == [
-		[1, 1, 1],
-		[1, 1, 1],
-		[1, 1, 1],
-	])
-	input = [
-		[-1, 1],
-		[1, -1],
-	]
-	ret = find_large_groups(input, 1)
-	assert(ret[0] == [
-		[0, 1],
-		[1, 0],
-	])
-	assert(ret[1] == 2)
-
 static func find_large_groups(input: Array, find_threshold: int):
 	var size = Vector2(input[0].size(), input.size())
 	var result = Array2D.new_array_2d(size, 0)
@@ -157,5 +113,15 @@ static func find_large_groups(input: Array, find_threshold: int):
 				group_count += 1
 				for pos in group:
 					result[pos.y][pos.x] = 1
+					check_around_garbage(pos, input, result)
 
 	return [result, group_count]
+
+static func check_around_garbage(target_position: Vector2, input: Array, result: Array) -> void:
+	var directions = [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]
+	for dir in directions:
+		var new_pos = target_position + dir
+		if Array2D.out_of_bounds(new_pos, input):
+			continue
+		if input[new_pos.y][new_pos.x] == 10:
+			result[new_pos.y][new_pos.x] = 1

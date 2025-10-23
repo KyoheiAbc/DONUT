@@ -116,18 +116,3 @@ static func create_walls(node: Node, all_donuts: Array[Donut]) -> void:
 				node.add_child(all_donuts.back())
 				all_donuts.back().pos = Vector2(x * 100 + 50, y * 100 + 50)
 				all_donuts.back().visible = false
-
-func get_around_garbage(all_donuts: Array[Donut]) -> Array[Donut]:
-	var result: Array[Donut] = []
-	for other_donut in all_donuts:
-		if other_donut.value != 10:
-			continue
-		if other_donut.pos == self.pos + Vector2(100, 0):
-			result.append(other_donut)
-		if other_donut.pos == self.pos + Vector2(-100, 0):
-			result.append(other_donut)
-		if other_donut.pos == self.pos + Vector2(0, 100):
-			result.append(other_donut)
-		if other_donut.pos == self.pos + Vector2(0, -100):
-			result.append(other_donut)
-	return result

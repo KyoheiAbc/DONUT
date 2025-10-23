@@ -19,36 +19,31 @@ static func rotation(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
 	donuts_pair.child_relative_pos.push_back(donuts_pair.child_relative_pos.pop_front())
 	donuts_pair.elements[1].pos = donuts_pair.elements[0].pos
 	Donut.move(donuts_pair.elements[1], donuts_pair.child_relative_pos[0], donuts)
-	sync_position(donuts_pair, false, donuts)
-	if Donut.get_colliding_donut(donuts_pair.elements[0], donuts) == null:
-		return
+	if sync_position(donuts_pair, false, donuts):
+		if Donut.get_colliding_donut(donuts_pair.elements[0], donuts) == null:
+			return
 	
 	donuts_pair.child_relative_pos.push_back(donuts_pair.child_relative_pos.pop_front())
 	donuts_pair.elements[1].pos = initial_pos
 	donuts_pair.elements[0].pos = initial_child_pos
 	return
 
-
 static func move(donuts_pair: DonutsPair, direction: Vector2, donuts: Array[Donut]) -> Vector2:
 	var initial_pos = donuts_pair.elements[0].pos
 
-	var donuts_except_pair = donuts.duplicate()
-	donuts_except_pair.erase(donuts_pair.elements[0])
-	donuts_except_pair.erase(donuts_pair.elements[1])
-
-	Donut.move(donuts_pair.elements[0], direction, donuts_except_pair)
-	if sync_position(donuts_pair, true, donuts_except_pair):
+	Donut.move(donuts_pair.elements[0], direction, donuts)
+	if sync_position(donuts_pair, true, donuts):
 		return donuts_pair.elements[0].pos - initial_pos
 	
 	donuts_pair.elements[0].pos = initial_pos
-	sync_position(donuts_pair, true, donuts_except_pair)
+	sync_position(donuts_pair, true, donuts)
 
-	Donut.move(donuts_pair.elements[1], direction, donuts_except_pair)
-	if sync_position(donuts_pair, false, donuts_except_pair):
+	Donut.move(donuts_pair.elements[1], direction, donuts)
+	if sync_position(donuts_pair, false, donuts):
 		return donuts_pair.elements[0].pos - initial_pos
 
 	donuts_pair.elements[0].pos = initial_pos
-	sync_position(donuts_pair, true, donuts_except_pair)
+	sync_position(donuts_pair, true, donuts)
 	return Vector2.ZERO
 
 static func hard_drop(donuts_pair: DonutsPair, donuts: Array[Donut]) -> void:
