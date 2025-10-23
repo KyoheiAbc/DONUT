@@ -8,7 +8,6 @@ var next_colors: NextColors = NextColors.new()
 var player_sprite: ActionSprite = ActionSprite.new()
 var combo: int = 0
 var combo_label: Label = Label.new()
-var combo_label_destroy_timer: Timer = Timer.new()
 var score: int = 0
 var score_slider: GameVSlider = GameVSlider.new(Vector2(50, 800), Color(1, 1, 0))
 
@@ -48,17 +47,11 @@ func _ready():
 	combo_label.position = Vector2(1450, 700)
 	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	add_child(combo_label_destroy_timer)
-	combo_label_destroy_timer.timeout.connect(func() -> void:
-		combo_label.text = ""
-		combo_label_destroy_timer.stop()
-	)
 
 	cleaner.signal_cleared.connect(func() -> void:
 		combo += 1
 		combo_label.text = "%d COMBO!" % combo
 		player_sprite.hop(1)
-		combo_label_destroy_timer.stop()
 	)
 
 	rival.signal_combo_ended.connect(func(rival_combo: int) -> void:
@@ -126,8 +119,6 @@ func player_loop() -> void:
 func combo_ended() -> void:
 	score += combo_to_score(combo)
 	combo = 0
-	if combo_label_destroy_timer.is_stopped():
-		combo_label_destroy_timer.start(1)
 	if score > 0:
 		var reduced = rival.reduce_hp(score)
 		if reduced > 0:
@@ -168,6 +159,7 @@ func setup_input() -> void:
 			all_donuts += append_donuts
 			donuts_pair = null
 			player_sprite.hop(1)
+			combo_label.text = ""
 			return
 		if direction == Vector2.DOWN:
 			if DonutsPair.move(donuts_pair, direction * 100, all_donuts) == Vector2.ZERO:
@@ -176,6 +168,7 @@ func setup_input() -> void:
 				all_donuts += append_donuts
 				donuts_pair = null
 				player_sprite.hop(1)
+				combo_label.text = ""
 			return
 		
 		DonutsPair.move(donuts_pair, direction * 100, all_donuts)
