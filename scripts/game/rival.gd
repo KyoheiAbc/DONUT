@@ -12,7 +12,7 @@ var sprite: Game.ActionSprite = Game.ActionSprite.new()
 
 var frame_count: int = 0
 
-static var COOL_COUNT_TO_ONE_COMBO: int = 540
+static var COOL_COUNT_TO_ONE_COMBO: int = 180
 static var MAX_COMBO_CHOICES_ARRAY: Array[int] = [1, 2, 2, 3, 3, 3]
 static var ONE_COMBO_DURATION: int = 60
 var combo: int = 0

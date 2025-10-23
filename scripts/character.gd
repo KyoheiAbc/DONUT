@@ -66,12 +66,13 @@ func _ready():
 	input_handler.pressed.connect(func(position: Vector2) -> void:
 		if Rect2(cursors[0].position, cursors[0].size).has_point(position):
 			target_index = 0
-			cursors[0].color = Color(1, 1, 0)
 		elif Rect2(cursors[1].position, cursors[1].size).has_point(position):
 			target_index = 1
-			cursors[1].color = Color(1, 1, 0)
 		else:
-			target_index = -1
+			if position.x < Main.WINDOW.x / 2:
+				target_index = 0
+			else:
+				target_index = 1
 	)
 	input_handler.released.connect(func() -> void:
 		target_index = -1
@@ -88,6 +89,8 @@ func _ready():
 	)
 
 func _process(_delta: float) -> void:
+	if target_index != -1:
+		cursors[target_index].color = Color(1, 1, 0)
 	for i in cursors.size():
 		cursors[i].position = sprites[Array2D.get_position_value(MAP, i)].position - cursors[i].size / 2
 	for i in SPRITES.size():
