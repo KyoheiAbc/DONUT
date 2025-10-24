@@ -73,7 +73,7 @@ func process():
 			emit_signal("signal_debug", "combo started, max combo: %d" % MAX_COMBO_CHOICES_ARRAY[0])
 
 		elif frame_count >= cooled_motion_count * COOL_COUNT_TO_ONE_COMBO:
-			sprite.hop(MAX_COMBO_CHOICES_ARRAY[0] if cooled_motion_count == 0 else 1)
+			sprite.hop(MAX_COMBO_CHOICES_ARRAY[0] if cooled_motion_count == 0 else 1, 0.15)
 			cooled_motion_count += 1
 
 		
@@ -92,5 +92,5 @@ func process():
 			else:
 				attack_gauge.value -= attack_gauge.max_value / MAX_COMBO_CHOICES_ARRAY[0]
 				emit_signal("signal_debug", "combo increased to %d" % combo)
-				sprite.hop(1)
+				sprite.hop(1, 0.15)
 				combo_label.text = "%d COMBO!" % combo
