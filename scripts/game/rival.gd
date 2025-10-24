@@ -75,8 +75,6 @@ func _init() -> void:
 		MAX_COMBO_CHOICES_ARRAY = [3, 4, 4, 5, 5, 5]
 	else:
 		MAX_COMBO_CHOICES_ARRAY = [3, 5, 5, 7, 7, 7]
-	print("Rival initialized: level=%d, hp=%d, cool_count=%d, max_combo_choices=%s" % [LEVEL, HP, COOL_COUNT_TO_ONE_COMBO, str(MAX_COMBO_CHOICES_ARRAY)])
-
 	
 	position = Vector2(700, 250)
 
@@ -87,7 +85,7 @@ func _init() -> void:
 	attack_gauge.position = Vector2(215, 0) - attack_gauge.size / 2
 
 	add_child(sprite)
-	sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 1)]
+	sprite.texture = Character.SPRITES[Main.CHARACTER_INDEXES[1]]
 
 	add_child(combo_label)
 	combo_label.add_theme_font_size_override("font_size", 48)

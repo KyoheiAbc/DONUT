@@ -26,7 +26,7 @@ func _ready():
 	add_child(player_sprite_node)
 	player_sprite_node.position = Vector2(700, 750)
 	player_sprite_node.add_child(player_sprite)
-	player_sprite.texture = Character.SPRITES[Array2D.get_position_value(Character.MAP, 0)]
+	player_sprite.texture = Character.SPRITES[Main.CHARACTER_INDEXES[0]]
 
 	add_child(next_colors)
 	next_donuts_pair()

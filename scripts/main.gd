@@ -6,6 +6,8 @@ static var NODE: Node
 static var LABEL: Label
 static var BUTTON: Button
 
+static var CHARACTER_INDEXES: Array[int] = [0, 1]
+
 func _ready():
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 1, 0.75))
 	

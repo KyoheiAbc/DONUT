@@ -28,6 +28,10 @@ func _ready():
 	Main.BUTTON.pressed.connect(func() -> void:
 		self.queue_free()
 		Main.NODE.add_child(Option.new())
+		Main.CHARACTER_INDEXES = [
+			Array2D.get_position_value(MAP, 0),
+			Array2D.get_position_value(MAP, 1),
+		]
 	)
 	Main.BUTTON.text = "OK"
 
