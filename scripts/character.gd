@@ -1,7 +1,6 @@
 class_name Character
 extends Node
 
-static var MAP = [[0, 1, -1, -1, -1, -1, -1, -1, -1]]
 const SPRITES: Array[Texture2D] = [
 	preload("res://assets/a_edited.png"),
 	preload("res://assets/b_edited.png"),
@@ -21,19 +20,24 @@ var cursors: Array[ColorRect]
 
 var target_index: int = -1
 
+var map = [[-1, -1, -1, -1, -1, -1, -1, -1, -1]]
+
 func _ready():
 	Main.LABEL.text = "VS\n\n"
-
-	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
+	Main.reset_button()
+	Main.BUTTON.visible = true
 	Main.BUTTON.pressed.connect(func() -> void:
 		self.queue_free()
 		Main.NODE.add_child(Option.new())
 		Main.CHARACTER_INDEXES = [
-			Array2D.get_position_value(MAP, 0),
-			Array2D.get_position_value(MAP, 1),
+			Array2D.get_position_value(map, 0),
+			Array2D.get_position_value(map, 1),
 		]
 	)
 	Main.BUTTON.text = "OK"
+
+	map[0][Main.CHARACTER_INDEXES[0]] = 0
+	map[0][Main.CHARACTER_INDEXES[1]] = 1
 
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
@@ -87,16 +91,16 @@ func _ready():
 		if target_index == -1:
 			return
 		if direction.x > 0:
-			Array2D.move_value(MAP, target_index, Vector2(1, 0))
+			Array2D.move_value(map, target_index, Vector2(1, 0))
 		elif direction.x < 0:
-			Array2D.move_value(MAP, target_index, Vector2(-1, 0))
+			Array2D.move_value(map, target_index, Vector2(-1, 0))
 	)
 
 func _process(_delta: float) -> void:
 	if target_index != -1:
 		cursors[target_index].color = Color(1, 1, 0)
 	for i in cursors.size():
-		cursors[i].position = sprites[Array2D.get_position_value(MAP, i)].position - cursors[i].size / 2
+		cursors[i].position = sprites[Array2D.get_position_value(map, i)].position - cursors[i].size / 2
 	for i in SPRITES.size():
-		sprites_a[i].visible = (i == Array2D.get_position_value(MAP, 0))
-		sprites_b[i].visible = (i == Array2D.get_position_value(MAP, 1))
+		sprites_a[i].visible = (i == Array2D.get_position_value(map, 0))
+		sprites_b[i].visible = (i == Array2D.get_position_value(map, 1))

@@ -8,6 +8,8 @@ static var BUTTON: Button
 
 static var CHARACTER_INDEXES: Array[int] = [0, 1]
 
+static var MODE: int = 0 # 0: Arcade, 1: Free Battle
+
 func _ready():
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 1, 0.75))
 	
@@ -39,7 +41,7 @@ static func init() -> void:
 	BUTTON.text = "START"
 	reset_button()
 	BUTTON.pressed.connect(func() -> void:
-		NODE.add_child(Character.new())
+		NODE.add_child(Mode.new())
 	)
 
 static func reset_button() -> void:

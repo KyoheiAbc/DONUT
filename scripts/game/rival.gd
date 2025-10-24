@@ -55,7 +55,7 @@ func reduce_hp(amount: int) -> int:
 	if hp_slider_tween:
 		hp_slider_tween.kill()
 	hp_slider_tween = create_tween()
-	hp_slider_tween.tween_property(hp_slider, "value", hp_slider.max_value * hp / HP, 3)
+	hp_slider_tween.tween_property(hp_slider, "value", hp_slider.max_value * hp / HP, 1.5)
 
 	frame_count -= 60
 	emit_signal("signal_debug", "took %d damage, hp: %d" % [amount, hp])
