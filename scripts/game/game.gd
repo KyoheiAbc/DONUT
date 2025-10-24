@@ -19,6 +19,8 @@ var rival: Rival = Rival.new()
 
 var is_damaging: bool = false
 
+var ready_go_timer: Timer = Timer.new()
+
 func _ready():
 	var player_sprite_node = Node2D.new()
 	add_child(player_sprite_node)
@@ -76,9 +78,14 @@ func ready_go() -> void:
 	set_process(false)
 	Main.LABEL.visible = true
 	Main.LABEL.text = "READY"
-	await get_tree().create_timer(1.5).timeout
+	add_child(ready_go_timer)
+	ready_go_timer.one_shot = true
+	ready_go_timer.start(1.0)
+	await ready_go_timer.timeout
 	Main.LABEL.text = "GO!"
-	await get_tree().create_timer(0.5).timeout
+	ready_go_timer.start(0.5)
+	await ready_go_timer.timeout
+	ready_go_timer.queue_free()
 	Main.LABEL.visible = false
 	set_process(true)
 
@@ -235,7 +242,7 @@ func game_over(is_player: bool) -> void:
 	Main.BUTTON.visible = true
 	Main.BUTTON.pressed.connect(func() -> void:
 		self.queue_free()
-		Main.NODE.add_child(Character.new())
+		Main.init()
 	)
 
 class ActionSprite extends Sprite2D:

@@ -13,7 +13,6 @@ func _ready():
 
 	LABEL = Label.new()
 	NODE.add_child(LABEL)
-	LABEL.text = "DONUTS POP"
 	LABEL.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
 	LABEL.add_theme_font_size_override("font_size", 160)
 	LABEL.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
@@ -26,9 +25,21 @@ func _ready():
 	BUTTON.add_theme_font_size_override("font_size", 48)
 	BUTTON.size = Vector2(384, 96)
 	BUTTON.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.9) - BUTTON.size / 2
-	BUTTON.text = "START"
 	BUTTON.z_index = 1000
 
+	init()
+
+static func init() -> void:
+	LABEL.visible = true
+	LABEL.text = "DONUTS POP"
+
+	BUTTON.visible = true
+	BUTTON.text = "START"
+	reset_button()
 	BUTTON.pressed.connect(func() -> void:
 		NODE.add_child(Character.new())
 	)
+
+static func reset_button() -> void:
+	for connection in BUTTON.pressed.get_connections():
+		BUTTON.pressed.disconnect(connection.callable)

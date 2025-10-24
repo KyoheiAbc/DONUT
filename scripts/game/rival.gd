@@ -1,6 +1,28 @@
 class_name Rival
 extends Node2D
 
+class Level:
+	var hp: int
+	var combo: int
+	var cool_count: int
+	func _init(hp: int, combo: int, cool_count: int) -> void:
+		self.hp = hp
+		self.combo = combo
+		self.cool_count = cool_count
+		
+static var LEVELS: Array[Level] = [
+	Level.new(16, 1, 6.2 * 60),
+	Level.new(32, 2, 5.4 * 60),
+	Level.new(32, 2, 4.6 * 60),
+	Level.new(64, 3, 3.8 * 60),
+	Level.new(64, 3, 3.0 * 60),
+	Level.new(64, 3, 2.6 * 60),
+	Level.new(128, 5, 2.2 * 60),
+	Level.new(128, 5, 1.8 * 60),
+	Level.new(256, 7, 1.4 * 60),
+]
+
+static var LEVEL: int = 5
 static var HP: int = 64
 var hp: int = HP
 var hp_slider: Game.GameVSlider = Game.GameVSlider.new(Vector2(30, 400), Color(0, 1, 0))
@@ -40,6 +62,22 @@ func reduce_hp(amount: int) -> int:
 	return amount
 
 func _init() -> void:
+	HP = LEVELS[LEVEL - 1].hp
+	hp = HP
+	COOL_COUNT_TO_ONE_COMBO = LEVELS[LEVEL - 1].cool_count
+	if LEVELS[LEVEL - 1].combo == 1:
+		MAX_COMBO_CHOICES_ARRAY = [1]
+	elif LEVELS[LEVEL - 1].combo == 2:
+		MAX_COMBO_CHOICES_ARRAY = [1, 2, 2]
+	elif LEVELS[LEVEL - 1].combo == 3:
+		MAX_COMBO_CHOICES_ARRAY = [1, 2, 2, 3, 3, 3]
+	elif LEVELS[LEVEL - 1].combo == 5:
+		MAX_COMBO_CHOICES_ARRAY = [3, 4, 4, 5, 5, 5]
+	else:
+		MAX_COMBO_CHOICES_ARRAY = [3, 5, 5, 7, 7, 7]
+	print("Rival initialized: level=%d, hp=%d, cool_count=%d, max_combo_choices=%s" % [LEVEL, HP, COOL_COUNT_TO_ONE_COMBO, str(MAX_COMBO_CHOICES_ARRAY)])
+
+	
 	position = Vector2(700, 250)
 
 	add_child(hp_slider)
