@@ -62,6 +62,8 @@ func reduce_hp(amount: int) -> int:
 	return amount
 
 func _init() -> void:
+	if Main.MODE == 0:
+		LEVEL = Arcade.LEVEL + 1
 	HP = LEVELS[LEVEL - 1].hp
 	hp = HP
 	COOL_COUNT_TO_ONE_COMBO = LEVELS[LEVEL - 1].cool_count

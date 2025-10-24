@@ -232,7 +232,10 @@ func game_over(is_player: bool) -> void:
 		rival.sprite.hop(-1, 0.25)
 		player_sprite.rotation(true)
 	else:
-		Main.LABEL.text = "YOU WIN"
+		if Main.MODE == 0 and Arcade.LEVEL == 7:
+			Main.LABEL.text = "CLEAR!"
+		else:
+			Main.LABEL.text = "YOU WIN"
 		player_sprite.jump(true)
 		player_sprite.hop(-1, 0.25)
 		rival.sprite.rotation(true)
@@ -242,6 +245,11 @@ func game_over(is_player: bool) -> void:
 	Main.BUTTON.visible = true
 	Main.BUTTON.pressed.connect(func() -> void:
 		self.queue_free()
+		if Main.MODE == 0 and not is_player:
+			if Arcade.LEVEL < 7:
+				Arcade.LEVEL += 1
+				Main.NODE.add_child(Arcade.new())
+				return
 		Main.init()
 	)
 

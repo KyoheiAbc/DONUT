@@ -15,8 +15,9 @@ func _ready() -> void:
 	button_arcade.text = "ARCADE"
 	button_arcade.pressed.connect(func() -> void:
 		self.queue_free()
+		Arcade.LEVEL = 0
 		Main.MODE = 0
-		Main.NODE.add_child(Arcade.new())
+		Main.NODE.add_child(CharacterSingle.new())
 	)
 
 	var button_freeplay = Button.new()
