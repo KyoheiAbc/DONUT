@@ -22,22 +22,11 @@ var target_index: int = -1
 
 var map = [[-1, -1, -1, -1, -1, -1, -1, -1, -1]]
 
-func _ready():
-	Main.LABEL.text = "VS\n\n"
-	Main.reset_button()
-	Main.BUTTON.visible = true
-	Main.BUTTON.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Option.new())
-		Main.CHARACTER_INDEXES = [
-			Array2D.get_position_value(map, 0),
-			Array2D.get_position_value(map, 1),
-		]
-	)
-	Main.BUTTON.text = "OK"
-
+func _init(is_single: bool) -> void:
 	map[0][Main.CHARACTER_INDEXES[0]] = 0
-	map[0][Main.CHARACTER_INDEXES[1]] = 1
+
+	if not is_single:
+		map[0][Main.CHARACTER_INDEXES[1]] = 1
 
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
@@ -50,12 +39,13 @@ func _ready():
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
 		sprites_a.back().texture = SPRITES[i]
-		sprites_a.back().position = Vector2(600, 250)
+		sprites_a.back().position = Vector2(1000, 250) if is_single else Vector2(600, 250)
 
-		sprites_b.append(Sprite2D.new())
-		add_child(sprites_b[i])
-		sprites_b.back().texture = SPRITES[i]
-		sprites_b.back().position = Vector2(1400, 250)
+		if not is_single:
+			sprites_b.append(Sprite2D.new())
+			add_child(sprites_b[i])
+			sprites_b.back().texture = SPRITES[i]
+			sprites_b.back().position = Vector2(1400, 250)
 
 	for i in range(2):
 		var cursor = ColorRect.new()
@@ -65,24 +55,58 @@ func _ready():
 		cursor.position = sprites[i].position - cursor.size / 2
 		cursor.z_index = -1
 		cursors.append(cursor)
+		if is_single:
+			break
 
+	var button = Main.button_new(true)
+	add_child(button)
+	button.pressed.connect(func() -> void:
+		cursors[0].color = Color.from_hsv(0, 1, 1, 1)
+		Main.CHARACTER_INDEXES[0] = Array2D.get_position_value(map, 0)
+		if not is_single:
+			Main.CHARACTER_INDEXES[1] = Array2D.get_position_value(map, 1)
+		self.queue_free()
+		if Main.MODE == 0:
+			Main.NODE.add_child(Arcade.new())
+		else:
+			Main.NODE.add_child(Option.new())
+	)
+
+	var button_back = Main.button_new(false)
+	add_child(button_back)
+	button_back.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Mode.new())
+	)
 
 	var input_handler = InputHandler.new()
 	input_handler.threshold = 400 * 0.45
 	input_handler.drag_area_end_x = 8000
 	add_child(input_handler)
 	input_handler.pressed.connect(func(position: Vector2) -> void:
+		if is_single:
+			target_index = 0
+			cursors[0].color = Color(1, 1, 0)
+			return
 		if Rect2(cursors[0].position, cursors[0].size).has_point(position):
 			target_index = 0
+			cursors[0].color = Color(1, 1, 0)
 		elif Rect2(cursors[1].position, cursors[1].size).has_point(position):
 			target_index = 1
+			cursors[1].color = Color(1, 1, 0)
 		else:
 			if position.x < Main.WINDOW.x / 2:
 				target_index = 0
+				cursors[0].color = Color(1, 1, 0)
 			else:
 				target_index = 1
+				cursors[1].color = Color(1, 1, 0)
 	)
 	input_handler.released.connect(func() -> void:
+		if is_single:
+			target_index = -1
+			cursors[0].color = Color.from_hsv(0, 1, 1)
+			return
 		target_index = -1
 		cursors[0].color = Color.from_hsv(0, 1, 1, 1)
 		cursors[1].color = Color.from_hsv(0.5, 1, 1, 1)
@@ -97,10 +121,11 @@ func _ready():
 	)
 
 func _process(_delta: float) -> void:
-	if target_index != -1:
-		cursors[target_index].color = Color(1, 1, 0)
-	for i in cursors.size():
-		cursors[i].position = sprites[Array2D.get_position_value(map, i)].position - cursors[i].size / 2
+	cursors[0].position = sprites[Array2D.get_position_value(map, 0)].position - cursors[0].size / 2
+	if cursors.size() > 1:
+		cursors[1].position = sprites[Array2D.get_position_value(map, 1)].position - cursors[1].size / 2
+
 	for i in SPRITES.size():
 		sprites_a[i].visible = (i == Array2D.get_position_value(map, 0))
-		sprites_b[i].visible = (i == Array2D.get_position_value(map, 1))
+		if sprites_b.size() != 0:
+			sprites_b[i].visible = (i == Array2D.get_position_value(map, 1))

@@ -5,8 +5,7 @@ signal pressed(position: Vector2)
 signal direction(direction: Vector2)
 signal released()
 
-static var THRESHOLD: int = 64
-var threshold: int = THRESHOLD
+var threshold: int = 64
 
 var base_position = null
 var drag_area_end_x: float = Main.WINDOW.x * 0.75

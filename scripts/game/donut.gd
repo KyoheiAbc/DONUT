@@ -1,8 +1,8 @@
 class_name Donut
 extends Node2D
 
-static var SPRITE_SIZE = Vector2(64, 64)
-static var POSITION_OFFSET = Vector2(1000 - SPRITE_SIZE.x, 500 - SPRITE_SIZE.y * 9)
+const SPRITE_SIZE = Vector2(64, 64)
+const POSITION_OFFSET = Vector2(1000 - SPRITE_SIZE.x, 500 - SPRITE_SIZE.y * 9)
 
 const DONUT_TEXTURE: Texture2D = preload("res://assets/donut.png")
 
@@ -12,7 +12,7 @@ var sprite: Sprite2D
 
 var freeze_count: int = 0
 const FREEZE_COUNT = 15
-static var GRAVITY = 30
+const GRAVITY = 30
 
 func _init(_value: int):
 	value = _value

@@ -1,6 +1,8 @@
 class_name Option
 extends Node
 
+var level: int = 1
+
 class CustomHSlider extends HSlider:
 	func _init(text: String, initial_value: float, min: float, max: float, step: float) -> void:
 		min_value = min
@@ -23,22 +25,23 @@ class CustomHSlider extends HSlider:
 
 
 func _ready():
-	Main.LABEL.visible = false
-	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
-	Main.BUTTON.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Game.new())
+	var slider = CustomHSlider.new("LEVEL", level, 1, 9, 1)
+	add_child(slider)
+	slider.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.5) - slider.size * 0.5
+	slider.value_changed.connect(func(value):
+		level = int(value)
 	)
-	Main.BUTTON.text = "OK"
-	
-	var slider: CustomHSlider
 
-	slider = CustomHSlider.new("input_threshold", InputHandler.THRESHOLD, 16, 128, 16)
-	add_child(slider)
-	slider.value_changed.connect(func(value): InputHandler.THRESHOLD = value)
-	slider.position = Vector2(Main.WINDOW.x * 0.5, 250) - slider.size / 2
+	var button_back = Main.button_new(false)
+	add_child(button_back)
+	button_back.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Character.new(false))
+	)
 
-	slider = CustomHSlider.new("rival_level", Rival.LEVEL, 1, Rival.LEVELS.size(), 1)
-	add_child(slider)
-	slider.value_changed.connect(func(value): Rival.LEVEL = int(value))
-	slider.position = Vector2(Main.WINDOW.x * 0.5, 500) - slider.size / 2
+	var button_start = Main.button_new(true)
+	add_child(button_start)
+	button_start.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Game.new(self))
+	)

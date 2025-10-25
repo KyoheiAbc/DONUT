@@ -1,7 +1,9 @@
 class_name Game
 extends Node
 
-static var COLOR_NUMBER = 4
+const COLOR_NUMBER = 4
+
+var parent_node: Node = null
 
 var donuts_pair: DonutsPair = null
 var next_colors: NextColors = NextColors.new()
@@ -15,13 +17,44 @@ var all_donuts: Array[Donut] = []
 
 var cleaner: Cleaner = Cleaner.new()
 
-var rival: Rival = Rival.new()
+var rival: Rival
 
 var is_damaging: bool = false
 
 var ready_go_timer: Timer = Timer.new()
 
+func _init(parent_node: Node) -> void:
+	self.parent_node = parent_node
+
+	if parent_node is Arcade:
+		var arcade = parent_node as Arcade
+		rival = Arcade.rival_new_from_level(arcade.level)
+	elif parent_node is Option:
+		var option = parent_node as Option
+		rival = Arcade.rival_new_from_level(option.level - 1)
+
+
 func _ready():
+	var button_back = Main.button_new(false)
+	add_child(button_back)
+	button_back.pressed.connect(func() -> void:
+		if not parent_node == Main.NODE:
+			parent_node.queue_free()
+		else:
+			self.queue_free()
+		Main.NODE.add_child(Character.new(true))
+	)
+
+	var button_reset = Main.button_new(false)
+	add_child(button_reset)
+	button_reset.text = "RESET"
+	button_reset.position = Vector2(2000 - button_reset.size.x - 16, 16)
+	button_reset.pressed.connect(func() -> void:
+		var parent_node = self.get_parent()
+		self.queue_free()
+		parent_node.add_child(Game.new(parent_node))
+	)
+
 	var player_sprite_node = Node2D.new()
 	add_child(player_sprite_node)
 	player_sprite_node.position = Vector2(700, 750)
@@ -40,7 +73,7 @@ func _ready():
 	score_slider.value = score_slider.max_value * 0.5
 
 	Donut.create_walls(self, all_donuts)
-	
+
 	await ready_go()
 
 	setup_input()
@@ -73,20 +106,20 @@ func ready_go() -> void:
 	rect.position = Vector2(1000 + Donut.SPRITE_SIZE.x * 3, 500) - rect.size / 2
 	rect.z_index = -1
 
-	Main.BUTTON.pressed.disconnect(Main.BUTTON.pressed.get_connections()[0].callable)
-	Main.BUTTON.visible = false
+	var label = Main.label_new()
+	add_child(label)
+	label.text = "READY"
+
 	set_process(false)
-	Main.LABEL.visible = true
-	Main.LABEL.text = "READY"
 	add_child(ready_go_timer)
 	ready_go_timer.one_shot = true
 	ready_go_timer.start(1.0)
 	await ready_go_timer.timeout
-	Main.LABEL.text = "GO!"
+	label.text = "GO!"
 	ready_go_timer.start(0.5)
 	await ready_go_timer.timeout
+	label.queue_free()
 	ready_go_timer.queue_free()
-	Main.LABEL.visible = false
 	set_process(true)
 
 func player_loop() -> void:
@@ -225,33 +258,39 @@ func game_over(is_player: bool) -> void:
 
 	input_handler.queue_free()
 
-	Main.LABEL.visible = true
+	var label = Main.label_new()
+	add_child(label)
+	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
+
+	var button = Main.button_new(true)
+	add_child(button)
+	button.text = "END" if is_player else "NEXT"
+	button.pressed.connect(func() -> void:
+		if parent_node == null:
+			self.queue_free()
+			Main.NODE.add_child(Main.Title.new())
+			return
+		if parent_node is Arcade:
+			if is_player:
+				parent_node.queue_free()
+				Main.NODE.add_child(Main.Title.new())
+			else:
+				self.queue_free()
+				var arcade = parent_node as Arcade
+				arcade.next()
+		else:
+			self.queue_free()
+			Main.NODE.add_child(Mode.new())
+	)
+
 	if is_player:
-		Main.LABEL.text = "YOU LOSE"
 		rival.sprite.jump(false)
 		rival.sprite.hop(-1, 0.25)
 		player_sprite.rotation(true)
 	else:
-		if Main.MODE == 0 and Arcade.LEVEL == 7:
-			Main.LABEL.text = "CLEAR!"
-		else:
-			Main.LABEL.text = "YOU WIN"
 		player_sprite.jump(true)
 		player_sprite.hop(-1, 0.25)
 		rival.sprite.rotation(true)
-
-
-	Main.BUTTON.text = "END"
-	Main.BUTTON.visible = true
-	Main.BUTTON.pressed.connect(func() -> void:
-		self.queue_free()
-		if Main.MODE == 0 and not is_player:
-			if Arcade.LEVEL < 7:
-				Arcade.LEVEL += 1
-				Main.NODE.add_child(Arcade.new())
-				return
-		Main.init()
-	)
 
 class ActionSprite extends Sprite2D:
 	var tween: Tween = null

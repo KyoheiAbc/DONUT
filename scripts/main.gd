@@ -3,47 +3,41 @@ extends Node
 
 static var WINDOW: Vector2 = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
 static var NODE: Node
-static var LABEL: Label
-static var BUTTON: Button
 
 static var CHARACTER_INDEXES: Array[int] = [0, 1]
 
-static var MODE: int = 0 # 0: Arcade, 1: Free Battle
+static var MODE: int = 0 # 0: arcade, 1: survival, 2: free battle, 3: training
 
 func _ready():
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 1, 0.75))
-	
 	NODE = self
+	NODE.add_child(Main.Title.new())
 
-	LABEL = Label.new()
-	NODE.add_child(LABEL)
-	LABEL.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
-	LABEL.add_theme_font_size_override("font_size", 160)
-	LABEL.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	LABEL.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	LABEL.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	LABEL.z_index = 1000
+static func label_new() -> Label:
+	var label = Label.new()
+	label.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 224)
+	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+	label.text = "DONUTS POP"
+	return label
 
-	BUTTON = Button.new()
-	NODE.add_child(BUTTON)
-	BUTTON.add_theme_font_size_override("font_size", 48)
-	BUTTON.size = Vector2(384, 96)
-	BUTTON.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.9) - BUTTON.size / 2
-	BUTTON.z_index = 1000
+static func button_new(main: bool) -> Button:
+	var button = Button.new()
+	button.size = Vector2(384, 96) if main else Vector2(128, 64)
+	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.9) - button.size / 2 if main else Vector2(16, 16)
+	button.add_theme_font_size_override("font_size", 32 if main else 24)
+	button.text = "START" if main else "BACK"
+	return button
 
-	init()
+class Title extends Node:
+	func _ready() -> void:
+		add_child(Main.label_new())
 
-static func init() -> void:
-	LABEL.visible = true
-	LABEL.text = "DONUTS POP"
-
-	BUTTON.visible = true
-	BUTTON.text = "START"
-	reset_button()
-	BUTTON.pressed.connect(func() -> void:
-		NODE.add_child(Mode.new())
-	)
-
-static func reset_button() -> void:
-	for connection in BUTTON.pressed.get_connections():
-		BUTTON.pressed.disconnect(connection.callable)
+		var button = Main.button_new(true)
+		add_child(button)
+		button.pressed.connect(func() -> void:
+			self.queue_free()
+			Main.NODE.add_child(Mode.new())
+		)

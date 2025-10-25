@@ -2,32 +2,39 @@ class_name Mode
 extends Node
 
 func _ready() -> void:
-	Main.LABEL.text = "MODE SELECT\n\n\n"
-
-	Main.reset_button()
-	Main.BUTTON.visible = false
-
-	var button_arcade = Button.new()
+	var button_arcade = Main.button_new(true)
 	add_child(button_arcade)
-	button_arcade.add_theme_font_size_override("font_size", 48)
-	button_arcade.size = Vector2(384, 96)
-	button_arcade.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.45) - button_arcade.size / 2
 	button_arcade.text = "ARCADE"
+	button_arcade.position.y = Main.WINDOW.y * 0.2 - button_arcade.size.y / 2
 	button_arcade.pressed.connect(func() -> void:
-		self.queue_free()
-		Arcade.LEVEL = 0
 		Main.MODE = 0
-		Main.NODE.add_child(CharacterSingle.new())
+		self.queue_free()
+		Main.NODE.add_child(Character.new(true))
 	)
 
-	var button_freeplay = Button.new()
-	add_child(button_freeplay)
-	button_freeplay.add_theme_font_size_override("font_size", 48)
-	button_freeplay.size = Vector2(384, 96)
-	button_freeplay.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.65) - button_freeplay.size / 2
-	button_freeplay.text = "FREE BATTLE"
-	button_freeplay.pressed.connect(func() -> void:
+	var button_survival = Main.button_new(true)
+	add_child(button_survival)
+	button_survival.text = "SURVIVAL"
+	button_survival.position.y = Main.WINDOW.y * 0.4 - button_survival.size.y / 2
+
+	var button_free_battle = Main.button_new(true)
+	add_child(button_free_battle)
+	button_free_battle.text = "FREE BATTLE"
+	button_free_battle.position.y = Main.WINDOW.y * 0.6 - button_free_battle.size.y / 2
+	button_free_battle.pressed.connect(func() -> void:
+		Main.MODE = 2
 		self.queue_free()
-		Main.MODE = 1
-		Main.NODE.add_child(Character.new())
+		Main.NODE.add_child(Character.new(false))
+	)
+
+	var button_training = Main.button_new(true)
+	add_child(button_training)
+	button_training.text = "TRAINING"
+	button_training.position.y = Main.WINDOW.y * 0.8 - button_training.size.y / 2
+
+	var button_back = Main.button_new(false)
+	add_child(button_back)
+	button_back.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Main.Title.new())
 	)

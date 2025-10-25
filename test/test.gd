@@ -3,7 +3,7 @@ extends Node
 
 var all_donuts: Array[Donut] = []
 var donut: Donut = null
-var rival: Rival = Rival.new()
+var rival: Rival = null
 var frame_count: int = 0
 
 func _ready() -> void:
@@ -109,23 +109,21 @@ func _ready() -> void:
 		donut.queue_free()
 	all_donuts.clear()
 
-
+	rival = Rival.new(100, [2], 180)
 	add_child(rival)
 	var reduced = 0
 	assert(rival.reduce_hp(10) == 10)
-	assert(rival.hp == Rival.HP - 10)
+	assert(rival.hp == rival.hp_max - 10)
 	assert(rival.frame_count == -60)
 
 	rival.is_cool = false
 	assert(rival.reduce_hp(10) == 0)
-	assert(rival.hp == Rival.HP - 10)
+	assert(rival.hp == rival.hp_max - 10)
 	assert(rival.frame_count == -60)
 
 	rival.queue_free()
-	Rival.MAX_COMBO_CHOICES_ARRAY = [2]
-	Rival.COOL_COUNT_TO_ONE_COMBO = 180
-	Rival.ONE_COMBO_DURATION = 60
-	rival = Rival.new()
+
+	rival = Rival.new(100, [2], 180)
 	add_child(rival)
 
 	for i in range(1200):
@@ -165,12 +163,11 @@ func _ready() -> void:
 
 
 	rival.queue_free()
-	Rival.MAX_COMBO_CHOICES_ARRAY = [1, 2, 3]
-	rival = Rival.new()
+	rival = Rival.new(100, [1, 2, 3], 180)
 	add_child(rival)
 	rival.signal_debug.connect(func(msg: String) -> void:
 		pass
-		# print("[Rival] ", msg, " @ frame ", frame_count)
+		print("[Rival] ", msg, " @ frame ", frame_count)
 	)
 	frame_count = 0
 
