@@ -40,7 +40,7 @@ func reduce_hp(amount: int) -> int:
 	emit_signal("signal_debug", "took %d damage, hp: %d" % [amount, hp])
 	return amount
 
-func _init(hp_max: int, max_combo_choices_array: Array[int], cool_count_to_one_combo: int) -> void:
+func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_count_to_one_combo: int) -> void:
 	self.hp_max = hp_max
 	hp = hp_max
 	self.max_combo_choices_array = max_combo_choices_array
@@ -54,7 +54,7 @@ func _init(hp_max: int, max_combo_choices_array: Array[int], cool_count_to_one_c
 	attack_gauge.position = Vector2(215, 0) - attack_gauge.size / 2
 
 	add_child(sprite)
-	sprite.texture = Character.SPRITES[Main.CHARACTER_INDEXES[1]]
+	sprite.texture = Character.SPRITES[index]
 
 	add_child(combo_label)
 	combo_label.add_theme_font_size_override("font_size", 48)

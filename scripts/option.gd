@@ -24,7 +24,7 @@ class CustomHSlider extends HSlider:
 		label.text = text + ": " + str(int(value))
 
 
-func _ready():
+func _init():
 	var slider = CustomHSlider.new("LEVEL", level, 1, 9, 1)
 	add_child(slider)
 	slider.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.5) - slider.size * 0.5
@@ -36,7 +36,7 @@ func _ready():
 	add_child(button_back)
 	button_back.pressed.connect(func() -> void:
 		self.queue_free()
-		Main.NODE.add_child(Character.new(false))
+		Main.NODE.add_child(Character.new())
 	)
 
 	var button_start = Main.button_new(true)

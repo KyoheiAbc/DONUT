@@ -4,11 +4,13 @@ extends Node
 static var WINDOW: Vector2 = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
 static var NODE: Node
 
-static var CHARACTER_INDEXES: Array[int] = [0, 1]
+static var MODE: int = -1
 
-static var MODE: int = 0 # 0: arcade, 1: survival, 2: free battle, 3: training
+static var ARCADE_LEVEL: int = 0
+static var ARCADE_PLAYER_CHARACTER_INDEX: int = 0
+static var ARCADE_RIVAL_CHARACTER_INDEXES: Array[int] = []
 
-func _ready():
+func _init():
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 1, 0.75))
 	NODE = self
 	NODE.add_child(Main.Title.new())
@@ -32,7 +34,7 @@ static func button_new(main: bool) -> Button:
 	return button
 
 class Title extends Node:
-	func _ready() -> void:
+	func _init() -> void:
 		add_child(Main.label_new())
 
 		var button = Main.button_new(true)

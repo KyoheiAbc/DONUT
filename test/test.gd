@@ -109,7 +109,7 @@ func _ready() -> void:
 		donut.queue_free()
 	all_donuts.clear()
 
-	rival = Rival.new(100, [2], 180)
+	rival = Rival.new(0, 100, [2], 180)
 	add_child(rival)
 	var reduced = 0
 	assert(rival.reduce_hp(10) == 10)
@@ -123,7 +123,7 @@ func _ready() -> void:
 
 	rival.queue_free()
 
-	rival = Rival.new(100, [2], 180)
+	rival = Rival.new(0, 100, [2], 180)
 	add_child(rival)
 
 	for i in range(1200):
@@ -163,7 +163,7 @@ func _ready() -> void:
 
 
 	rival.queue_free()
-	rival = Rival.new(100, [1, 2, 3], 180)
+	rival = Rival.new(0, 100, [1, 2, 3], 180)
 	add_child(rival)
 	rival.signal_debug.connect(func(msg: String) -> void:
 		pass

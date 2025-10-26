@@ -22,11 +22,11 @@ var target_index: int = -1
 
 var map = [[-1, -1, -1, -1, -1, -1, -1, -1, -1]]
 
-func _init(is_single: bool) -> void:
-	map[0][Main.CHARACTER_INDEXES[0]] = 0
-
-	if not is_single:
-		map[0][Main.CHARACTER_INDEXES[1]] = 1
+func _init() -> void:
+	var is_single: bool = false
+	if Main.MODE == 0:
+		map[0][Main.ARCADE_PLAYER_CHARACTER_INDEX] = 0
+		is_single = true
 
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
@@ -61,15 +61,10 @@ func _init(is_single: bool) -> void:
 	var button = Main.button_new(true)
 	add_child(button)
 	button.pressed.connect(func() -> void:
-		cursors[0].color = Color.from_hsv(0, 1, 1, 1)
-		Main.CHARACTER_INDEXES[0] = Array2D.get_position_value(map, 0)
-		if not is_single:
-			Main.CHARACTER_INDEXES[1] = Array2D.get_position_value(map, 1)
-		self.queue_free()
 		if Main.MODE == 0:
+			Main.ARCADE_PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
 			Main.NODE.add_child(Arcade.new())
-		else:
-			Main.NODE.add_child(Option.new())
+		self.queue_free()
 	)
 
 	var button_back = Main.button_new(false)

@@ -23,49 +23,40 @@ var is_damaging: bool = false
 
 var ready_go_timer: Timer = Timer.new()
 
-func _init(parent_node: Node) -> void:
-	self.parent_node = parent_node
-
-	if parent_node is Arcade:
-		var arcade = parent_node as Arcade
-		rival = Arcade.rival_new_from_level(arcade.level)
-	elif parent_node is Option:
-		var option = parent_node as Option
-		rival = Arcade.rival_new_from_level(option.level - 1)
-
 
 func _ready():
-	var button_back = Main.button_new(false)
-	add_child(button_back)
-	button_back.pressed.connect(func() -> void:
-		if not parent_node == Main.NODE:
-			parent_node.queue_free()
-		else:
-			self.queue_free()
-		Main.NODE.add_child(Character.new(true))
-	)
-
 	var button_reset = Main.button_new(false)
 	add_child(button_reset)
 	button_reset.text = "RESET"
-	button_reset.position = Vector2(2000 - button_reset.size.x - 16, 16)
+	button_reset.position = Vector2(2000 - 16 - button_reset.size.x, 16)
 	button_reset.pressed.connect(func() -> void:
-		var parent_node = self.get_parent()
 		self.queue_free()
-		parent_node.add_child(Game.new(parent_node))
+		Main.NODE.add_child(Game.new())
+	)
+
+	var button_quit = Main.button_new(false)
+	add_child(button_quit)
+	button_quit.text = "BACK"
+	button_quit.position = Vector2(16, 16)
+	button_quit.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Mode.new())
 	)
 
 	var player_sprite_node = Node2D.new()
 	add_child(player_sprite_node)
 	player_sprite_node.position = Vector2(700, 750)
 	player_sprite_node.add_child(player_sprite)
-	player_sprite.texture = Character.SPRITES[Main.CHARACTER_INDEXES[0]]
+	if Main.MODE == 0:
+		player_sprite.texture = Character.SPRITES[Main.ARCADE_PLAYER_CHARACTER_INDEX]
 
 	add_child(next_colors)
 	next_donuts_pair()
 
 	add_child(cleaner)
 
+	if Main.MODE == 0:
+		rival = Arcade.rival_new_from_level(Main.ARCADE_LEVEL)
 	add_child(rival)
 
 	add_child(score_slider)
@@ -262,27 +253,6 @@ func game_over(is_player: bool) -> void:
 	add_child(label)
 	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
 
-	var button = Main.button_new(true)
-	add_child(button)
-	button.text = "END" if is_player else "NEXT"
-	button.pressed.connect(func() -> void:
-		if parent_node == null:
-			self.queue_free()
-			Main.NODE.add_child(Main.Title.new())
-			return
-		if parent_node is Arcade:
-			if is_player:
-				parent_node.queue_free()
-				Main.NODE.add_child(Main.Title.new())
-			else:
-				self.queue_free()
-				var arcade = parent_node as Arcade
-				arcade.next()
-		else:
-			self.queue_free()
-			Main.NODE.add_child(Mode.new())
-	)
-
 	if is_player:
 		rival.sprite.jump(false)
 		rival.sprite.hop(-1, 0.25)
@@ -291,6 +261,23 @@ func game_over(is_player: bool) -> void:
 		player_sprite.jump(true)
 		player_sprite.hop(-1, 0.25)
 		rival.sprite.rotation(true)
+
+	if Main.MODE == 0:
+		if not is_player:
+			if Main.ARCADE_LEVEL == 7:
+				label.queue_free()
+				var label_final = Main.label_new()
+				add_child(label_final)
+				label_final.text = "ALL CLEAR!"
+				return
+			Main.ARCADE_LEVEL += 1
+			var button_next = Main.button_new(true)
+			add_child(button_next)
+			button_next.text = "NEXT"
+			button_next.pressed.connect(func() -> void:
+				self.queue_free()
+				Main.NODE.add_child(Arcade.new())
+			)
 
 class ActionSprite extends Sprite2D:
 	var tween: Tween = null
