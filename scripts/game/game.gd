@@ -194,6 +194,7 @@ func next_donuts_pair() -> void:
 		game_over(true)
 
 func setup_input() -> void:
+	input_handler.threshold = InputHandler.THRESHOLD
 	add_child(input_handler)
 	input_handler.direction.connect(func(direction: Vector2) -> void:
 		if donuts_pair == null:
