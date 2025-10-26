@@ -42,15 +42,15 @@ func reduce_hp(amount: int) -> int:
 
 static func rival_new_from_level(level: int, index: int) -> Rival:
 	match level:
-		0: return Rival.new(index, 1, [1], 6.2 * 60)
-		1: return Rival.new(index, 1, [1, 2, 2], 5.4 * 60)
-		2: return Rival.new(index, 1, [1, 2, 2], 4.6 * 60)
-		3: return Rival.new(index, 1, [1, 2, 2, 3, 3, 3], 3.8 * 60)
-		4: return Rival.new(index, 1, [1, 2, 2, 3, 3, 3], 3.0 * 60)
-		5: return Rival.new(index, 1, [1, 2, 2, 3, 3, 3], 2.6 * 60)
-		6: return Rival.new(index, 1, [3, 4, 4, 5, 5, 5], 2.2 * 60)
-		7: return Rival.new(index, 1, [3, 4, 4, 5, 5, 5], 1.8 * 60)
-		8: return Rival.new(index, 1, [3, 5, 5, 7, 7, 7], 1.4 * 60)
+		0: return Rival.new(index, 16, [1], 6.2 * 60)
+		1: return Rival.new(index, 32, [1, 2, 2], 5.4 * 60)
+		2: return Rival.new(index, 32, [1, 2, 2], 4.6 * 60)
+		3: return Rival.new(index, 64, [1, 2, 2, 3, 3, 3], 3.8 * 60)
+		4: return Rival.new(index, 64, [1, 2, 2, 3, 3, 3], 3.0 * 60)
+		5: return Rival.new(index, 64, [1, 2, 2, 3, 3, 3], 2.6 * 60)
+		6: return Rival.new(index, 128, [3, 4, 4, 5, 5, 5], 2.2 * 60)
+		7: return Rival.new(index, 128, [3, 4, 4, 5, 5, 5], 1.8 * 60)
+		8: return Rival.new(index, 256, [3, 5, 5, 7, 7, 7], 1.4 * 60)
 	return null
 	
 static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
