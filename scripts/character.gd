@@ -27,6 +27,9 @@ func _init() -> void:
 	if Main.MODE == 0:
 		map[0][Main.ARCADE_PLAYER_CHARACTER_INDEX] = 0
 		is_single = true
+	elif Main.MODE == 1:
+		map[0][Main.SURVIVAL_PLAYER_CHARACTER_INDEX] = 0
+		is_single = true
 	elif Main.MODE == 2:
 		map[0][Main.FREE_BATTLE_PLAYER_CHARACTER_INDEX] = 0
 		map[0][Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX] = 1
@@ -75,6 +78,15 @@ func _init() -> void:
 					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
 			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
 			Main.NODE.add_child(Arcade.new())
+		elif Main.MODE == 1:
+			Main.SURVIVAL_PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
+			Main.SURVIVAL_RIVAL_CHARACTER_INDEXES.clear()
+			for i in range(0, Character.SPRITES.size()):
+				if i != Main.SURVIVAL_PLAYER_CHARACTER_INDEX:
+					Main.SURVIVAL_RIVAL_CHARACTER_INDEXES.append(i)
+			Main.SURVIVAL_RIVAL_CHARACTER_INDEXES.shuffle()
+			Main.SURVIVAL_LEVEL = 0
+			Main.NODE.add_child(Game.new())
 		elif Main.MODE == 2:
 			Main.FREE_BATTLE_PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
 			Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX = Array2D.get_position_value(map, 1)

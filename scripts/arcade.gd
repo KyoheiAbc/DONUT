@@ -1,19 +1,6 @@
 class_name Arcade
 extends Node
 
-static func rival_new_from_level(level: int) -> Rival:
-	match level:
-		0: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 16, [1], 6.2 * 60)
-		1: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 32, [1, 2, 2], 5.4 * 60)
-		2: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 32, [1, 2, 2], 4.6 * 60)
-		3: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 64, [1, 2, 2, 3, 3, 3], 3.8 * 60)
-		4: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 64, [1, 2, 2, 3, 3, 3], 3.0 * 60)
-		5: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 64, [1, 2, 2, 3, 3, 3], 2.6 * 60)
-		6: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 128, [3, 4, 4, 5, 5, 5], 2.2 * 60)
-		7: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 128, [3, 4, 4, 5, 5, 5], 1.8 * 60)
-		8: return Rival.new(Main.ARCADE_RIVAL_CHARACTER_INDEXES[level], 256, [3, 5, 5, 7, 7, 7], 1.4 * 60)
-	return null
-
 func _ready() -> void:
 	var sprite_a = Sprite2D.new()
 	add_child(sprite_a)

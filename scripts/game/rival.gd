@@ -34,12 +34,25 @@ func reduce_hp(amount: int) -> int:
 	if hp_slider_tween:
 		hp_slider_tween.kill()
 	hp_slider_tween = create_tween()
-	hp_slider_tween.tween_property(hp_slider, "value", hp_slider.max_value * hp / hp_max, 1.5)
+	hp_slider_tween.tween_property(hp_slider, "value", hp_slider.max_value * hp / hp_max, 3)
 
 	frame_count -= 60
 	emit_signal("signal_debug", "took %d damage, hp: %d" % [amount, hp])
 	return amount
 
+static func rival_new_from_level(level: int, index: int) -> Rival:
+	match level:
+		0: return Rival.new(index, 1, [1], 6.2 * 60)
+		1: return Rival.new(index, 1, [1, 2, 2], 5.4 * 60)
+		2: return Rival.new(index, 1, [1, 2, 2], 4.6 * 60)
+		3: return Rival.new(index, 1, [1, 2, 2, 3, 3, 3], 3.8 * 60)
+		4: return Rival.new(index, 1, [1, 2, 2, 3, 3, 3], 3.0 * 60)
+		5: return Rival.new(index, 1, [1, 2, 2, 3, 3, 3], 2.6 * 60)
+		6: return Rival.new(index, 1, [3, 4, 4, 5, 5, 5], 2.2 * 60)
+		7: return Rival.new(index, 1, [3, 4, 4, 5, 5, 5], 1.8 * 60)
+		8: return Rival.new(index, 1, [3, 5, 5, 7, 7, 7], 1.4 * 60)
+	return null
+	
 static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
 	var choices_array: Array[int] = [1, 2, 2, 3, 3, 3]
 	match max_combo:
@@ -77,7 +90,6 @@ func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_co
 
 	attack_gauge.value = 0
 
-	print("Rival initialized: HP=%d, max_combo_choices_array=%s, cool_count_to_one_combo=%d" % [hp_max, str(max_combo_choices_array), cool_count_to_one_combo])
 func process():
 	frame_count += 1
 	if is_cool:

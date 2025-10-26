@@ -19,6 +19,11 @@ func _init() -> void:
 	add_child(button_survival)
 	button_survival.text = "SURVIVAL"
 	button_survival.position.y = Main.WINDOW.y * 0.4 - button_survival.size.y / 2
+	button_survival.pressed.connect(func() -> void:
+		Main.MODE = 1
+		self.queue_free()
+		Main.NODE.add_child(Character.new())
+	)
 
 	var button_free_battle = Main.button_new(true)
 	add_child(button_free_battle)

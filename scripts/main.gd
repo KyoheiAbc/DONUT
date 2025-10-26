@@ -10,6 +10,10 @@ static var ARCADE_LEVEL: int = 0
 static var ARCADE_PLAYER_CHARACTER_INDEX: int = 0
 static var ARCADE_RIVAL_CHARACTER_INDEXES: Array[int] = []
 
+static var SURVIVAL_LEVEL: int = 0
+static var SURVIVAL_PLAYER_CHARACTER_INDEX: int = 0
+static var SURVIVAL_RIVAL_CHARACTER_INDEXES: Array[int] = []
+
 static var FREE_BATTLE_PLAYER_CHARACTER_INDEX: int = 0
 static var FREE_BATTLE_RIVAL_CHARACTER_INDEX: int = 1
 static var FREE_BATTLE_RIVAL_HP: int = 64
