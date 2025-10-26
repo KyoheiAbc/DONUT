@@ -40,6 +40,18 @@ func reduce_hp(amount: int) -> int:
 	emit_signal("signal_debug", "took %d damage, hp: %d" % [amount, hp])
 	return amount
 
+static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
+	var choices_array: Array[int] = [1, 2, 2, 3, 3, 3]
+	match max_combo:
+		1: choices_array = [1]
+		2: choices_array = [1, 2, 2]
+		3: choices_array = [1, 2, 2, 3, 3, 3]
+		4: choices_array = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+		5: choices_array = [3, 4, 4, 5, 5, 5]
+		6: choices_array = [3, 4, 4, 5, 5, 5, 6, 6, 6, 6]
+		7: choices_array = [3, 5, 5, 7, 7, 7]
+	return choices_array
+
 func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_count_to_one_combo: int) -> void:
 	self.hp_max = hp_max
 	hp = hp_max
@@ -65,6 +77,7 @@ func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_co
 
 	attack_gauge.value = 0
 
+	print("Rival initialized: HP=%d, max_combo_choices_array=%s, cool_count_to_one_combo=%d" % [hp_max, str(max_combo_choices_array), cool_count_to_one_combo])
 func process():
 	frame_count += 1
 	if is_cool:

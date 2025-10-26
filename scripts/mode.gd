@@ -11,11 +11,6 @@ func _init() -> void:
 	button_arcade.pressed.connect(func() -> void:
 		Main.MODE = 0
 		Main.ARCADE_LEVEL = 0
-		Main.ARCADE_RIVAL_CHARACTER_INDEXES.clear()
-		for i in range(0, Character.SPRITES.size()):
-			if i != Main.ARCADE_PLAYER_CHARACTER_INDEX:
-				Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
-		Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
 		self.queue_free()
 		Main.NODE.add_child(Character.new())
 	)
@@ -29,11 +24,21 @@ func _init() -> void:
 	add_child(button_free_battle)
 	button_free_battle.text = "FREE BATTLE"
 	button_free_battle.position.y = Main.WINDOW.y * 0.6 - button_free_battle.size.y / 2
+	button_free_battle.pressed.connect(func() -> void:
+		Main.MODE = 2
+		self.queue_free()
+		Main.NODE.add_child(Character.new())
+	)
 
 	var button_training = Main.button_new(true)
 	add_child(button_training)
 	button_training.text = "TRAINING"
 	button_training.position.y = Main.WINDOW.y * 0.8 - button_training.size.y / 2
+	button_training.pressed.connect(func() -> void:
+		Main.MODE = 3
+		self.queue_free()
+		Main.NODE.add_child(Character.new())
+	)
 
 	var button_back = Main.button_new(false)
 	add_child(button_back)

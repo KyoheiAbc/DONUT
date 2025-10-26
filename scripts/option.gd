@@ -10,7 +10,7 @@ class CustomHSlider extends HSlider:
 		value = initial_value
 		self.step = step
 
-		size = Vector2(800, 250)
+		size = Vector2(700, 250)
 
 		var label = Label.new()
 		add_child(label)
@@ -25,23 +25,38 @@ class CustomHSlider extends HSlider:
 
 
 func _init():
-	var slider = CustomHSlider.new("LEVEL", level, 1, 9, 1)
-	add_child(slider)
-	slider.position = Vector2(Main.WINDOW.x * 0.5, Main.WINDOW.y * 0.5) - slider.size * 0.5
-	slider.value_changed.connect(func(value):
-		level = int(value)
+	var slider_hp = CustomHSlider.new("HP", Main.FREE_BATTLE_RIVAL_HP, 16, 256, 16)
+	add_child(slider_hp)
+	slider_hp.position = Vector2(Main.WINDOW.x * 0.5, 200) - slider_hp.size / 2
+	slider_hp.value_changed.connect(func(value):
+		Main.FREE_BATTLE_RIVAL_HP = int(value)
+	)
+	var slider_max_combo = CustomHSlider.new("Max Combo", Main.FREE_BATTLE_RIVAL_MAX_COMBO, 1, 7, 1)
+	add_child(slider_max_combo)
+	slider_max_combo.position = Vector2(Main.WINDOW.x * 0.5, 450) - slider_max_combo.size / 2
+	slider_max_combo.value_changed.connect(func(value):
+		Main.FREE_BATTLE_RIVAL_MAX_COMBO = int(value)
+	)
+
+	var slider_cool_count = CustomHSlider.new("Cool Count", Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO, 60, 540, 10)
+	add_child(slider_cool_count)
+	slider_cool_count.position = Vector2(Main.WINDOW.x * 0.5, 700) - slider_cool_count.size / 2
+	slider_cool_count.value_changed.connect(func(value):
+		Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO = int(value)
 	)
 
 	var button_back = Main.button_new(false)
 	add_child(button_back)
 	button_back.pressed.connect(func() -> void:
 		self.queue_free()
-		Main.NODE.add_child(Character.new())
+		if Main.MODE == 2:
+			Main.NODE.add_child(Character.new())
 	)
 
 	var button_start = Main.button_new(true)
 	add_child(button_start)
 	button_start.pressed.connect(func() -> void:
 		self.queue_free()
-		Main.NODE.add_child(Game.new(self))
+		if Main.MODE == 2:
+			Main.NODE.add_child(Game.new())
 	)
