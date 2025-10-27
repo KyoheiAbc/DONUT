@@ -7,20 +7,14 @@ static var NODE: Node
 static var MODE: int = -1
 
 static var ARCADE_LEVEL: int = 0
-static var ARCADE_PLAYER_CHARACTER_INDEX: int = 0
+static var PLAYER_CHARACTER_INDEX: int = 0
 static var ARCADE_RIVAL_CHARACTER_INDEXES: Array[int] = []
 
-static var SURVIVAL_LEVEL: int = 0
-static var SURVIVAL_PLAYER_CHARACTER_INDEX: int = 0
-static var SURVIVAL_RIVAL_CHARACTER_INDEXES: Array[int] = []
-
-static var FREE_BATTLE_PLAYER_CHARACTER_INDEX: int = 0
 static var FREE_BATTLE_RIVAL_CHARACTER_INDEX: int = 1
 static var FREE_BATTLE_RIVAL_HP: int = 64
 static var FREE_BATTLE_RIVAL_MAX_COMBO: int = 3
 static var FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO: int = 180
 
-static var TRAINING_PLAYER_CHARACTER_INDEX: int = 0
 
 func _init():
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 1, 0.75))

@@ -15,15 +15,6 @@ func _init() -> void:
 		Main.NODE.add_child(Character.new())
 	)
 
-	var button_survival = Main.button_new(true)
-	add_child(button_survival)
-	button_survival.text = "SURVIVAL"
-	button_survival.position.y = Main.WINDOW.y * 0.35 - button_survival.size.y / 2
-	button_survival.pressed.connect(func() -> void:
-		Main.MODE = 1
-		self.queue_free()
-		Main.NODE.add_child(Character.new())
-	)
 
 	var button_free_battle = Main.button_new(true)
 	add_child(button_free_battle)
@@ -35,23 +26,14 @@ func _init() -> void:
 		Main.NODE.add_child(Character.new())
 	)
 
-	var button_training = Main.button_new(true)
-	add_child(button_training)
-	button_training.text = "TRAINING"
-	button_training.position.y = Main.WINDOW.y * 0.65 - button_training.size.y / 2
-	button_training.pressed.connect(func() -> void:
-		Main.MODE = 3
-		self.queue_free()
-		Main.NODE.add_child(Character.new())
-	)
 
-	var button_system = Main.button_new(true)
-	add_child(button_system)
-	button_system.text = "SYSTEM"
-	button_system.position.y = Main.WINDOW.y * 0.8 - button_training.size.y / 2
-	button_system.pressed.connect(func() -> void:
+	var button_option = Main.button_new(true)
+	add_child(button_option)
+	button_option.text = "OPTION"
+	button_option.position.y = Main.WINDOW.y * 0.8 - button_option.size.y / 2
+	button_option.pressed.connect(func() -> void:
 		self.queue_free()
-		Main.NODE.add_child(System.new())
+		Main.NODE.add_child(Option.new())
 	)
 
 	var button_back = Main.button_new(false)

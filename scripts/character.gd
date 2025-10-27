@@ -25,17 +25,15 @@ var map = [[-1, -1, -1, -1, -1, -1, -1, -1, -1]]
 func _init() -> void:
 	var is_single: bool = false
 	if Main.MODE == 0:
-		map[0][Main.ARCADE_PLAYER_CHARACTER_INDEX] = 0
-		is_single = true
-	elif Main.MODE == 1:
-		map[0][Main.SURVIVAL_PLAYER_CHARACTER_INDEX] = 0
+		map[0][Main.PLAYER_CHARACTER_INDEX] = 0
 		is_single = true
 	elif Main.MODE == 2:
-		map[0][Main.FREE_BATTLE_PLAYER_CHARACTER_INDEX] = 0
+		map[0][Main.PLAYER_CHARACTER_INDEX] = 0
+		if Main.PLAYER_CHARACTER_INDEX == Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX:
+			Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX = Main.PLAYER_CHARACTER_INDEX - 1
+			if Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX < 0:
+				Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX = Main.PLAYER_CHARACTER_INDEX + 1
 		map[0][Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX] = 1
-	elif Main.MODE == 3:
-		map[0][Main.TRAINING_PLAYER_CHARACTER_INDEX] = 0
-		is_single = true
 
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
@@ -71,29 +69,17 @@ func _init() -> void:
 	add_child(button)
 	button.pressed.connect(func() -> void:
 		if Main.MODE == 0:
-			Main.ARCADE_PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
+			Main.PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
 			Main.ARCADE_RIVAL_CHARACTER_INDEXES.clear()
 			for i in range(0, Character.SPRITES.size()):
-				if i != Main.ARCADE_PLAYER_CHARACTER_INDEX:
+				if i != Main.PLAYER_CHARACTER_INDEX:
 					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
 			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
 			Main.NODE.add_child(Arcade.new())
-		elif Main.MODE == 1:
-			Main.SURVIVAL_PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
-			Main.SURVIVAL_RIVAL_CHARACTER_INDEXES.clear()
-			for i in range(0, Character.SPRITES.size()):
-				if i != Main.SURVIVAL_PLAYER_CHARACTER_INDEX:
-					Main.SURVIVAL_RIVAL_CHARACTER_INDEXES.append(i)
-			Main.SURVIVAL_RIVAL_CHARACTER_INDEXES.shuffle()
-			Main.SURVIVAL_LEVEL = 0
-			Main.NODE.add_child(Game.new())
 		elif Main.MODE == 2:
-			Main.FREE_BATTLE_PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
+			Main.PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
 			Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX = Array2D.get_position_value(map, 1)
 			Main.NODE.add_child(Option.new())
-		elif Main.MODE == 3:
-			Main.TRAINING_PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
-			Main.NODE.add_child(Game.new())
 		self.queue_free()
 	)
 

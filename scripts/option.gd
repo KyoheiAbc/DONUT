@@ -1,8 +1,6 @@
 class_name Option
 extends Node
 
-var level: int = 1
-
 class CustomHSlider extends HSlider:
 	func _init(text: String, initial_value: float, min: float, max: float, step: float) -> void:
 		min_value = min
@@ -59,4 +57,11 @@ func _init():
 		self.queue_free()
 		if Main.MODE == 2:
 			Main.NODE.add_child(Game.new())
+	)
+
+	var slider_input_threshold = CustomHSlider.new("Input Threshold", InputHandler.THRESHOLD, 16, 128, 16)
+	add_child(slider_input_threshold)
+	slider_input_threshold.position = Vector2(1000, 500) - slider_input_threshold.size / 2
+	slider_input_threshold.value_changed.connect(func(value):
+		InputHandler.THRESHOLD = int(value)
 	)

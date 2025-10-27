@@ -47,14 +47,7 @@ func _ready():
 	add_child(player_sprite_node)
 	player_sprite_node.position = Vector2(700, 750)
 	player_sprite_node.add_child(player_sprite)
-	if Main.MODE == 0:
-		player_sprite.texture = Character.SPRITES[Main.ARCADE_PLAYER_CHARACTER_INDEX]
-	elif Main.MODE == 1:
-		player_sprite.texture = Character.SPRITES[Main.SURVIVAL_PLAYER_CHARACTER_INDEX]
-	elif Main.MODE == 2:
-		player_sprite.texture = Character.SPRITES[Main.FREE_BATTLE_PLAYER_CHARACTER_INDEX]
-	elif Main.MODE == 3:
-		player_sprite.texture = Character.SPRITES[Main.TRAINING_PLAYER_CHARACTER_INDEX]
+	player_sprite.texture = Character.SPRITES[Main.PLAYER_CHARACTER_INDEX]
 
 	add_child(next_colors)
 	next_donuts_pair()
@@ -63,8 +56,6 @@ func _ready():
 
 	if Main.MODE == 0:
 		rival = Rival.rival_new_from_level(Main.ARCADE_LEVEL, Main.ARCADE_RIVAL_CHARACTER_INDEXES[Main.ARCADE_LEVEL])
-	elif Main.MODE == 1:
-		rival = Rival.rival_new_from_level(Main.SURVIVAL_LEVEL, Main.SURVIVAL_RIVAL_CHARACTER_INDEXES[Main.SURVIVAL_LEVEL])
 	elif Main.MODE == 2:
 		var index = Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX
 		var hp = Main.FREE_BATTLE_RIVAL_HP
@@ -271,20 +262,6 @@ static func combo_to_score(combo: int) -> int:
 	return total
 
 func game_over(is_player: bool) -> void:
-	if Main.MODE == 1:
-		if not is_player:
-			if Main.SURVIVAL_LEVEL == 7:
-				pass
-			else:
-				player_sprite.jump(true)
-				if rival != null:
-					rival.sprite.rotation(false)
-				Main.SURVIVAL_LEVEL += 1
-				rival.queue_free()
-				rival = Rival.rival_new_from_level(Main.SURVIVAL_LEVEL, Main.SURVIVAL_RIVAL_CHARACTER_INDEXES[Main.SURVIVAL_LEVEL])
-				add_child(rival)
-				return
-
 	set_process(false)
 
 	input_handler.queue_free()

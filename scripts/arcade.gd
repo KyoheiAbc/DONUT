@@ -4,7 +4,7 @@ extends Node
 func _ready() -> void:
 	var sprite_a = Sprite2D.new()
 	add_child(sprite_a)
-	sprite_a.texture = Character.SPRITES[Main.ARCADE_PLAYER_CHARACTER_INDEX]
+	sprite_a.texture = Character.SPRITES[Main.PLAYER_CHARACTER_INDEX]
 	sprite_a.position = Vector2(600, 250)
 	
 	var sprite_b = Sprite2D.new()
