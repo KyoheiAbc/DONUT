@@ -94,6 +94,12 @@ func _init() -> void:
 	button_start.pressed.connect(func() -> void:
 		Main.PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
 		if Main.MODE == 0:
+			Main.ARCADE_LEVEL = -1
+			Main.ARCADE_RIVAL_CHARACTER_INDEXES.clear()
+			for i in Character.SPRITES.size():
+				if i != Main.PLAYER_CHARACTER_INDEX:
+					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
+			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
 			Main.NODE.add_child(Arcade.new())
 		else:
 			Main.RIVAL_CHARACTER_INDEX = Array2D.get_position_value(map, 1)
@@ -101,15 +107,7 @@ func _init() -> void:
 		self.queue_free()
 	)
 
-	var button_back = Main.button_new()
-	add_child(button_back)
-	button_back.text = "BACK"
-	button_back.size.x = button_back.size.x * 0.8
-	button_back.position = Vector2(16, 16)
-	button_back.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Main.Initial.new())
-	)
+	add_child(Main.quit_button_new(self))
 
 func _process(_delta: float) -> void:
 	if target_index == -1:

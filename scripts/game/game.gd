@@ -51,21 +51,13 @@ func _ready():
 
 	Donut.create_walls(self, all_donuts)
 
-	var button_back = Main.button_new()
-	add_child(button_back)
-	button_back.text = "BACK"
-	button_back.size.x = button_back.size.x * 0.8
-	button_back.position = Vector2(16, 16)
-	button_back.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Main.Initial.new())
-	)
+	add_child(Main.quit_button_new(self))
 
-	var button_retry = Main.button_new()
+	var button_retry = Main.quit_button_new(self)
 	add_child(button_retry)
 	button_retry.text = "RETRY"
-	button_retry.size.x = button_retry.size.x * 0.8
 	button_retry.position = Vector2(2000 - 16 - button_retry.size.x, 16)
+	button_retry.pressed.disconnect(button_retry.pressed.get_connections()[0].callable)
 	button_retry.pressed.connect(func() -> void:
 		self.queue_free()
 		Main.NODE.add_child(Game.new())
@@ -143,13 +135,15 @@ func player_loop() -> void:
 func combo_ended() -> void:
 	score += combo_to_score(combo)
 	combo = 0
+	if rival.combo == 0:
+		rival.combo_label.text = ""
 	if score > 0:
 		var reduced = rival.reduce_hp(score)
 		if reduced > 0:
 			action_effect(true)
 		score -= reduced
 	elif score < 0:
-		if Main.MODE == 1 and IS_TRAINING_MODE:
+		if IS_TRAINING_MODE:
 			score = 0
 			action_effect(false)
 		else:
@@ -172,9 +166,6 @@ func _process(delta: float) -> void:
 	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
 	if rival.hp_slider.value <= 0:
-		if Main.MODE == 1 and IS_TRAINING_MODE:
-			rival.hp_slider.value = rival.hp_slider.max_value
-			return
 		game_over(false)
 
 func next_donuts_pair() -> void:
@@ -195,8 +186,6 @@ func setup_input() -> void:
 			all_donuts += append_donuts
 			donuts_pair = null
 			player_sprite.hop(1, 0.15)
-			if rival.combo == 0:
-				rival.combo_label.text = ""
 			combo_label.text = ""
 			return
 		if direction == Vector2.DOWN:
@@ -206,8 +195,6 @@ func setup_input() -> void:
 				all_donuts += append_donuts
 				donuts_pair = null
 				player_sprite.hop(1, 0.15)
-				if rival.combo == 0:
-					rival.combo_label.text = ""
 				combo_label.text = ""
 			return
 		
@@ -271,9 +258,6 @@ func game_over(is_player: bool) -> void:
 	var label = Main.label_new()
 	add_child(label)
 	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
-	if Main.MODE == 1 and IS_TRAINING_MODE:
-		label.text = "TRAINING FINISHED!"
-		return
 
 
 	if is_player:
@@ -297,6 +281,8 @@ func game_over(is_player: bool) -> void:
 				Main.NODE.add_child(Arcade.new())
 			)
 
+	if IS_TRAINING_MODE:
+		label.text = "TRAINING FINISHED!"
 
 class ActionSprite extends Sprite2D:
 	var tween: Tween = null
@@ -342,7 +328,7 @@ class ActionSprite extends Sprite2D:
 			tween.tween_property(self, "rotation_degrees", 360, 1)
 		await tween.finished
 		self.rotation_degrees = 0
-
+	
 func action_effect(attack: bool) -> void:
 	if attack:
 		player_sprite.jump(true)

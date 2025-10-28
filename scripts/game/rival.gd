@@ -42,15 +42,15 @@ func reduce_hp(amount: int) -> int:
 
 static func rival_new_from_level(level: int, index: int) -> Rival:
 	match level:
-		0: return Rival.new(index, 16, max_combo_to_choices_array(level + 1), 9.0 * 60)
-		1: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 6.0 * 60)
-		2: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 5.0 * 60)
-		3: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 4.0 * 60)
-		4: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 3.0 * 60)
-		5: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 2.75 * 60)
-		6: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.5 * 60)
-		7: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.25 * 60)
-		8: return Rival.new(index, 256, max_combo_to_choices_array(level + 1), 2.0 * 60)
+		0: return Rival.new(index, 16, max_combo_to_choices_array(1), 9.0 * 60)
+		1: return Rival.new(index, 32, max_combo_to_choices_array(2), 6.0 * 60)
+		2: return Rival.new(index, 32, max_combo_to_choices_array(2), 5.0 * 60)
+		3: return Rival.new(index, 64, max_combo_to_choices_array(3), 4.0 * 60)
+		4: return Rival.new(index, 64, max_combo_to_choices_array(3), 3.0 * 60)
+		5: return Rival.new(index, 64, max_combo_to_choices_array(3), 2.75 * 60)
+		6: return Rival.new(index, 128, max_combo_to_choices_array(5), 2.5 * 60)
+		7: return Rival.new(index, 128, max_combo_to_choices_array(5), 2.25 * 60)
+		8: return Rival.new(index, 256, max_combo_to_choices_array(7), 2.0 * 60)
 	return null
 	
 static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
@@ -60,9 +60,9 @@ static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
 		2: choices_array = [1, 2, 2]
 		3: choices_array = [1, 2, 2, 3, 3, 3]
 		4: choices_array = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
-		5: choices_array = [3, 4, 4, 5, 5, 5]
-		6: choices_array = [3, 4, 4, 5, 5, 5, 6, 6, 6, 6]
-		7: choices_array = [3, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 7]
+		5: choices_array = [3, 5, 5]
+		6: choices_array = [3, 5, 5, 6, 6, 6]
+		7: choices_array = [3, 5, 5, 7, 7, 7]
 	return choices_array
 
 func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_count_to_one_combo: int) -> void:

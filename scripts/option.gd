@@ -23,7 +23,7 @@ class CustomHSlider extends HSlider:
 
 
 func _init():
-	var slider_input_threshold = CustomHSlider.new("Input Threshold", InputHandler.THRESHOLD, 16, 128, 16)
+	var slider_input_threshold = CustomHSlider.new("Input Sensitivity", InputHandler.THRESHOLD, 16, 128, 16)
 	add_child(slider_input_threshold)
 	slider_input_threshold.position = Vector2(600, 250) - slider_input_threshold.size / 2
 	slider_input_threshold.value_changed.connect(func(value):
@@ -44,11 +44,12 @@ func _init():
 		Cleaner.GROUP_SIZE_TO_CLEAR = int(value)
 	)
 
-	var slider_hp = CustomHSlider.new("Rival HP", Main.FREE_BATTLE_RIVAL_HP, 16, 256, 16)
+	var slider_hp = CustomHSlider.new("Rival HP Level", log(Main.FREE_BATTLE_RIVAL_HP) / log(2), 4, 10, 1)
 	add_child(slider_hp)
 	slider_hp.position = Vector2(1400, 250) - slider_hp.size / 2
 	slider_hp.value_changed.connect(func(value):
-		Main.FREE_BATTLE_RIVAL_HP = int(value)
+		Main.FREE_BATTLE_RIVAL_HP = 2 ** int(value)
+		print(Main.FREE_BATTLE_RIVAL_HP)
 	)
 
 	var slider_max_combo = CustomHSlider.new("Rival Max Combo", Main.FREE_BATTLE_RIVAL_MAX_COMBO, 1, 7, 1)
@@ -72,12 +73,4 @@ func _init():
 		Game.IS_TRAINING_MODE = true if int(value) == 1 else false
 	)
 
-	var button_back = Main.button_new()
-	add_child(button_back)
-	button_back.text = "BACK"
-	button_back.size.x = button_back.size.x * 0.8
-	button_back.position = Vector2(16, 16)
-	button_back.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Main.Initial.new())
-	)
+	add_child(Main.quit_button_new(self))

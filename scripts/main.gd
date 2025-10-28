@@ -38,14 +38,6 @@ class Initial extends Node:
 		button_arcade.pressed.connect(func() -> void:
 			Main.MODE = 0
 			Main.PLAYER_CHARACTER_INDEX = 0
-			Main.ARCADE_LEVEL = -1
-			Main.ARCADE_RIVAL_CHARACTER_INDEXES.clear()
-			for i in Character.SPRITES.size():
-				if i != Main.PLAYER_CHARACTER_INDEX:
-					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
-			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
-			Main.RIVAL_CHARACTER_INDEX = Main.ARCADE_RIVAL_CHARACTER_INDEXES[0]
-			
 			self.queue_free()
 			Main.NODE.add_child(Character.new())
 		)
@@ -58,7 +50,6 @@ class Initial extends Node:
 			Main.MODE = 1
 			Main.PLAYER_CHARACTER_INDEX = 0
 			Main.RIVAL_CHARACTER_INDEX = 1
-		
 			self.queue_free()
 			Main.NODE.add_child(Character.new())
 		)
@@ -81,10 +72,21 @@ static func label_new() -> Label:
 	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 	return label
 
-
 static func button_new() -> Button:
 	var button = Button.new()
-	button.size = Vector2(32 * 12, 32 * 4)
+	button.size = Vector2(32 * 10, 32 * 3)
 	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.85) - button.size / 2
-	button.add_theme_font_size_override("font_size", 64)
+	button.add_theme_font_size_override("font_size", 48)
+	return button
+
+static func quit_button_new(current_class: Node) -> Button:
+	var button = Button.new()
+	button.text = "QUIT"
+	button.size = Vector2(32 * 6, 32 * 3)
+	button.position = Vector2(16, 16)
+	button.add_theme_font_size_override("font_size", 32)
+	button.pressed.connect(func() -> void:
+		current_class.queue_free()
+		Main.NODE.add_child(Main.Initial.new())
+	)
 	return button
