@@ -27,6 +27,7 @@ class Initial extends Node:
 		var label = Main.label_new()
 		add_child(label)
 		label.text = "DONUTS POP BATTLE"
+		label.position.y = (Main.WINDOW.y * 0.85 - 64) * 0.5 - label.size.y / 2
 
 		Main.MODE = -1
 
@@ -83,7 +84,7 @@ static func label_new() -> Label:
 
 static func button_new() -> Button:
 	var button = Button.new()
-	button.size = Vector2(32 * 10, 32 * 3)
-	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.9) - button.size / 2
-	button.add_theme_font_size_override("font_size", 32)
+	button.size = Vector2(32 * 12, 32 * 4)
+	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.85) - button.size / 2
+	button.add_theme_font_size_override("font_size", 64)
 	return button

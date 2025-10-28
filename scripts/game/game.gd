@@ -54,19 +54,19 @@ func _ready():
 	var button_back = Main.button_new()
 	add_child(button_back)
 	button_back.text = "BACK"
-	button_back.size = Vector2(32 * 6, 32 * 2)
+	button_back.size.x = button_back.size.x * 0.8
 	button_back.position = Vector2(16, 16)
 	button_back.pressed.connect(func() -> void:
 		self.queue_free()
 		Main.NODE.add_child(Main.Initial.new())
 	)
 
-	var button_restart = Main.button_new()
-	add_child(button_restart)
-	button_restart.text = "RESTART"
-	button_restart.size = Vector2(32 * 6, 32 * 2)
-	button_restart.position = Vector2(2000 - 16 - button_restart.size.x, 16)
-	button_restart.pressed.connect(func() -> void:
+	var button_retry = Main.button_new()
+	add_child(button_retry)
+	button_retry.text = "RETRY"
+	button_retry.size.x = button_retry.size.x * 0.8
+	button_retry.position = Vector2(2000 - 16 - button_retry.size.x, 16)
+	button_retry.pressed.connect(func() -> void:
 		self.queue_free()
 		Main.NODE.add_child(Game.new())
 	)

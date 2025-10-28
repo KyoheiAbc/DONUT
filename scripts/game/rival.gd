@@ -42,15 +42,15 @@ func reduce_hp(amount: int) -> int:
 
 static func rival_new_from_level(level: int, index: int) -> Rival:
 	match level:
-		0: return Rival.new(index, 16, [1], 6.2 * 60)
-		1: return Rival.new(index, 32, [1, 2, 2], 5.4 * 60)
-		2: return Rival.new(index, 32, [1, 2, 2], 4.6 * 60)
-		3: return Rival.new(index, 64, [1, 2, 2, 3, 3, 3], 3.8 * 60)
-		4: return Rival.new(index, 64, [1, 2, 2, 3, 3, 3], 3.0 * 60)
-		5: return Rival.new(index, 64, [1, 2, 2, 3, 3, 3], 2.7 * 60)
-		6: return Rival.new(index, 128, [3, 4, 4, 5, 5, 5], 2.4 * 60)
-		7: return Rival.new(index, 128, [3, 4, 4, 5, 5, 5], 2.1 * 60)
-		8: return Rival.new(index, 256, [3, 5, 5, 7, 7, 7], 1.8 * 60)
+		0: return Rival.new(index, 16, max_combo_to_choices_array(level + 1), 6.2 * 60)
+		1: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 5.4 * 60)
+		2: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 4.6 * 60)
+		3: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 3.8 * 60)
+		4: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 3.0 * 60)
+		5: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 2.7 * 60)
+		6: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.4 * 60)
+		7: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.1 * 60)
+		8: return Rival.new(index, 256, max_combo_to_choices_array(level + 1), 1.8 * 60)
 	return null
 	
 static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
@@ -62,7 +62,7 @@ static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
 		4: choices_array = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
 		5: choices_array = [3, 4, 4, 5, 5, 5]
 		6: choices_array = [3, 4, 4, 5, 5, 5, 6, 6, 6, 6]
-		7: choices_array = [3, 5, 5, 7, 7, 7]
+		7: choices_array = [3, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 7]
 	return choices_array
 
 func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_count_to_one_combo: int) -> void:
@@ -82,7 +82,7 @@ func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_co
 	sprite.texture = Character.SPRITES[index]
 
 	add_child(combo_label)
-	combo_label.add_theme_font_size_override("font_size", 48)
+	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
 	combo_label.position = Vector2(-400, -200)
 

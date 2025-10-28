@@ -32,19 +32,19 @@ func _init() -> void:
 		add_child(sprites.back())
 		sprites.back().scale = Vector2(0.45, 0.45)
 		sprites.back().texture = SPRITES[i]
-		sprites.back().position = Vector2(i * 200, 650)
+		sprites.back().position = Vector2(i * 200, 640)
 		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 200) / 2
 
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
 		sprites_a.back().texture = SPRITES[i]
-		sprites_a.back().position = Vector2(1000, 250) if Main.MODE == 0 else Vector2(600, 250)
+		sprites_a.back().position = Vector2(1000, 300) if Main.MODE == 0 else Vector2(600, 300)
 
 		if not Main.MODE == 0:
 			sprites_b.append(Sprite2D.new())
 			add_child(sprites_b[i])
 			sprites_b.back().texture = SPRITES[i]
-			sprites_b.back().position = Vector2(1400, 250)
+			sprites_b.back().position = Vector2(1400, 300)
 
 	for i in range(2):
 		var cursor = ColorRect.new()
@@ -104,7 +104,7 @@ func _init() -> void:
 	var button_back = Main.button_new()
 	add_child(button_back)
 	button_back.text = "BACK"
-	button_back.size = Vector2(32 * 6, 32 * 2)
+	button_back.size.x = button_back.size.x * 0.8
 	button_back.position = Vector2(16, 16)
 	button_back.pressed.connect(func() -> void:
 		self.queue_free()

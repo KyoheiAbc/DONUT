@@ -37,7 +37,7 @@ func _init():
 		Game.COLOR_NUMBER = int(value)
 	)
 
-	var slider_clear_group_size = CustomHSlider.new("Clear Group Size", Cleaner.GROUP_SIZE_TO_CLEAR, 1, 5, 1)
+	var slider_clear_group_size = CustomHSlider.new("Clear Group Size", Cleaner.GROUP_SIZE_TO_CLEAR, 3, 5, 1)
 	add_child(slider_clear_group_size)
 	slider_clear_group_size.position = Vector2(600, 650) - slider_clear_group_size.size / 2
 	slider_clear_group_size.value_changed.connect(func(value):
