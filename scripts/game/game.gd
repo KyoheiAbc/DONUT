@@ -149,13 +149,17 @@ func combo_ended() -> void:
 			action_effect(true)
 		score -= reduced
 	elif score < 0:
-		if not is_damaging:
-			var garbage_count = min(18, -score)
-			var spawn_count = Donut.spawn_garbage(garbage_count, all_donuts, self)
-			score += spawn_count
-			is_damaging = true
-			return
+		if Main.MODE == 1 and IS_TRAINING_MODE:
+			score = 0
 			action_effect(false)
+		else:
+			if not is_damaging:
+				var garbage_count = min(18, -score)
+				var spawn_count = Donut.spawn_garbage(garbage_count, all_donuts, self)
+				score += spawn_count
+				is_damaging = true
+				action_effect(false)
+				return
 
 	next_donuts_pair()
 	is_damaging = false
@@ -168,6 +172,9 @@ func _process(delta: float) -> void:
 	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
 	if rival.hp_slider.value <= 0:
+		if Main.MODE == 1 and IS_TRAINING_MODE:
+			rival.hp_slider.value = rival.hp_slider.max_value
+			return
 		game_over(false)
 
 func next_donuts_pair() -> void:
@@ -264,6 +271,10 @@ func game_over(is_player: bool) -> void:
 	var label = Main.label_new()
 	add_child(label)
 	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
+	if Main.MODE == 1 and IS_TRAINING_MODE:
+		label.text = "TRAINING FINISHED!"
+		return
+
 
 	if is_player:
 		rival.sprite.jump(false)

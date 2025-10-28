@@ -34,7 +34,7 @@ func reduce_hp(amount: int) -> int:
 	if hp_slider_tween:
 		hp_slider_tween.kill()
 	hp_slider_tween = create_tween()
-	hp_slider_tween.tween_property(hp_slider, "value", hp_slider.max_value * hp / hp_max, 3)
+	hp_slider_tween.tween_property(hp_slider, "value", hp_slider.max_value * hp / hp_max, 1)
 
 	frame_count -= 60
 	emit_signal("signal_debug", "took %d damage, hp: %d" % [amount, hp])
@@ -42,15 +42,15 @@ func reduce_hp(amount: int) -> int:
 
 static func rival_new_from_level(level: int, index: int) -> Rival:
 	match level:
-		0: return Rival.new(index, 16, max_combo_to_choices_array(level + 1), 6.2 * 60)
-		1: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 5.4 * 60)
-		2: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 4.6 * 60)
-		3: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 3.8 * 60)
+		0: return Rival.new(index, 16, max_combo_to_choices_array(level + 1), 9.0 * 60)
+		1: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 6.0 * 60)
+		2: return Rival.new(index, 32, max_combo_to_choices_array(level + 1), 5.0 * 60)
+		3: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 4.0 * 60)
 		4: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 3.0 * 60)
-		5: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 2.7 * 60)
-		6: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.4 * 60)
-		7: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.1 * 60)
-		8: return Rival.new(index, 256, max_combo_to_choices_array(level + 1), 1.8 * 60)
+		5: return Rival.new(index, 64, max_combo_to_choices_array(level + 1), 2.75 * 60)
+		6: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.5 * 60)
+		7: return Rival.new(index, 128, max_combo_to_choices_array(level + 1), 2.25 * 60)
+		8: return Rival.new(index, 256, max_combo_to_choices_array(level + 1), 2.0 * 60)
 	return null
 	
 static func max_combo_to_choices_array(max_combo: int) -> Array[int]:

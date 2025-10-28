@@ -58,7 +58,7 @@ func _init():
 		Main.FREE_BATTLE_RIVAL_MAX_COMBO = int(value)
 	)
 
-	var slider_cool_count = CustomHSlider.new("Rival Cool Count", Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO, 60, 540, 10)
+	var slider_cool_count = CustomHSlider.new("Rival Cool Count", Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO, 60, 540, 15)
 	add_child(slider_cool_count)
 	slider_cool_count.position = Vector2(1400, 650) - slider_cool_count.size / 2
 	slider_cool_count.value_changed.connect(func(value):
@@ -75,7 +75,7 @@ func _init():
 	var button_back = Main.button_new()
 	add_child(button_back)
 	button_back.text = "BACK"
-	button_back.size = Vector2(32 * 6, 32 * 2)
+	button_back.size.x = button_back.size.x * 0.8
 	button_back.position = Vector2(16, 16)
 	button_back.pressed.connect(func() -> void:
 		self.queue_free()
