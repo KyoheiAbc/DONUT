@@ -3,7 +3,7 @@ extends Node
 
 static var COLOR_NUMBER = 4
 
-static var IS_TRAINING_MODE = false
+static var IS_TRAINING = false
 
 var donuts_pair: DonutsPair = null
 var next_colors: NextColors = NextColors.new()
@@ -144,7 +144,7 @@ func combo_ended() -> void:
 			action_effect(true)
 		score -= reduced
 	elif score < 0:
-		if IS_TRAINING_MODE:
+		if IS_TRAINING:
 			score = 0
 			action_effect(false)
 		else:
@@ -282,7 +282,7 @@ func game_over(is_player: bool) -> void:
 				Main.NODE.add_child(Arcade.new())
 			)
 
-	if IS_TRAINING_MODE:
+	if IS_TRAINING:
 		label.text = "TRAINING FINISHED!"
 
 class ActionSprite extends Sprite2D:

@@ -66,11 +66,11 @@ func _init():
 		Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO = int(value)
 	)
 
-	var slider_is_training_mode = CustomHSlider.new("Training Mode", 1 if Game.IS_TRAINING_MODE else 0, 0, 1, 1)
-	add_child(slider_is_training_mode)
-	slider_is_training_mode.position = Vector2(1400, 850) - slider_is_training_mode.size / 2
-	slider_is_training_mode.value_changed.connect(func(value):
-		Game.IS_TRAINING_MODE = true if int(value) == 1 else false
+	var slider_IS_TRAINING = CustomHSlider.new("Training", 1 if Game.IS_TRAINING else 0, 0, 1, 1)
+	add_child(slider_IS_TRAINING)
+	slider_IS_TRAINING.position = Vector2(1400, 850) - slider_IS_TRAINING.size / 2
+	slider_IS_TRAINING.value_changed.connect(func(value):
+		Game.IS_TRAINING = true if int(value) == 1 else false
 	)
 
 	add_child(Main.quit_button_new(self))
