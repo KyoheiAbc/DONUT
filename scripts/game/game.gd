@@ -3,7 +3,7 @@ extends Node
 
 static var COLOR_NUMBER = 4
 
-var parent_node: Node = null
+static var IS_TRAINING_MODE = false
 
 var donuts_pair: DonutsPair = null
 var next_colors: NextColors = NextColors.new()
@@ -23,26 +23,7 @@ var is_damaging: bool = false
 
 var ready_go_timer: Timer = Timer.new()
 
-
 func _ready():
-	var button_reset = Main.button_new(false)
-	add_child(button_reset)
-	button_reset.text = "RESET"
-	button_reset.position = Vector2(2000 - 16 - button_reset.size.x, 16)
-	button_reset.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Game.new())
-	)
-
-	var button_quit = Main.button_new(false)
-	add_child(button_quit)
-	button_quit.text = "BACK"
-	button_quit.position = Vector2(16, 16)
-	button_quit.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Mode.new())
-	)
-
 	var player_sprite_node = Node2D.new()
 	add_child(player_sprite_node)
 	player_sprite_node.position = Vector2(700, 750)
@@ -55,17 +36,14 @@ func _ready():
 	add_child(cleaner)
 
 	if Main.MODE == 0:
-		rival = Rival.rival_new_from_level(Main.ARCADE_LEVEL, Main.ARCADE_RIVAL_CHARACTER_INDEXES[Main.ARCADE_LEVEL])
-	elif Main.MODE == 2:
-		var index = Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX
+		rival = Rival.rival_new_from_level(Main.ARCADE_LEVEL, Main.RIVAL_CHARACTER_INDEX)
+	elif Main.MODE == 1:
+		var index = Main.RIVAL_CHARACTER_INDEX
 		var hp = Main.FREE_BATTLE_RIVAL_HP
 		var max_combo_choices_array = Rival.max_combo_to_choices_array(Main.FREE_BATTLE_RIVAL_MAX_COMBO)
 		var cool_count = Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO
 		rival = Rival.new(index, hp, max_combo_choices_array, cool_count)
-	elif Main.MODE == 3:
-		rival = null
-	if rival != null:
-		add_child(rival)
+	add_child(rival)
 
 	add_child(score_slider)
 	score_slider.position = Vector2(1650, 500) - score_slider.size / 2
@@ -88,15 +66,14 @@ func _ready():
 		player_sprite.hop(1, 0.15)
 	)
 
-	if rival != null:
-		rival.signal_combo_ended.connect(func(rival_combo: int) -> void:
-			score -= combo_to_score(rival_combo)
-			if score > 0:
-				var reduced = rival.reduce_hp(score)
-				if reduced > 0:
-					action_effect(true)
-				score -= reduced
-		)
+	rival.signal_combo_ended.connect(func(rival_combo: int) -> void:
+		score -= combo_to_score(rival_combo)
+		if score > 0:
+			var reduced = rival.reduce_hp(score)
+			if reduced > 0:
+				action_effect(true)
+			score -= reduced
+	)
 
 func ready_go() -> void:
 	var rect = ColorRect.new()
@@ -146,13 +123,10 @@ func combo_ended() -> void:
 	score += combo_to_score(combo)
 	combo = 0
 	if score > 0:
-		if rival != null:
-			var reduced = rival.reduce_hp(score)
-			if reduced > 0:
-				action_effect(true)
-			score -= reduced
-		else:
-			score = 0
+		var reduced = rival.reduce_hp(score)
+		if reduced > 0:
+			action_effect(true)
+		score -= reduced
 	elif score < 0:
 		if not is_damaging:
 			var garbage_count = min(18, -score)
@@ -168,15 +142,11 @@ func combo_ended() -> void:
 func _process(delta: float) -> void:
 	player_loop()
 
-	if rival != null:
-		rival.process()
+	rival.process()
 
-	if rival != null:
-		score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
-	else:
-		score_slider.value = (score + combo_to_score(combo)) * 8 + score_slider.max_value * 0.5
+	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
-	if rival != null and rival.hp_slider.value <= 0:
+	if rival.hp_slider.value <= 0:
 		game_over(false)
 
 func next_donuts_pair() -> void:
@@ -271,37 +241,26 @@ func game_over(is_player: bool) -> void:
 	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
 
 	if is_player:
-		if rival != null:
-			rival.sprite.jump(false)
-			rival.sprite.hop(-1, 0.25)
-		if Main.MODE != 3:
-			player_sprite.rotation(true)
-		else:
-			player_sprite.hop(-1, 0.25)
+		rival.sprite.jump(false)
+		rival.sprite.hop(-1, 0.25)
+		player_sprite.rotation(true)
 	else:
 		player_sprite.jump(true)
 		player_sprite.hop(-1, 0.25)
-		if rival != null:
-			rival.sprite.rotation(true)
+		rival.sprite.rotation(true)
 
-	if Main.MODE == 0:
-		if not is_player:
+		if Main.MODE == 0:
 			if Main.ARCADE_LEVEL == 7:
-				label.queue_free()
-				var label_final = Main.label_new()
-				add_child(label_final)
-				label_final.text = "ALL CLEAR!"
+				label.text = "ALL CLEAR!"
 				return
-			Main.ARCADE_LEVEL += 1
-			var button_next = Main.button_new(true)
+			var button_next = Main.button_new()
 			add_child(button_next)
 			button_next.text = "NEXT"
 			button_next.pressed.connect(func() -> void:
 				self.queue_free()
 				Main.NODE.add_child(Arcade.new())
 			)
-	elif Main.MODE == 3:
-		label.text = "FINISHED"
+
 
 class ActionSprite extends Sprite2D:
 	var tween: Tween = null
@@ -351,11 +310,9 @@ class ActionSprite extends Sprite2D:
 func action_effect(attack: bool) -> void:
 	if attack:
 		player_sprite.jump(true)
-		if rival != null:
-			rival.sprite.rotation(false)
+		rival.sprite.rotation(false)
 	else:
-		if rival != null:
-			rival.sprite.jump(false)
+		rival.sprite.jump(false)
 		player_sprite.rotation(false)
 
 class GameVSlider extends VSlider:

@@ -6,11 +6,12 @@ static var NODE: Node
 
 static var MODE: int = -1
 
-static var ARCADE_LEVEL: int = 0
 static var PLAYER_CHARACTER_INDEX: int = 0
+static var RIVAL_CHARACTER_INDEX: int = 1
+
+static var ARCADE_LEVEL: int = 0
 static var ARCADE_RIVAL_CHARACTER_INDEXES: Array[int] = []
 
-static var FREE_BATTLE_RIVAL_CHARACTER_INDEX: int = 1
 static var FREE_BATTLE_RIVAL_HP: int = 64
 static var FREE_BATTLE_RIVAL_MAX_COMBO: int = 3
 static var FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO: int = 180
@@ -19,33 +20,70 @@ static var FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO: int = 180
 func _init():
 	RenderingServer.set_default_clear_color(Color.from_hsv(0.5, 1, 0.75))
 	NODE = self
-	NODE.add_child(Main.Title.new())
+	NODE.add_child(Main.Initial.new())
+
+class Initial extends Node:
+	func _init() -> void:
+		var label = Main.label_new()
+		add_child(label)
+		label.text = "DONUTS POP BATTLE"
+
+		Main.MODE = -1
+
+		var button_arcade = Main.button_new()
+		add_child(button_arcade)
+		button_arcade.text = "ARCADE"
+		button_arcade.position.x = Main.WINDOW.x * 0.25 - button_arcade.size.x / 2
+		button_arcade.pressed.connect(func() -> void:
+			Main.MODE = 0
+			Main.PLAYER_CHARACTER_INDEX = 0
+			Main.ARCADE_LEVEL = -1
+			Main.ARCADE_RIVAL_CHARACTER_INDEXES.clear()
+			for i in Character.SPRITES.size():
+				if i != Main.PLAYER_CHARACTER_INDEX:
+					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
+			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
+			Main.RIVAL_CHARACTER_INDEX = Main.ARCADE_RIVAL_CHARACTER_INDEXES[0]
+			
+			self.queue_free()
+			Main.NODE.add_child(Character.new())
+		)
+
+		var button_free_play = Main.button_new()
+		add_child(button_free_play)
+		button_free_play.text = "FREE PLAY"
+		button_free_play.position.x = Main.WINDOW.x * 0.5 - button_free_play.size.x / 2
+		button_free_play.pressed.connect(func() -> void:
+			Main.MODE = 1
+			Main.PLAYER_CHARACTER_INDEX = 0
+			Main.RIVAL_CHARACTER_INDEX = 1
+		
+			self.queue_free()
+			Main.NODE.add_child(Character.new())
+		)
+
+		var button_option = Main.button_new()
+		add_child(button_option)
+		button_option.text = "OPTION"
+		button_option.position.x = Main.WINDOW.x * 0.75 - button_option.size.x / 2
+		button_option.pressed.connect(func() -> void:
+			self.queue_free()
+			Main.NODE.add_child(Option.new())
+		)
 
 static func label_new() -> Label:
 	var label = Label.new()
 	label.size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), ProjectSettings.get_setting("display/window/size/viewport_height"))
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 224)
+	label.add_theme_font_size_override("font_size", 32 * 5)
 	label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	label.text = "DONUTS POP"
 	return label
 
-static func button_new(main: bool) -> Button:
+
+static func button_new() -> Button:
 	var button = Button.new()
-	button.size = Vector2(384, 96) if main else Vector2(128, 64)
-	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.9) - button.size / 2 if main else Vector2(16, 16)
-	button.add_theme_font_size_override("font_size", 32 if main else 24)
-	button.text = "START" if main else "BACK"
+	button.size = Vector2(32 * 10, 32 * 3)
+	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.9) - button.size / 2
+	button.add_theme_font_size_override("font_size", 32)
 	return button
-
-class Title extends Node:
-	func _init() -> void:
-		add_child(Main.label_new())
-
-		var button = Main.button_new(true)
-		add_child(button)
-		button.pressed.connect(func() -> void:
-			self.queue_free()
-			Main.NODE.add_child(Mode.new())
-		)

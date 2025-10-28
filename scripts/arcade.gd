@@ -2,6 +2,8 @@ class_name Arcade
 extends Node
 
 func _ready() -> void:
+	Main.ARCADE_LEVEL += 1
+	
 	var sprite_a = Sprite2D.new()
 	add_child(sprite_a)
 	sprite_a.texture = Character.SPRITES[Main.PLAYER_CHARACTER_INDEX]
@@ -9,7 +11,8 @@ func _ready() -> void:
 	
 	var sprite_b = Sprite2D.new()
 	add_child(sprite_b)
-	sprite_b.texture = Character.SPRITES[Main.ARCADE_RIVAL_CHARACTER_INDEXES[Main.ARCADE_LEVEL]]
+	Main.RIVAL_CHARACTER_INDEX = Main.ARCADE_RIVAL_CHARACTER_INDEXES[Main.ARCADE_LEVEL]
+	sprite_b.texture = Character.SPRITES[Main.RIVAL_CHARACTER_INDEX]
 	sprite_b.position = Vector2(1400, 250)
 
 	for i in range(Main.ARCADE_RIVAL_CHARACTER_INDEXES.size()):

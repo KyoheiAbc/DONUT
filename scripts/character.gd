@@ -23,17 +23,9 @@ var target_index: int = -1
 var map = [[-1, -1, -1, -1, -1, -1, -1, -1, -1]]
 
 func _init() -> void:
-	var is_single: bool = false
-	if Main.MODE == 0:
-		map[0][Main.PLAYER_CHARACTER_INDEX] = 0
-		is_single = true
-	elif Main.MODE == 2:
-		map[0][Main.PLAYER_CHARACTER_INDEX] = 0
-		if Main.PLAYER_CHARACTER_INDEX == Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX:
-			Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX = Main.PLAYER_CHARACTER_INDEX - 1
-			if Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX < 0:
-				Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX = Main.PLAYER_CHARACTER_INDEX + 1
-		map[0][Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX] = 1
+	map[0][Main.PLAYER_CHARACTER_INDEX] = 0
+	if not Main.MODE == 0:
+		map[0][Main.RIVAL_CHARACTER_INDEX] = 1
 
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
@@ -46,9 +38,9 @@ func _init() -> void:
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
 		sprites_a.back().texture = SPRITES[i]
-		sprites_a.back().position = Vector2(1000, 250) if is_single else Vector2(600, 250)
+		sprites_a.back().position = Vector2(1000, 250) if Main.MODE == 0 else Vector2(600, 250)
 
-		if not is_single:
+		if not Main.MODE == 0:
 			sprites_b.append(Sprite2D.new())
 			add_child(sprites_b[i])
 			sprites_b.back().texture = SPRITES[i]
@@ -62,65 +54,30 @@ func _init() -> void:
 		cursor.position = sprites[i].position - cursor.size / 2
 		cursor.z_index = -1
 		cursors.append(cursor)
-		if is_single:
+		if Main.MODE == 0:
 			break
 
-	var button = Main.button_new(true)
-	add_child(button)
-	button.pressed.connect(func() -> void:
-		if Main.MODE == 0:
-			Main.PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
-			Main.ARCADE_RIVAL_CHARACTER_INDEXES.clear()
-			for i in range(0, Character.SPRITES.size()):
-				if i != Main.PLAYER_CHARACTER_INDEX:
-					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
-			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
-			Main.NODE.add_child(Arcade.new())
-		elif Main.MODE == 2:
-			Main.PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
-			Main.FREE_BATTLE_RIVAL_CHARACTER_INDEX = Array2D.get_position_value(map, 1)
-			Main.NODE.add_child(Option.new())
-		self.queue_free()
-	)
-
-	var button_back = Main.button_new(false)
-	add_child(button_back)
-	button_back.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Mode.new())
-	)
 
 	var input_handler = InputHandler.new()
 	input_handler.threshold = 400 * 0.45
 	input_handler.drag_area_end_x = 8000
 	add_child(input_handler)
 	input_handler.pressed.connect(func(position: Vector2) -> void:
-		if is_single:
+		if Main.MODE == 0:
 			target_index = 0
-			cursors[0].color = Color(1, 1, 0)
 			return
 		if Rect2(cursors[0].position, cursors[0].size).has_point(position):
 			target_index = 0
-			cursors[0].color = Color(1, 1, 0)
 		elif Rect2(cursors[1].position, cursors[1].size).has_point(position):
 			target_index = 1
-			cursors[1].color = Color(1, 1, 0)
 		else:
 			if position.x < Main.WINDOW.x / 2:
 				target_index = 0
-				cursors[0].color = Color(1, 1, 0)
 			else:
 				target_index = 1
-				cursors[1].color = Color(1, 1, 0)
 	)
 	input_handler.released.connect(func() -> void:
-		if is_single:
-			target_index = -1
-			cursors[0].color = Color.from_hsv(0, 1, 1)
-			return
 		target_index = -1
-		cursors[0].color = Color.from_hsv(0, 1, 1, 1)
-		cursors[1].color = Color.from_hsv(0.5, 1, 1, 1)
 	)
 	input_handler.direction.connect(func(direction: Vector2) -> void:
 		if target_index == -1:
@@ -131,12 +88,42 @@ func _init() -> void:
 			Array2D.move_value(map, target_index, Vector2(-1, 0))
 	)
 
+	var button_start = Main.button_new()
+	add_child(button_start)
+	button_start.text = "START"
+	button_start.pressed.connect(func() -> void:
+		Main.PLAYER_CHARACTER_INDEX = Array2D.get_position_value(map, 0)
+		if Main.MODE == 0:
+			Main.NODE.add_child(Arcade.new())
+		else:
+			Main.RIVAL_CHARACTER_INDEX = Array2D.get_position_value(map, 1)
+			Main.NODE.add_child(Game.new())
+		self.queue_free()
+	)
+
+	var button_back = Main.button_new()
+	add_child(button_back)
+	button_back.text = "BACK"
+	button_back.size = Vector2(32 * 6, 32 * 2)
+	button_back.position = Vector2(16, 16)
+	button_back.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Main.Initial.new())
+	)
+
 func _process(_delta: float) -> void:
+	if target_index == -1:
+		cursors[0].color = Color.from_hsv(0, 1, 1, 1)
+		if not Main.MODE == 0:
+			cursors[1].color = Color.from_hsv(0.5, 1, 1, 1)
+	else:
+		cursors[target_index].color = Color(1, 1, 0)
+
 	cursors[0].position = sprites[Array2D.get_position_value(map, 0)].position - cursors[0].size / 2
-	if cursors.size() > 1:
+	if not Main.MODE == 0:
 		cursors[1].position = sprites[Array2D.get_position_value(map, 1)].position - cursors[1].size / 2
 
 	for i in SPRITES.size():
 		sprites_a[i].visible = (i == Array2D.get_position_value(map, 0))
-		if sprites_b.size() != 0:
+		if not Main.MODE == 0:
 			sprites_b[i].visible = (i == Array2D.get_position_value(map, 1))
