@@ -23,7 +23,7 @@ func _init(_value: int):
 	if value >= 10:
 		sprite.modulate = Color(0.8, 0.8, 0.8).darkened((value - 10) * 0.1)
 	else:
-		sprite.modulate = Color.from_hsv(value / 5.0, 0.5, 1)
+		sprite.modulate = Color.from_hsv(value / float(Game.COLOR_NUMBER + 1), 0.5, 1)
 
 
 func process(all_donuts: Array[Donut]) -> bool:

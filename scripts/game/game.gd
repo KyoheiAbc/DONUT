@@ -1,7 +1,7 @@
 class_name Game
 extends Node
 
-const COLOR_NUMBER = 4
+static var COLOR_NUMBER = 4
 
 var parent_node: Node = null
 
