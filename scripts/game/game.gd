@@ -143,14 +143,10 @@ func combo_ended() -> void:
 	score += combo_to_score(combo)
 	combo = 0
 	if score > 0:
-		if not IS_TRAINING_MODE:
-			var reduced = rival.reduce_hp(score)
-			if reduced > 0:
-				action_effect(true)
-			score -= reduced
-		else:
-			score = 0
+		var reduced = rival.reduce_hp(score)
+		if reduced > 0:
 			action_effect(true)
+		score -= reduced
 	elif score < 0:
 		if not is_damaging:
 			var garbage_count = min(18, -score)
@@ -166,12 +162,11 @@ func combo_ended() -> void:
 func _process(delta: float) -> void:
 	player_loop()
 
-	if not IS_TRAINING_MODE:
-		rival.process()
+	rival.process()
 
 	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
-	if rival.hp_slider.value <= 0 and not IS_TRAINING_MODE:
+	if rival.hp_slider.value <= 0:
 		game_over(false)
 
 func next_donuts_pair() -> void:
@@ -264,18 +259,14 @@ func game_over(is_player: bool) -> void:
 	var label = Main.label_new()
 	add_child(label)
 	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
-	if IS_TRAINING_MODE:
-		player_sprite.hop(-1, 0.25)
-		label.text = "TRAINING FINISHED"
-		return
 
 	if is_player:
 		rival.sprite.jump(false)
-		rival.sprite.hop(-1, 0.25)
+		rival.sprite.hop(-1, 0.2)
 		player_sprite.rotation(true)
 	else:
 		player_sprite.jump(true)
-		player_sprite.hop(-1, 0.25)
+		player_sprite.hop(-1, 0.2)
 		rival.sprite.rotation(true)
 
 		if Main.MODE == 0:
@@ -330,9 +321,9 @@ class ActionSprite extends Sprite2D:
 		tween = create_tween()
 		if loop:
 			tween.set_loops()
-			tween.tween_property(self, "rotation_degrees", 360, 1.5).as_relative()
+			tween.tween_property(self, "rotation_degrees", 360, 1).as_relative()
 		else:
-			tween.tween_property(self, "rotation_degrees", 360, 0.8)
+			tween.tween_property(self, "rotation_degrees", 360, 1)
 		await tween.finished
 		self.rotation_degrees = 0
 
