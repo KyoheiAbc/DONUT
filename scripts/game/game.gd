@@ -51,6 +51,26 @@ func _ready():
 
 	Donut.create_walls(self, all_donuts)
 
+	var button_back = Main.button_new()
+	add_child(button_back)
+	button_back.text = "BACK"
+	button_back.size = Vector2(32 * 6, 32 * 2)
+	button_back.position = Vector2(16, 16)
+	button_back.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Main.Initial.new())
+	)
+
+	var button_restart = Main.button_new()
+	add_child(button_restart)
+	button_restart.text = "RESTART"
+	button_restart.size = Vector2(32 * 6, 32 * 2)
+	button_restart.position = Vector2(2000 - 16 - button_restart.size.x, 16)
+	button_restart.pressed.connect(func() -> void:
+		self.queue_free()
+		Main.NODE.add_child(Game.new())
+	)
+
 	await ready_go()
 
 	setup_input()
@@ -123,10 +143,14 @@ func combo_ended() -> void:
 	score += combo_to_score(combo)
 	combo = 0
 	if score > 0:
-		var reduced = rival.reduce_hp(score)
-		if reduced > 0:
+		if not IS_TRAINING_MODE:
+			var reduced = rival.reduce_hp(score)
+			if reduced > 0:
+				action_effect(true)
+			score -= reduced
+		else:
+			score = 0
 			action_effect(true)
-		score -= reduced
 	elif score < 0:
 		if not is_damaging:
 			var garbage_count = min(18, -score)
@@ -142,11 +166,12 @@ func combo_ended() -> void:
 func _process(delta: float) -> void:
 	player_loop()
 
-	rival.process()
+	if not IS_TRAINING_MODE:
+		rival.process()
 
 	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
-	if rival.hp_slider.value <= 0:
+	if rival.hp_slider.value <= 0 and not IS_TRAINING_MODE:
 		game_over(false)
 
 func next_donuts_pair() -> void:
@@ -239,6 +264,10 @@ func game_over(is_player: bool) -> void:
 	var label = Main.label_new()
 	add_child(label)
 	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
+	if IS_TRAINING_MODE:
+		player_sprite.hop(-1, 0.25)
+		label.text = "TRAINING FINISHED"
+		return
 
 	if is_player:
 		rival.sprite.jump(false)
