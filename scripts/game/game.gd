@@ -46,7 +46,7 @@ func _ready():
 	add_child(rival)
 
 	add_child(score_slider)
-	score_slider.position = Vector2(1650, 500) - score_slider.size / 2
+	score_slider.position = Vector2(1570, 500) - score_slider.size / 2
 	score_slider.value = score_slider.max_value * 0.5
 
 	Donut.create_walls(self, all_donuts)
@@ -76,9 +76,10 @@ func _ready():
 	setup_input()
 
 	add_child(combo_label)
-	combo_label.position = Vector2(1450, 700)
+	combo_label.position = Vector2(1200, 500)
 	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
+	combo_label.z_index = 1024
 
 	cleaner.signal_cleared.connect(func(group_count: int) -> void:
 		combo += group_count
@@ -187,6 +188,8 @@ func setup_input() -> void:
 			all_donuts += append_donuts
 			donuts_pair = null
 			player_sprite.hop(1, 0.15)
+			if rival.combo == 0:
+				rival.combo_label.text = ""
 			combo_label.text = ""
 			return
 		if direction == Vector2.DOWN:
@@ -196,6 +199,8 @@ func setup_input() -> void:
 				all_donuts += append_donuts
 				donuts_pair = null
 				player_sprite.hop(1, 0.15)
+				if rival.combo == 0:
+					rival.combo_label.text = ""
 				combo_label.text = ""
 			return
 		
@@ -224,10 +229,10 @@ class NextColors extends Node:
 			add_child(next_donuts[i])
 			next_donuts[i].texture = Donut.DONUT_TEXTURE
 
-		next_donuts[0].position = Vector2(1500, 100 + 64)
-		next_donuts[1].position = Vector2(1500, 100 + 0)
-		next_donuts[2].position = Vector2(1500, 100 + 256)
-		next_donuts[3].position = Vector2(1500, 100 + 192)
+		next_donuts[0].position = Vector2(1450, 100 + 64)
+		next_donuts[1].position = Vector2(1450, 100 + 0)
+		next_donuts[2].position = Vector2(1450, 100 + 256)
+		next_donuts[3].position = Vector2(1450, 100 + 192)
 		for i in range(next_donuts.size()):
 			next_donuts[i].modulate = Color.from_hsv(bag[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
 

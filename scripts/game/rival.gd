@@ -84,7 +84,7 @@ func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_co
 	add_child(combo_label)
 	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	combo_label.position = Vector2(-400, -200)
+	combo_label.position = Vector2(-320, 100)
 
 	max_combo_choices_array.shuffle()
 
@@ -118,7 +118,6 @@ func process():
 				is_cool = true
 				emit_signal("signal_combo_ended", final_combo)
 				emit_signal("signal_debug", "combo ended, next max combo: %d" % max_combo_choices_array[0])
-				combo_label.text = ""
 			else:
 				attack_gauge.value -= attack_gauge.max_value / max_combo_choices_array[0]
 				emit_signal("signal_debug", "combo increased to %d" % combo)
