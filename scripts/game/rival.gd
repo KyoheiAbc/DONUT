@@ -59,7 +59,7 @@ static func max_combo_to_choices_array(max_combo: int) -> Array[int]:
 		1: choices_array = [1]
 		2: choices_array = [1, 2, 2]
 		3: choices_array = [1, 2, 2, 3, 3, 3]
-		4: choices_array = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+		4: choices_array = [3, 4, 4]
 		5: choices_array = [3, 5, 5]
 		6: choices_array = [3, 5, 5, 6, 6, 6]
 		7: choices_array = [3, 5, 5, 7, 7, 7]

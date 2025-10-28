@@ -27,7 +27,7 @@ class Initial extends Node:
 		var label = Main.label_new()
 		add_child(label)
 		label.text = "DONUTS POP BATTLE"
-		label.position.y = (Main.WINDOW.y * 0.85 - 64) * 0.5 - label.size.y / 2
+		label.position.y = (Main.WINDOW.y * 0.85 - 48) * 0.5 - label.size.y / 2
 
 		Main.MODE = -1
 

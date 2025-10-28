@@ -86,6 +86,7 @@ func _ready():
 			if reduced > 0:
 				action_effect(true)
 			score -= reduced
+			rival.combo_label.text = ""
 	)
 
 func ready_go() -> void:
