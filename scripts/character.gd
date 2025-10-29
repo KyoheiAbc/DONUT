@@ -4,6 +4,8 @@ extends Node
 const SPRITES: Array[Texture2D] = [
 	preload("res://assets/a_edited.png"),
 	preload("res://assets/b_edited.png"),
+	preload("res://assets/j_edited.png"),
+	preload("res://assets/k_edited.png"),
 	preload("res://assets/c_edited.png"),
 	preload("res://assets/d_edited.png"),
 	preload("res://assets/e_edited.png"),
@@ -11,8 +13,6 @@ const SPRITES: Array[Texture2D] = [
 	preload("res://assets/g_edited.png"),
 	preload("res://assets/h_edited.png"),
 	preload("res://assets/i_edited.png"),
-	preload("res://assets/j_edited.png"),
-	preload("res://assets/k_edited.png"),
 	preload("res://assets/l_edited.png"),
 ]
 
