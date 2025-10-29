@@ -107,7 +107,12 @@ func _init() -> void:
 		self.queue_free()
 	)
 
-	add_child(Main.quit_button_new(self))
+	if Main.MODE == 1:
+		var label_vs = Main.label_new()
+		add_child(label_vs)
+		label_vs.text = "VS"
+		label_vs.position = Vector2((Main.WINDOW.x - label_vs.size.x) / 2, 300 - label_vs.size.y / 2)
+
 
 func _process(_delta: float) -> void:
 	if target_index == -1:

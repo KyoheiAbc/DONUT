@@ -51,11 +51,11 @@ func _ready():
 
 	Donut.create_walls(self, all_donuts)
 
-	add_child(Main.quit_button_new(self))
+	add_child(Main.end_button_new(self))
 
-	var button_retry = Main.quit_button_new(self)
+	var button_retry = Main.end_button_new(self)
 	add_child(button_retry)
-	button_retry.text = "RETRY"
+	button_retry.text = "REPLAY"
 	button_retry.position = Vector2(2000 - 16 - button_retry.size.x, 16)
 	button_retry.pressed.disconnect(button_retry.pressed.get_connections()[0].callable)
 	button_retry.pressed.connect(func() -> void:
@@ -68,10 +68,12 @@ func _ready():
 	setup_input()
 
 	add_child(combo_label)
-	combo_label.position = Vector2(1200, 500)
+	combo_label.position = Vector2(1200, 600)
 	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	combo_label.z_index = 1024
+	combo_label.add_theme_color_override("font_outline_color", Color.from_hsv(0.15, 1, 0.5))
+	combo_label.add_theme_constant_override("outline_size", 16)
+	combo_label.z_index = 4096
 
 	cleaner.signal_cleared.connect(func(group_count: int) -> void:
 		combo += group_count
@@ -229,7 +231,7 @@ class NextColors extends Node:
 		next_donuts[2].position = Vector2(1450, 100 + 256)
 		next_donuts[3].position = Vector2(1450, 100 + 192)
 		for i in range(next_donuts.size()):
-			next_donuts[i].modulate = Color.from_hsv(bag[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
+			next_donuts[i].modulate = Color.from_hsv(bag[i] / 5.0, 0.5, 1)
 
 
 	func next_color() -> int:
@@ -242,7 +244,7 @@ class NextColors extends Node:
 			append_array.shuffle()
 			bag += append_array
 		for i in range(next_donuts.size()):
-			next_donuts[i].modulate = Color.from_hsv(bag[i] / float(Game.COLOR_NUMBER + 1), 0.5, 1)
+			next_donuts[i].modulate = Color.from_hsv(bag[i] / 5.0, 0.5, 1)
 		return color
 
 static func combo_to_score(combo: int) -> int:
@@ -259,6 +261,7 @@ func game_over(is_player: bool) -> void:
 	var label = Main.label_new()
 	add_child(label)
 	label.text = "YOU LOSE!" if is_player else "YOU WIN!"
+	label.z_index = 4096
 
 
 	if is_player:

@@ -27,7 +27,7 @@ class Initial extends Node:
 		var label = Main.label_new()
 		add_child(label)
 		label.text = "DONUTS POP BATTLE"
-		label.position.y = (Main.WINDOW.y * 0.85 - 48) * 0.5 - label.size.y / 2
+		label.position.y = (Main.WINDOW.y * 0.9 - 48) * 0.5 - label.size.y / 2
 
 		Main.MODE = -1
 
@@ -42,11 +42,11 @@ class Initial extends Node:
 			Main.NODE.add_child(Character.new())
 		)
 
-		var button_free_play = Main.button_new()
-		add_child(button_free_play)
-		button_free_play.text = "FREE PLAY"
-		button_free_play.position.x = Main.WINDOW.x * 0.5 - button_free_play.size.x / 2
-		button_free_play.pressed.connect(func() -> void:
+		var button_free_battle = Main.button_new()
+		add_child(button_free_battle)
+		button_free_battle.text = "FREE BATTLE"
+		button_free_battle.position.x = Main.WINDOW.x * 0.5 - button_free_battle.size.x / 2
+		button_free_battle.pressed.connect(func() -> void:
 			Main.MODE = 1
 			Main.PLAYER_CHARACTER_INDEX = 0
 			Main.RIVAL_CHARACTER_INDEX = 1
@@ -74,14 +74,14 @@ static func label_new() -> Label:
 
 static func button_new() -> Button:
 	var button = Button.new()
-	button.size = Vector2(32 * 10, 32 * 3)
-	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.85) - button.size / 2
+	button.size = Vector2(32 * 11, 32 * 3)
+	button.position = Vector2(WINDOW.x * 0.5, WINDOW.y * 0.9) - button.size / 2
 	button.add_theme_font_size_override("font_size", 48)
 	return button
 
-static func quit_button_new(current_class: Node) -> Button:
+static func end_button_new(current_class: Node) -> Button:
 	var button = Button.new()
-	button.text = "QUIT"
+	button.text = "END"
 	button.size = Vector2(32 * 6, 32 * 3)
 	button.position = Vector2(16, 16)
 	button.add_theme_font_size_override("font_size", 32)
