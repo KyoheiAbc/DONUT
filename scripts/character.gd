@@ -11,6 +11,9 @@ const SPRITES: Array[Texture2D] = [
 	preload("res://assets/g_edited.png"),
 	preload("res://assets/h_edited.png"),
 	preload("res://assets/i_edited.png"),
+	preload("res://assets/j_edited.png"),
+	preload("res://assets/k_edited.png"),
+	preload("res://assets/l_edited.png"),
 ]
 
 var sprites: Array[Sprite2D]
@@ -20,7 +23,7 @@ var cursors: Array[ColorRect]
 
 var target_index: int = -1
 
-var map = [[-1, -1, -1, -1, -1, -1, -1, -1, -1]]
+var map = [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]]
 
 func _init() -> void:
 	map[0][Main.PLAYER_CHARACTER_INDEX] = 0
@@ -30,10 +33,10 @@ func _init() -> void:
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
 		add_child(sprites.back())
-		sprites.back().scale = Vector2(0.45, 0.45)
+		sprites.back().scale = Vector2(0.375, 0.375)
 		sprites.back().texture = SPRITES[i]
-		sprites.back().position = Vector2(i * 200, 640)
-		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 200) / 2
+		sprites.back().position = Vector2(i * 160, 685)
+		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 160) / 2
 
 		sprites_a.append(Sprite2D.new())
 		add_child(sprites_a[i])
@@ -50,7 +53,7 @@ func _init() -> void:
 		var cursor = ColorRect.new()
 		add_child(cursor)
 		cursor.color = Color.from_hsv(i * 0.5, 1, 1)
-		cursor.size = Vector2(200, 200)
+		cursor.size = Vector2(160, 160)
 		cursor.position = sprites[i].position - cursor.size / 2
 		cursor.z_index = -1
 		cursors.append(cursor)
@@ -100,6 +103,7 @@ func _init() -> void:
 				if i != Main.PLAYER_CHARACTER_INDEX:
 					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
 			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
+			Main.ARCADE_RIVAL_CHARACTER_INDEXES.resize(8)
 			Main.NODE.add_child(Arcade.new())
 		else:
 			Main.RIVAL_CHARACTER_INDEX = Array2D.get_position_value(map, 1)
