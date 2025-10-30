@@ -37,6 +37,13 @@ func _init():
 		Game.COLOR_NUMBER = int(value)
 	)
 
+	var slider_arcade_max_level = CustomHSlider.new("Arcade Max Level", Main.ARCADE_MAX_LEVEL + 1, 1, 9, 1)
+	add_child(slider_arcade_max_level)
+	slider_arcade_max_level.position = Vector2(550, 570) - slider_arcade_max_level.size / 2
+	slider_arcade_max_level.value_changed.connect(func(value):
+		Main.ARCADE_MAX_LEVEL = int(value) - 1
+	)
+
 	var slider_hp = CustomHSlider.new("F. B. Rival HP Level", log(Main.FREE_BATTLE_RIVAL_HP) / log(2), 1, 10, 1)
 	add_child(slider_hp)
 	slider_hp.position = Vector2(1450, 170) - slider_hp.size / 2

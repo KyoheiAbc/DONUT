@@ -274,7 +274,7 @@ func game_over(is_player: bool) -> void:
 		rival.sprite.rotation(true)
 
 		if Main.MODE == 0:
-			if Main.ARCADE_LEVEL == 7:
+			if Main.ARCADE_LEVEL == 8:
 				label.text = "ALL CLEAR!"
 				return
 			var button_next = Main.button_new()

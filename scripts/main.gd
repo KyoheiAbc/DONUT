@@ -10,6 +10,7 @@ static var PLAYER_CHARACTER_INDEX: int = 0
 static var RIVAL_CHARACTER_INDEX: int = 1
 
 static var ARCADE_LEVEL: int = 0
+static var ARCADE_MAX_LEVEL: int = 8
 static var ARCADE_RIVAL_CHARACTER_INDEXES: Array[int] = []
 
 static var FREE_BATTLE_RIVAL_HP: int = 64

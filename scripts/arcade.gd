@@ -21,7 +21,7 @@ func _ready() -> void:
 		sprite.texture = Character.SPRITES[Main.ARCADE_RIVAL_CHARACTER_INDEXES[i]]
 		sprite.scale = Vector2(0.45, 0.45)
 		sprite.position = Vector2(i * 220, 685)
-		sprite.position.x += (Main.WINDOW.x - (7) * 220) / 2
+		sprite.position.x += (Main.WINDOW.x - (8) * 220) / 2
 
 		var color_rect = ColorRect.new()
 		add_child(color_rect)

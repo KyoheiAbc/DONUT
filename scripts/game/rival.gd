@@ -41,6 +41,7 @@ func reduce_hp(amount: int) -> int:
 	return amount
 
 static func rival_new_from_level(level: int, index: int) -> Rival:
+	level = min(level, Main.ARCADE_MAX_LEVEL)
 	match level:
 		0: return Rival.new(index, 16, max_combo_to_choices_array(1), 9.0 * 60)
 		1: return Rival.new(index, 32, max_combo_to_choices_array(2), 6.0 * 60)

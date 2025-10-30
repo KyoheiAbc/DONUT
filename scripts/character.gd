@@ -33,7 +33,7 @@ func _init() -> void:
 	for i in range(SPRITES.size()):
 		sprites.append(Sprite2D.new())
 		add_child(sprites.back())
-		sprites.back().scale = Vector2(0.375, 0.375)
+		sprites.back().scale = Vector2(0.35, 0.35)
 		sprites.back().texture = SPRITES[i]
 		sprites.back().position = Vector2(i * 160, 685)
 		sprites.back().position.x += (Main.WINDOW.x - (SPRITES.size() - 1) * 160) / 2
@@ -103,7 +103,7 @@ func _init() -> void:
 				if i != Main.PLAYER_CHARACTER_INDEX:
 					Main.ARCADE_RIVAL_CHARACTER_INDEXES.append(i)
 			Main.ARCADE_RIVAL_CHARACTER_INDEXES.shuffle()
-			Main.ARCADE_RIVAL_CHARACTER_INDEXES.resize(8)
+			Main.ARCADE_RIVAL_CHARACTER_INDEXES.resize(9)
 			Main.NODE.add_child(Arcade.new())
 		else:
 			Main.RIVAL_CHARACTER_INDEX = Array2D.get_position_value(map, 1)
