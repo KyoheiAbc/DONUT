@@ -37,28 +37,21 @@ func _init():
 		Game.COLOR_NUMBER = int(value)
 	)
 
-	var slider_clear_group_size = CustomHSlider.new("Clear Group Size", Cleaner.GROUP_SIZE_TO_CLEAR, 3, 5, 1)
-	add_child(slider_clear_group_size)
-	slider_clear_group_size.position = Vector2(550, 570) - slider_clear_group_size.size / 2
-	slider_clear_group_size.value_changed.connect(func(value):
-		Cleaner.GROUP_SIZE_TO_CLEAR = int(value)
-	)
-
-	var slider_hp = CustomHSlider.new("Rival HP Level", log(Main.FREE_BATTLE_RIVAL_HP) / log(2), 0, 10, 1)
+	var slider_hp = CustomHSlider.new("F. B. Rival HP Level", log(Main.FREE_BATTLE_RIVAL_HP) / log(2), 1, 10, 1)
 	add_child(slider_hp)
 	slider_hp.position = Vector2(1450, 170) - slider_hp.size / 2
 	slider_hp.value_changed.connect(func(value):
 		Main.FREE_BATTLE_RIVAL_HP = 2 ** int(value)
 	)
 
-	var slider_max_combo = CustomHSlider.new("Rival Max Combo", Main.FREE_BATTLE_RIVAL_MAX_COMBO, 1, 7, 1)
+	var slider_max_combo = CustomHSlider.new("F. B. Rival Combo", Main.FREE_BATTLE_RIVAL_MAX_COMBO, 1, 7, 1)
 	add_child(slider_max_combo)
 	slider_max_combo.position = Vector2(1450, 370) - slider_max_combo.size / 2
 	slider_max_combo.value_changed.connect(func(value):
 		Main.FREE_BATTLE_RIVAL_MAX_COMBO = int(value)
 	)
 
-	var slider_cool_count = CustomHSlider.new("Rival Cool Count", Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO, 60, 540, 15)
+	var slider_cool_count = CustomHSlider.new("F. B. Rival Cool Count", Main.FREE_BATTLE_RIVAL_COOL_COUNT_TO_ONE_COMBO, 60, 540, 15)
 	add_child(slider_cool_count)
 	slider_cool_count.position = Vector2(1450, 570) - slider_cool_count.size / 2
 	slider_cool_count.value_changed.connect(func(value):

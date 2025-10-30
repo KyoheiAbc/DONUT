@@ -23,17 +23,17 @@ func _ready() -> void:
 		sprite.position = Vector2(i * 220, 725)
 		sprite.position.x += (Main.WINDOW.x - (7) * 220) / 2
 
-		# var color_rect = ColorRect.new()
-		# add_child(color_rect)
-		# color_rect.size = Vector2(400 * 0.45, 400 * 0.45)
-		# color_rect.position = sprite.position - color_rect.size / 2
+		var color_rect = ColorRect.new()
+		add_child(color_rect)
+		color_rect.size = Vector2(400 * 0.45, 400 * 0.45)
+		color_rect.position = sprite.position - color_rect.size / 2
 
-		# if i < Main.ARCADE_LEVEL:
-		# 	color_rect.color = Color(0, 0, 0, 0.6)
-		# elif i == Main.ARCADE_LEVEL:
-		# 	color_rect.visible = false
-		# else:
-		# 	color_rect.color = Color(0, 0, 0, 0.95)
+		if i < Main.ARCADE_LEVEL:
+			color_rect.color = Color(0, 0, 0, 0.6)
+		elif i == Main.ARCADE_LEVEL:
+			color_rect.visible = false
+		else:
+			color_rect.color = Color(0, 0, 0, 0.95)
 
 	var label = Main.label_new()
 	add_child(label)
