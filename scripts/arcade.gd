@@ -40,10 +40,6 @@ func _ready() -> void:
 	label.text = "VS"
 	label.position.y = 300 - label.size.y / 2
 
-	var button_start = Main.button_new()
-	add_child(button_start)
-	button_start.text = "START"
-	button_start.pressed.connect(func() -> void:
-		self.queue_free()
-		Main.NODE.add_child(Game.new())
-	)
+	await get_tree().create_timer(1.5).timeout
+	self.queue_free()
+	Main.NODE.add_child(Game.new())

@@ -11,7 +11,7 @@ var player_sprite: ActionSprite = ActionSprite.new()
 var combo: int = 0
 var combo_label: Label = Label.new()
 var score: int = 0
-var score_slider: GameVSlider = GameVSlider.new(Vector2(50, 800), Color(1, 1, 0))
+# var score_slider: GameVSlider = GameVSlider.new(Vector2(50, 800), Color(1, 1, 0))
 var input_handler: InputHandler = InputHandler.new()
 var all_donuts: Array[Donut] = []
 
@@ -45,9 +45,9 @@ func _ready():
 		rival = Rival.new(index, hp, max_combo_choices_array, cool_count)
 	add_child(rival)
 
-	add_child(score_slider)
-	score_slider.position = Vector2(1570, 500) - score_slider.size / 2
-	score_slider.value = score_slider.max_value * 0.5
+	# add_child(score_slider)
+	# score_slider.position = Vector2(1570, 500) - score_slider.size / 2
+	# score_slider.value = score_slider.max_value * 0.5
 
 	Donut.create_walls(self, all_donuts)
 
@@ -68,11 +68,11 @@ func _ready():
 	setup_input()
 
 	add_child(combo_label)
-	combo_label.position = Vector2(1200, 600)
+	combo_label.position = Vector2(1420, 700)
 	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	combo_label.add_theme_color_override("font_outline_color", Color.from_hsv(0.15, 1, 0.5))
-	combo_label.add_theme_constant_override("outline_size", 16)
+	# combo_label.add_theme_color_override("font_outline_color", Color.from_hsv(0, 0, 0.1))
+	# combo_label.add_theme_constant_override("outline_size", 3)
 	combo_label.z_index = 4096
 
 	cleaner.signal_cleared.connect(func(group_count: int) -> void:
@@ -166,7 +166,7 @@ func _process(delta: float) -> void:
 
 	rival.process()
 
-	score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
+	# score_slider.value = (score + combo_to_score(combo) - combo_to_score(rival.combo)) * 8 + score_slider.max_value * 0.5
 
 	if rival.hp_slider.value <= 0:
 		game_over(false)

@@ -85,9 +85,9 @@ func _init(index: int, hp_max: int, max_combo_choices_array: Array[int], cool_co
 	add_child(combo_label)
 	combo_label.add_theme_font_size_override("font_size", 64)
 	combo_label.add_theme_color_override("font_color", Color.from_hsv(0.15, 1, 1))
-	combo_label.position = Vector2(60, -180)
-	combo_label.add_theme_color_override("font_outline_color", Color.from_hsv(0.15, 1, 0.5))
-	combo_label.add_theme_constant_override("outline_size", 16)
+	combo_label.position = Vector2(-550, 70)
+	# combo_label.add_theme_color_override("font_outline_color", Color.from_hsv(0, 0, 0.1))
+	# combo_label.add_theme_constant_override("outline_size", 3)
 	combo_label.z_index = 4096
 
 	max_combo_choices_array.shuffle()
